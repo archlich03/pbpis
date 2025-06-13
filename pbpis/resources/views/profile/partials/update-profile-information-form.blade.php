@@ -47,6 +47,31 @@
             @endif
         </div>
 
+        <div>
+            <x-input-label for="pedagogical_name" :value="__('Pedagogical Name')" />
+            <x-text-input id="pedagogical_name" class="block mt-1 w-full" type="text" name="pedagogical_name" :value="old('pedagogical_name', $user->pedagogical_name)" autocomplete="pedagogical_name" />
+            <x-input-error class="mt-2" :messages="$errors->get('pedagogical_name')" />
+        </div>
+
+        <div>
+            <x-input-label for="role" :value="__('Role')" />
+            <select id="role" name="role" class="block mt-1 w-full">
+                <option value="IT administratorius" {{ old('role') == 'IT administratorius' || $user->role == 'IT administratorius' ? 'selected' : '' }}>{{ __('IT administratorius') }}</option>
+                <option value="Sekretorius" {{ old('role') == 'Sekretorius' || $user->role == 'Sekretorius' ? 'selected' : '' }}>{{ __('Sekretorius') }}</option>
+                <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || $user->role == 'Balsuojantysis' ? 'selected' : '' }}>{{ __('Balsuojantysis') }}</option>
+            </select>
+            <x-input-error class="mt-2" :messages="$errors->get('role')" />
+        </div>
+
+        <div>
+            <x-input-label for="gender" :value="__('Gender')" />
+            <select id="gender" name="gender" class="block mt-1 w-full">
+                <option value="0" {{ old('gender') == '0' || $user->gender == '0' ? 'selected' : '' }}>{{ __('Female') }}</option>
+                <option value="1" {{ old('gender') == '1' || $user->gender == '1' ? 'selected' : '' }}>{{ __('Male') }}</option>
+            </select>
+            <x-input-error class="mt-2" :messages="$errors->get('gender')" />
+        </div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
