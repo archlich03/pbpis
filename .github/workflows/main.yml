@@ -1,0 +1,64 @@
+name: Tests (Pest)
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_DATABASE: pbpis
+          MYSQL_USER: user
+          MYSQL_PASSWORD: secret
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost -u root -prot root"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_mysql, intl, gd
+          tools: composer:v2
+    
+      - name: Prepare environment
+        run: cp .env.example .env
+    
+      - name: Install composer deps
+        run: composer install --prefer-dist --no-interaction
+    
+      - name: Generate application key
+        run: php artisan key:generate
+    
+      - name: Run migrations
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: pbpis
+          DB_USERNAME: user
+          DB_PASSWORD: secret
+        run: php artisan migrate --force
+    
+      - name: Run Pest Tests
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: pbpis
+          DB_USERNAME: user
+          DB_PASSWORD: secret
+        run: php artisan test
