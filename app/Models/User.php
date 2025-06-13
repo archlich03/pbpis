@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class Vartotojai extends Authenticatable
+class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
@@ -15,7 +15,7 @@ class Vartotojai extends Authenticatable
      *
      * @var string
      */
-    protected $table = 'vartotojai';
+    protected $table = 'User';
 
     /**
      * The primary key associated with the table.
@@ -32,9 +32,8 @@ class Vartotojai extends Authenticatable
     protected $fillable = [
         'naudotojo_id',
         'ms_id',
-        'vardas',
-        'pavarde',
-        'el_pastas',
+        'name',
+        'email',
         'role',
         'pedagoginis_vardas',
         'lytis',
@@ -64,9 +63,8 @@ class Vartotojai extends Authenticatable
         return [
             'naudotojo_id' => 'integer',
             'ms_id' => 'string',
-            'vardas' => 'string',
-            'pavarde' => 'string',
-            'el_pastas' => 'string',
+            'name' => 'string',
+            'email' => 'string',
             'role' => 'string',
             'pedagoginis_vardas' => 'string',
             'lytis' => 'boolean',

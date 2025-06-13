@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vartotojai', function (Blueprint $table) {
+        Schema::create('User', function (Blueprint $table) {
             $table->id('naudotojo_id');
             $table->string('ms_id')->default('');
             $table->string('password');
-            $table->string('vardas');
-            $table->string('pavarde');
-            $table->string('el_pastas')->unique();
+            $table->string('name');
+            $table->string('email')->unique();
             $table->string('role');
             $table->string('pedagoginis_vardas');
             $table->boolean('lytis');
