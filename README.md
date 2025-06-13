@@ -181,7 +181,8 @@ volumes:
 cd ~/Documents/pbpis;
 sudo docker compose up -d;
 ```
-5. Atidarykite web aplikaciją per naršyklę: `http://localhost:8000`
+6. Įvykdyti DB migracijas: `sudo docker exec pbpis php artisan migrate`
+7. Atidarykite web aplikaciją per naršyklę: `http://localhost:8000`
 
 ## Licencija
 
