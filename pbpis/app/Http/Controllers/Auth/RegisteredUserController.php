@@ -36,7 +36,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'gender' => ['required', 'boolean'],
             'role' => ['required', 'string', 'max:32'],
-            'pedagogical_name' => ['string', 'max:32'],
+            'pedagogical_name' => ['nullable', 'string', 'max:32'],
         ]);
 
         $user = User::create([
@@ -46,13 +46,13 @@ class RegisteredUserController extends Controller
             'password' => bcrypt($request->password),
             'gender' => $request->gender,
             'role' => $request->role,
-            'pedagogical_name' => $request->pedagogical_name,
+            'pedagogical_name' => $request->filled('pedagogical_name') 
+                ? strtolower($request->input('pedagogical_name')) 
+                : null,
         ]);
 
         event(new Registered($user));
 
-        Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('users.panel', absolute: false));
     }
 }
