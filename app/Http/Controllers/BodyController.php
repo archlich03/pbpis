@@ -15,10 +15,10 @@ class BodyController extends Controller
      */
     public function index()
     {
-        $bodies = Body::orderBy('title', 'asc')->get(); // Fetch all bodies sorted by title
-        $users = User::orderBy('name', 'asc')->get(); // Fetch all users sorted by name
+        $bodies = Body::orderBy('title', 'asc')->get();
+        $users = User::orderBy('name', 'asc')->get();
 
-        return view('bodies.panel', ['bodies' => $bodies, 'users' => $users]); // Pass bodies and users to the view
+        return view('bodies.panel', ['bodies' => $bodies, 'users' => $users]);
     }
 
     /**
@@ -40,11 +40,24 @@ class BodyController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'is_ba_sp' => ['required', 'in:0,1'],
+            'classification' => ['required', 'string', 'max:16'],
+            'chairman_id' => ['required', 'integer', 'exists:users,user_id'],
+            'members' => ['array'],
+            'members.*' => ['integer', 'exists:users,user_id'],
+        ]);
+
         $body = new Body();
-        $body->name = $request->input('name');
-        $body->type = $request->input('type');
+        $body->title = $request->input('title');
+        $body->classification = $request->input('classification');
         $body->chairman_id = $request->input('chairman_id');
-        $body->members = $request->input('members', []);
+        
+        $members = $request->input('members', []);
+        sort($members); // Sort the members array
+
+        $body->members = $members;
         $body->save();
 
         return redirect()->route('bodies.panel');
@@ -58,7 +71,11 @@ class BodyController extends Controller
      */
     public function show($id)
     {
-        //
+        $body = Body::findOrFail($id);
+        $membersIds = $body->members ?? [];
+        $members = User::whereIn('user_id', $membersIds)->orderBy('name')->get();
+
+        return view('bodies.show', ['body' => $body, 'members' => $members]);
     }
 
     /**

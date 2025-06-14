@@ -25,6 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/bodies', [BodyController::class, 'index'])->name('bodies.panel');
     Route::get('/bodies/create', [BodyController::class, 'create'])->name('bodies.create');
     Route::post('/bodies', [BodyController::class, 'store'])->name('bodies.store');
+    Route::get('/bodies/{body}', [BodyController::class, 'show'])->name('bodies.show');
     Route::get('/bodies/{body}/edit', [BodyController::class, 'edit'])->name('bodies.edit');
     Route::patch('/bodies/{body}', [BodyController::class, 'update'])->name('bodies.update');
     Route::delete('/bodies/{body}', [BodyController::class, 'destroy'])->name('bodies.destroy');

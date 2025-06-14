@@ -16,6 +16,8 @@ class Body extends Model
      * @var string
      */
     protected $primaryKey = 'body_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -30,6 +32,15 @@ class Body extends Model
         'is_ba_sp',
         'created_at',
         'updated_at',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'members' => 'array',
     ];
 
     /**

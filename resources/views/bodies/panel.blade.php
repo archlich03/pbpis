@@ -28,13 +28,22 @@
                         <tbody>
                             @foreach ($bodies as $body)
                                 <tr>
-                                    <td class="border px-4 py-2">{{ $body->name }}</td>
+                                    <td class="border px-4 py-2">{{ $body->title }}</td>
                                     <td class="border px-4 py-2">
                                         {{ optional($body->chairman)->pedagogical_name ?? '' }} {{ optional($body->chairman)->name ?? '' }}
                                     </td>
                                     <td class="border px-4 py-2">{{ $body->is_ba_sp ? 'BA' : 'MA' }}</td>
                                     <td class="border px-4 py-2">
+                                        <a href="{{ route('bodies.show', $body) }}">View</a> | 
                                         <a href="{{ route('bodies.edit', $body) }}">Edit</a>
+                                        @if (Auth::user()->role === 'IT administratorius')
+                                            <form action="{{ route('bodies.destroy', $body) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
