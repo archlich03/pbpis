@@ -20,7 +20,7 @@
                         <thead>
                             <tr class="bg-gray-100 dark:bg-gray-700">
                                 <th class="px-4 py-2 w-1/6">Name</th>
-                                <th class="px-4 py-2 w-1/6">Chairman</th>
+                                <th class="px-4 py-2 w-1/6">Chairperson</th>
                                 <th class="px-4 py-2 w-1/6">Type</th>
                                 <th class="px-4 py-2 w-1/6">Actions</th>
                             </tr>
@@ -40,14 +40,6 @@
                                         <a href="{{ route('bodies.show', $body) }}">View</a>
                                         @if (in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
                                             | <a href="{{ route('bodies.edit', $body) }}">Edit</a>
-                                        @endif
-                                        @if (Auth::user()->role === 'IT administratorius')
-                                            <form action="{{ route('bodies.destroy', $body) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
-                                            </form>
                                         @endif
                                     </td>
                                 </tr>

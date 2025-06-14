@@ -37,7 +37,7 @@
                     <div class="mt-6">
                         <x-input-label for="chairman_id" value="Chairman" />
                         <select id="chairman_id" name="chairman_id" required>
-                            <option value="">Select chairman</option>
+                            <option value="">Select chairperson</option>
                             @foreach ($users as $user)
                                 <option value="{{ $user->user_id }}" {{ $body->chairman_id === $user->user_id ? 'selected' : '' }}>{{ $user->name }}</option>
                             @endforeach
@@ -62,8 +62,52 @@
                     </div>
 
                 </form>
+
+                @if (in_array(Auth::user()->role, ['IT administratorius']))
+                        <div x-data="{ confirmingBodyDeletion: false }"
+                            class="relative">
+                            <x-danger-button
+                                x-on:click.prevent="confirmingBodyDeletion = true">
+                                {{ __('Delete Body') }}
+                            </x-danger-button>
+
+                            <div
+                                x-show="confirmingBodyDeletion"
+                                @click.outside="confirmingBodyDeletion = false"
+                                class="fixed z-50 inset-0 bg-gray-900 bg-opacity-50 dark:bg-gray-800 dark:bg-opacity-50 flex items-center justify-center"
+                                style="backdrop-filter: blur(2px);">
+                                
+                                <div class="bg-gray-800 dark:bg-gray-700 p-6 rounded shadow-md max-w-md mx-auto">
+                                    <h2 class="text-lg font-medium text-gray-300 dark:text-gray-100">
+                                        {{ __('Are you sure you want to delete this body?') }}
+                                    </h2>
+
+                                    <form method="post" action="{{ route('bodies.destroy', $body) }}">
+                                        @csrf
+                                        @method('delete')
+
+                                        <div class="mt-6">
+                                            <x-input-label for="password" value="{{ __('Confirm password') }}" />
+                                            <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" placeholder="{{ __('Confirm password') }}" />
+                                        </div>
+
+                                        <div class="mt-6 flex justify-end">
+                                            <x-secondary-button x-on:click="confirmingBodyDeletion = false">
+                                                {{ __('Cancel') }}
+                                            </x-secondary-button>
+
+                                            <x-danger-button type="submit">
+                                                {{ __('Delete') }}
+                                            </x-danger-button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
             </div>
         </div>
     </div>
 </x-app-layout>
+
 

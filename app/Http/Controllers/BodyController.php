@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Body;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BodyController extends Controller
 {
@@ -28,6 +29,9 @@ class BodyController extends Controller
      */
     public function create()
     {
+        if (!in_array(Auth::user()->role, ['IT administratorius'])) {
+            abort(403);
+        }
         $users = User::orderBy('name', 'asc')->get();
         return view('bodies.create', ['users' => $users]);
     }
@@ -40,6 +44,9 @@ class BodyController extends Controller
      */
     public function store(Request $request)
     {
+        if (!in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius'])) {
+            abort(403);
+        }
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'is_ba_sp' => ['required', 'in:0,1'],
@@ -86,6 +93,9 @@ class BodyController extends Controller
      */
     public function edit($id)
     {
+        if (!in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius'])) {
+            abort(403);
+        }
         $body = Body::findOrFail($id);
         $users = User::orderBy('name', 'asc')->get();
         return view('bodies.edit', ['body' => $body, 'users' => $users]);
@@ -100,6 +110,9 @@ class BodyController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius'])) {
+            abort(403);
+        }
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'is_ba_sp' => ['required', 'in:0,1'],
@@ -132,7 +145,14 @@ class BodyController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if (!in_array(Auth::user()->role, ['IT administratorius'])) {
+            abort(403);
+        }
+
+        $body = Body::findOrFail($id);
+        $body->delete();
+
+        return redirect()->route('bodies.panel');
     }
 }
 

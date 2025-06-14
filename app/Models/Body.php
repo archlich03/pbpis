@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class Body extends Model
 {
@@ -49,6 +50,20 @@ class Body extends Model
     public function chairman(): BelongsTo
     {
         return $this->belongsTo(User::class, 'chairman_id');
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->body_id)) {
+                $model->body_id = (string) Str::uuid();
+            }
+        });
     }
 }
 

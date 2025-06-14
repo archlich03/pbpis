@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('bodies', function (Blueprint $table) {
-            $table->uuid('body_id')->primary()->default(Str::uuid());
+            $table->uuid('body_id')->primary();
             $table->string('title');
             $table->string('classification')->default('SPK');
             $table->integer('chairman_id');
