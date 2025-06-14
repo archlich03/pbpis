@@ -79,10 +79,10 @@ class BodyController extends Controller
     public function show($id)
     {
         $body = Body::findOrFail($id);
-        $membersIds = $body->members ?? [];
-        $members = User::whereIn('user_id', $membersIds)->orderBy('name')->get();
+        //$membersIds = $body->members ?? [];
+        //$members = User::whereIn('user_id', $membersIds)->orderBy('name')->get();
 
-        return view('bodies.show', ['body' => $body, 'members' => $members]);
+        return view('bodies.show', ['body' => $body]);//, 'members' => $members]);
     }
 
     /**

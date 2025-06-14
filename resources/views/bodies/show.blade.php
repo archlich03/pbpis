@@ -32,7 +32,7 @@
                         <li><strong>Chairman:</strong> {{ optional($body->chairman)->pedagogical_name ?? '' }} {{ optional($body->chairman)->name ?? '' }}</li>
                         <li><strong>Members:</strong>
                             <ul class="list-disc pl-8">
-                                @foreach ($members as $member)
+                                @foreach ($body->members as $member)
                                     <li>{{ $member->pedagogical_name ?? '' }} {{ $member->name ?? '' }}</li>
                                 @endforeach
                             </ul>

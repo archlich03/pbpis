@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid('body_id')->primary();
             $table->string('title');
             $table->string('classification')->default('SPK');
-            $table->integer('chairman_id');
+            $table->foreignId('chairman_id')->constrained('users', 'user_id');
             $table->json('members');
             $table->boolean('is_ba_sp')->default(true);
             $table->timestamps();
