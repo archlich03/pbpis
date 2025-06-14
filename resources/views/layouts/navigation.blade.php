@@ -16,12 +16,14 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                     @if (in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
+                        <x-nav-link :href="route('bodies.panel')" :active="request()->routeIs('bodies.create')">
+                            {{ __('Bodies') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('users.panel')" :active="request()->routeIs('users.panel')">
                             {{ __('Users') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('register')" :active="request()->routeIs('register')">
-                            {{ __('Register User') }}
-                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->role == 'IT administratorius')
                     @endif
                 </div>
             </div>
@@ -80,12 +82,14 @@
             </x-responsive-nav-link>
             
             @if (in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
+                <x-nav-link :href="route('bodies.panel')" :active="request()->routeIs('bodies.create')">
+                    {{ __('Bodies') }}
+                </x-nav-link>
                 <x-responsive-nav-link :href="route('users.panel')" :active="request()->routeIs('users.panel')">
                     {{ __('Users') }}
                 </x-responsive-nav-link>
-                <x-nav-link :href="route('register')" :active="request()->routeIs('register')">
-                    {{ __('Register User') }}
-                </x-nav-link>
+            @endif
+            @if (Auth::user()->role == 'IT administratorius')
             @endif
         </div>
 
