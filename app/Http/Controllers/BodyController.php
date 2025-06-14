@@ -86,7 +86,9 @@ class BodyController extends Controller
      */
     public function edit($id)
     {
-        //
+        $body = Body::findOrFail($id);
+        $users = User::orderBy('name', 'asc')->get();
+        return view('bodies.edit', ['body' => $body, 'users' => $users]);
     }
 
     /**
@@ -98,7 +100,28 @@ class BodyController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'is_ba_sp' => ['required', 'in:0,1'],
+            'classification' => ['required', 'string', 'max:16'],
+            'chairman_id' => ['required', 'integer', 'exists:users,user_id'],
+            'members' => ['array'],
+            'members.*' => ['integer', 'exists:users,user_id'],
+        ]);
+
+        $body = Body::findOrFail($id);
+        $body->title = $request->input('title');
+        $body->is_ba_sp = $request->input('is_ba_sp');
+        $body->classification = $request->input('classification');
+        $body->chairman_id = $request->input('chairman_id');
+        
+        $members = $request->input('members', []);
+        sort($members); // Sort the members array
+
+        $body->members = $members;
+        $body->save();
+
+        return redirect()->route('bodies.panel');
     }
 
     /**

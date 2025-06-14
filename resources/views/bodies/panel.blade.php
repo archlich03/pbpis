@@ -27,6 +27,9 @@
                         </thead>
                         <tbody>
                             @foreach ($bodies as $body)
+                                @if (Auth::user()->role === 'Balsuojantysis' && !in_array(Auth::user()->user_id, $body->members))
+                                    @continue
+                                @endif
                                 <tr>
                                     <td class="border px-4 py-2">{{ $body->title }}</td>
                                     <td class="border px-4 py-2">
@@ -34,8 +37,10 @@
                                     </td>
                                     <td class="border px-4 py-2">{{ $body->is_ba_sp ? 'BA' : 'MA' }}</td>
                                     <td class="border px-4 py-2">
-                                        <a href="{{ route('bodies.show', $body) }}">View</a> | 
-                                        <a href="{{ route('bodies.edit', $body) }}">Edit</a>
+                                        <a href="{{ route('bodies.show', $body) }}">View</a>
+                                        @if (in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
+                                            | <a href="{{ route('bodies.edit', $body) }}">Edit</a>
+                                        @endif
                                         @if (Auth::user()->role === 'IT administratorius')
                                             <form action="{{ route('bodies.destroy', $body) }}" method="POST" class="inline">
                                                 @csrf
