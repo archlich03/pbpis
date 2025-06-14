@@ -19,6 +19,9 @@
                         <x-nav-link :href="route('users.panel')" :active="request()->routeIs('users.panel')">
                             {{ __('Users') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('register')" :active="request()->routeIs('register')">
+                            {{ __('Register User') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -80,6 +83,9 @@
                 <x-responsive-nav-link :href="route('users.panel')" :active="request()->routeIs('users.panel')">
                     {{ __('Users') }}
                 </x-responsive-nav-link>
+                <x-nav-link :href="route('register')" :active="request()->routeIs('register')">
+                    {{ __('Register User') }}
+                </x-nav-link>
             @endif
         </div>
 

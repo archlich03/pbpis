@@ -53,9 +53,21 @@
         <div class="mt-4">
             <x-input-label for="role" :value="__('Role')" />
             <select id="role" name="role" class="block mt-1 w-full">
-                <option value="IT administratorius" {{ old('role') == 'IT administratorius' ? 'selected' : '' }}>{{ __('IT administratorius') }}</option>
-                <option value="Sekretorius" {{ old('role') == 'Sekretorius' ? 'selected' : '' }}>{{ __('Sekretorius') }}</option>
-                <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' ? 'selected' : '' }}>{{ __('Balsuojantysis') }}</option>
+                @if (Auth::user()->role === 'Sekretorius')
+                    <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || Auth::user()->role == 'Balsuojantysis' ? 'selected' : '' }}>
+                        {{ __('Balsuojantysis') }}
+                    </option>
+                @else
+                    <option value="IT administratorius" {{ old('role') == 'IT administratorius' || Auth::user()->role == 'IT administratorius' ? 'selected' : '' }}>
+                        {{ __('IT administratorius') }}
+                    </option>
+                    <option value="Sekretorius" {{ old('role') == 'Sekretorius' || Auth::user()->role == 'Sekretorius' ? 'selected' : '' }}>
+                        {{ __('Sekretorius') }}
+                    </option>
+                    <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || Auth::user()->role == 'Balsuojantysis' ? 'selected' : '' }}>
+                        {{ __('Balsuojantysis') }}
+                    </option>
+                @endif
             </select>
             <x-input-error :messages="$errors->get('role')" class="mt-2" />
         </div>
@@ -68,8 +80,8 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
+            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="javascript:history.back()">
+                {{ __('Back') }}
             </a>
 
             <x-primary-button class="ms-4">
