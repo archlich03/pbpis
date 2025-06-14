@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable(); // useless
             $table->string('password');
             $table->string('role')->default('Balsuojantysis');
-            $table->string('pedagogical_name')->default('');
+            $table->string('pedagogical_name')->nullable();
             $table->boolean('isLoggedIn')->default(false);
             $table->boolean('gender');
             $table->dateTime('last_login')->default(now());
