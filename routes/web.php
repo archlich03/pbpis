@@ -34,6 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/bodies/{body}/meeting', [MeetingController::class, 'create'])->name('meetings.create');
+    Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings.panel');
     Route::post('/meetings/{body}', [MeetingController::class, 'store'])->name('meetings.store');
     Route::get('/meetings/{meeting}', [MeetingController::class, 'show'])->name('meetings.show');
     Route::get('/meetings/{meeting}/edit', [MeetingController::class, 'edit'])->name('meetings.edit');

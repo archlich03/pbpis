@@ -19,11 +19,12 @@
                         {{ __('Bodies') }}
                     </x-nav-link>
                     @if (Auth::user()->isPrivileged())
+                        <x-nav-link :href="route('meetings.panel')" :active="request()->routeIs('meetings.panel')">
+                            {{ __('Meetings') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('users.panel')" :active="request()->routeIs('users.panel')">
                             {{ __('Users') }}
                         </x-nav-link>
-                    @endif
-                    @if (Auth::user()->role == 'IT administratorius')
                     @endif
                 </div>
             </div>
@@ -80,11 +81,14 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('bodies.panel')" :active="request()->routeIs('bodies.create')">
+            <x-responsive-nav-link :href="route('bodies.panel')" :active="request()->routeIs('bodies.panel')">
                 {{ __('Bodies') }}
             </x-responsive-nav-link>
             
             @if (Auth::user()->isPrivileged())
+                <x-responsive-nav-link :href="route('meetings.panel')" :active="request()->routeIs('meetings.panel')">
+                    {{ __('Meetings') }}
+                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('users.panel')" :active="request()->routeIs('users.panel')">
                     {{ __('Users') }}
                 </x-responsive-nav-link>

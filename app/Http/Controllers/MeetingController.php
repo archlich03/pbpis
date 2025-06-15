@@ -17,7 +17,10 @@ class MeetingController extends Controller
      */
     public function index(Request $request)
     {
-        $meetings = Meeting::orderBy('title', 'asc')->get();
+        if (!Auth::user()->isPrivileged()) {
+            abort(403);
+        }
+        $meetings = Meeting::orderBy('meeting_date', 'desc')->get();
 
         return view('meetings.panel', ['meetings' => $meetings]);
     }
