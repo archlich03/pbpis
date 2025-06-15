@@ -93,15 +93,12 @@ class QuestionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Question $question)
     {
         if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
-        $question = Question::findOrFail($id);
-        $meetings = Meeting::orderBy('meeting_date', 'asc')->get();
-        $users = User::orderBy('name', 'asc')->get();
-        return view('questions.edit', ['question' => $question, 'meetings' => $meetings, 'users' => $users]);
+        return view('questions.edit', ['question' => $question]);
     }
 
     /**

@@ -121,15 +121,43 @@
 
                     <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
 
-                    <h3 class="text-xl font-semibold mt-8 mb-4">Questions</h3>
-                    @if (Auth::User()->isPrivileged())
-                        <x-primary-button>
-                            <a href="{{ route('questions.create', $meeting) }}" class="w-full">
-                                {{ __('Create New Question') }}
-                            </a>
-                        </x-primary-button>
-                    @endif
-                    
+                    <details class="mb-4">
+                        <summary class="text-xl font-semibold"><span class="cursor-pointer">Questions</span></summary>
+                        @if (Auth::User()->isPrivileged())
+                            <x-primary-button>
+                                <a href="{{ route('questions.create', $meeting) }}" class="w-full">
+                                    {{ __('Create New Question') }}
+                                </a>
+                            </x-primary-button>
+                        @endif
+
+                        <table class="table-auto w-full">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Question</th>
+                                    <th>Presenter</th>
+                                    @if (Auth::User()->isPrivileged())
+                                        <th>Actions</th>
+                                    @endif
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($meeting->questions as $question)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}.</td>
+                                        <td>{{ $question->title }}</td>
+                                        <td class="text-right">{{ optional($question->presenter)->pedagogical_name ?? '' }} {{ optional($question->presenter)->name ?? '' }}</td>
+                                        @if (Auth::User()->isPrivileged())
+                                            <td class="text-right">
+                                                <a href="{{ route('questions.edit', [$meeting, $question]) }}" class="text-blue-500 hover:underline"><b>Edit</b></a>
+                                            </td>
+                                        @endif
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </details>
                 </div>
             </div>
         </div>

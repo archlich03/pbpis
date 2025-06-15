@@ -46,7 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/meetings/{meeting}/questions', [QuestionController::class, 'create'])->name('questions.create');
     Route::post('/meetings/{meeting}/questions', [QuestionController::class, 'store'])->name('questions.store');
-
+    Route::get('/meetings/{meeting}/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
 });
 
 Route::middleware('auth')->group(function () {
