@@ -27,7 +27,7 @@
                         </thead>
                         <tbody>
                             @foreach ($bodies as $body)
-                                @if (Auth::user()->role === 'Balsuojantysis' && !in_array(Auth::user()->user_id, $body->members))
+                                @if (Auth::user()->isVoter() && !$body->members->contains(Auth::user()))
                                     @continue
                                 @endif
                                 <tr>
