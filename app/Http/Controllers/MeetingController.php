@@ -85,12 +85,10 @@ class MeetingController extends Controller
         $meeting = Meeting::findOrFail($id);
         $users = User::orderBy('name', 'asc')->get();
         
-        if ($meeting->status == 'Suplanuotas' &&now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
+        if ($meeting->status != 'Vyksta' && now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
             $meeting->status = 'Vyksta';
             $meeting->save();
-        }
-
-        if ($meeting->status == 'Vyksta' && now() >= $meeting->vote_end) {
+        } elseif ($meeting->status != 'Baigtas' && now() >= $meeting->vote_end) {
             $meeting->status = 'Baigtas';
             $meeting->save();
         }
@@ -129,7 +127,6 @@ class MeetingController extends Controller
         }
     
         $request->validate([
-            'status' => ['required', 'string', 'max:16'],
             'secretary_id' => ['required', 'integer', 'exists:users,user_id'],
             'is_evote' => ['required', 'in:0,1'],
             'meeting_date' => ['required', 'date'],
@@ -141,7 +138,12 @@ class MeetingController extends Controller
             }],
         ]);
 
-        $meeting->status = $request->input('status');
+        $meeting->status = 'Suplanuotas';
+        if (now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
+            $meeting->status = 'Vyksta';
+        } elseif (now() >= $meeting->vote_end) {
+            $meeting->status = 'Baigtas';
+        }
         $meeting->secretary_id = $request->input('secretary_id');
         $meeting->is_evote = $request->input('is_evote');
         $meeting->meeting_date = $request->input('meeting_date');

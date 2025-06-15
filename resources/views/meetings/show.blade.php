@@ -28,6 +28,9 @@
                                 @method('PATCH')
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
+                                        <p class="text-gray-700 dark:text-gray-300"><strong>Status:</strong> {{ $meeting->status }}</p>
+                                    </div>
+                                    <div>
                                         <x-input-label for="meeting_date" value="Meeting date" />
                                         <x-text-input id="meeting_date" name="meeting_date" type="date" class="block w-full" value="{{ $meeting->meeting_date->format('Y-m-d') }}" />
                                     </div>
@@ -36,14 +39,6 @@
                                         <select id="is_evote" name="is_evote" class="block w-full">
                                             <option value="0" {{ $meeting->is_evote === 0 ? 'selected' : '' }}>Physical</option>
                                             <option value="1" {{ $meeting->is_evote === 1 ? 'selected' : '' }}>Electronic</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <x-input-label for="status" value="Status" />
-                                        <select id="status" name="status" class="block w-full">
-                                            @foreach ($meeting::STATUSES as $status)
-                                                <option value="{{ $status }}" {{ $meeting->status === $status ? 'selected' : '' }}>{{ $status }}</option>
-                                            @endforeach
                                         </select>
                                     </div>
                                     <div>
