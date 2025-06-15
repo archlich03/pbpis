@@ -158,6 +158,11 @@ class MeetingController extends Controller
             abort(403);
         }
 
+        $questions = Question::where('meeting_id', $id)->get();
+        foreach ($questions as $question) {
+            $question->delete();
+        }
+
         $meeting = Meeting::findOrFail($id);
         $body = $meeting->body;
         $meeting->delete();
