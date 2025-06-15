@@ -152,6 +152,13 @@ class BodyController extends Controller
         }
 
         $body = Body::findOrFail($id);
+
+        // Delete all meetings, that are assigned to this body
+        $meetings = Meeting::where('body_id', $id)->get();
+        foreach ($meetings as $meeting) {
+            $meeting->delete();
+        }
+
         $body->delete();
 
         return redirect()->route('bodies.panel');
