@@ -84,8 +84,16 @@ class MeetingController extends Controller
     {
         $meeting = Meeting::findOrFail($id);
         $users = User::orderBy('name', 'asc')->get();
-        //$membersIds = $meeting->members ?? [];
-        //$members = User::whereIn('user_id', $membersIds)->orderBy('name')->get();
+        
+        if ($meeting->status == 'Suplanuotas' &&now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
+            $meeting->status = 'Vyksta';
+            $meeting->save();
+        }
+
+        if ($meeting->status == 'Vyksta' && now() >= $meeting->vote_end) {
+            $meeting->status = 'Baigtas';
+            $meeting->save();
+        }
 
         return view('meetings.show', ['meeting' => $meeting, 'users' => $users]);//, 'members' => $members]);
     }
@@ -158,12 +166,14 @@ class MeetingController extends Controller
             abort(403);
         }
 
-        $questions = Question::where('meeting_id', $id)->get();
-        foreach ($questions as $question) {
-            $question->delete();
-        }
-
         $meeting = Meeting::findOrFail($id);
+        foreach ($meeting->questions as $question) {
+            foreach($question->votes() as $vote) {
+                $vote->delete();
+            };
+            $question->delete();
+        };
+
         $body = $meeting->body;
         $meeting->delete();
 

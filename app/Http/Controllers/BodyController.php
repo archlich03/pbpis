@@ -156,9 +156,11 @@ class BodyController extends Controller
 
         // Delete all meetings, that are assigned to this body
         $meetings = Meeting::where('body_id', $id)->get();
-        foreach ($meetings as $meeting) {
-            $questions = Question::where('meeting_id', $meeting->meeting_id)->get();
-            foreach ($questions as $question) {
+        foreach ($body->meetings as $meeting) {
+            foreach ($meeting->questions as $question) {
+                foreach($question->votes() as $vote) {
+                    $vote->delete();
+                }
                 $question->delete();
             }
             $meeting->delete();

@@ -202,6 +202,134 @@
                             @endforeach
                         </div>
                     </details>
+
+                    <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
+
+                    <details class="mb-4">
+                        <summary class="text-xl font-semibold"><span class="cursor-pointer">Voting process</span></summary>
+                        @if ($meeting->status == "Vyksta")
+                            <div class="w-full">
+                                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3">Question</th>
+                                            @foreach (\App\Models\Vote::STATUSES as $status)
+                                                <th scope="col" class="px-6 py-3">{{ $status }}</th>
+                                            @endforeach
+                                                <th scope="col" class="px-6 py-3">Nebalsuota</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($meeting->questions as $question)
+                                            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                                <td class="px-6 py-4">{{ $loop->iteration }}. {{ $question->title }}</td>
+                                                @if ($question->type == "Nebalsuoti")
+                                                    <td class="px-6 py-4" colspan="{{ count(\App\Models\Vote::STATUSES) }}">
+                                                        <i>Casting vote is not needed.</i>
+                                                    </td>
+                                                    @continue
+                                                @endif
+                                                @foreach (\App\Models\Vote::STATUSES as $status)
+                                                    <form method="POST" action="{{ route('votes.store', [$meeting, $question]) }}" class="inline-block">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <input type="hidden" name="choice" value="{{ $status }}">
+                                                        <td class="px-6 py-4">
+                                                            @if ($question->voteByUser(auth()->user()) && $question->voteByUser(auth()->user())->choice == $status)
+                                                                <x-danger-button type="submit" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest">
+                                                                    {{ $status }}
+                                                                </x-danger-button>
+                                                            @else
+                                                                <x-primary-button type="submit" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest">
+                                                                    {{ $status }}
+                                                                </x-primary-button>
+                                                            @endif
+                                                        </td>
+                                                    </form>
+                                                @endforeach
+                                                @if (!$question->voteByUser(auth()->user()))
+                                                    <form method="POST" action="{{ route('votes.store', [$meeting, $question]) }}" class="inline-block">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <input type="hidden" name="choice" value="Nebalsuota">
+                                                        <td class="px-6 py-4">
+                                                            <x-danger-button type="submit" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest">
+                                                                Nebalsuota
+                                                            </x-danger-button>
+                                                        </td>
+                                                    </form>
+                                                @else
+                                                    <form method="POST" action="{{ route('votes.destroy', [$meeting, $question]) }}" class="inline-block">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <td class="px-6 py-4">
+                                                            <x-primary-button type="submit" class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest">
+                                                                Nebalsuota
+                                                            </x-primary-button>
+                                                        </td>
+                                                    </form>
+                                                
+                                                @endif
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="w-full">
+                                <p class="text-gray-500 dark:text-gray-400">Voting process is not available.</p>
+                            </div>
+                            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">Question</th>
+                                        @foreach (\App\Models\Vote::STATUSES as $status)
+                                            <th scope="col" class="px-6 py-3">{{ $status }}</th>
+                                        @endforeach
+                                        <th scope="col" class="px-6 py-3">Nebalsuota</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($meeting->questions as $question)
+                                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                            <td class="px-6 py-4">{{ $loop->iteration }}. {{ $question->title }}</td>
+                                            @if ($question->type == "Nebalsuoti")
+                                                <td class="px-6 py-4" colspan="{{ count(\App\Models\Vote::STATUSES) }}">
+                                                    <i>Casting vote is not needed.</i>
+                                                </td>
+                                                @continue
+                                            @endif
+                                            @foreach (\App\Models\Vote::STATUSES as $status)
+                                                <td class="px-6 py-4">
+                                                    @if ($question->voteByUser(auth()->user()) && $question->voteByUser(auth()->user())->choice == $status)
+                                                        <span class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md font-semibold text-xs uppercase tracking-widest">
+                                                            {{ $status }}
+                                                        </span>
+                                                    @else
+                                                        <span class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-md font-semibold text-xs uppercase tracking-widest">
+                                                            {{ $status }}
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                            @endforeach
+                                            <td class="px-6 py-4">
+                                                @if (!$question->voteByUser(auth()->user()))
+                                                    <span class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-md font-semibold text-xs uppercase tracking-widest">
+                                                        Nebalsuota
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md font-semibold text-xs uppercase tracking-widest">
+                                                        Nebalsuota
+                                                    </span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+
+                        @endif
+                    </details>
                 </div>
             </div>
         </div>

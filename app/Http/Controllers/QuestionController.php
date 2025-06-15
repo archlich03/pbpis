@@ -148,7 +148,11 @@ class QuestionController extends Controller
         if ($meeting != $question->meeting) {
             abort(402);
         }
-        $meeting = $question->meeting;
+
+        foreach($question->votes() as $vote) {
+            $vote->delete();
+        };
+        
         $question->delete();
 
         return redirect()->route('meetings.show', ['meeting' => $meeting]);
