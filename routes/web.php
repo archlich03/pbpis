@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BodyController;
+use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\MeetingController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/meetings/{meeting}/edit', [MeetingController::class, 'edit'])->name('meetings.edit');
     Route::patch('/meetings/{meeting}', [MeetingController::class, 'update'])->name('meetings.update');
     Route::delete('/meetings/{meeting}', [MeetingController::class, 'destroy'])->name('meetings.destroy');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/meetings/{meeting}/questions', [QuestionController::class, 'create'])->name('questions.create');
+    Route::post('/meetings/{meeting}/questions', [QuestionController::class, 'store'])->name('questions.store');
+
 });
 
 Route::middleware('auth')->group(function () {

@@ -122,6 +122,14 @@
                     <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
 
                     <h3 class="text-xl font-semibold mt-8 mb-4">Questions</h3>
+                    @if (Auth::User()->isPrivileged())
+                        <x-primary-button>
+                            <a href="{{ route('questions.create', $meeting) }}" class="w-full">
+                                {{ __('Create New Question') }}
+                            </a>
+                        </x-primary-button>
+                    @endif
+                    
                 </div>
             </div>
         </div>
