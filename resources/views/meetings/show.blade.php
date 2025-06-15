@@ -121,6 +121,7 @@
 
                     <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
 
+                @if ($meeting->body->members->contains(Auth::user()))
                     <details class="mb-4">
                         <summary class="text-xl font-semibold"><span class="cursor-pointer">Questions</span></summary>
                         @if (Auth::User()->isPrivileged())
@@ -205,7 +206,7 @@
 
                     <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
 
-                    <details class="mb-4">
+                    <details class="mb-4" open>
                         <summary class="text-xl font-semibold"><span class="cursor-pointer">Voting process</span></summary>
                         @if ($meeting->status == "Vyksta")
                             <div class="w-full">
@@ -213,10 +214,9 @@
                                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                         <tr>
                                             <th scope="col" class="px-6 py-3">Question</th>
-                                            @foreach (\App\Models\Vote::STATUSES as $status)
-                                                <th scope="col" class="px-6 py-3">{{ $status }}</th>
-                                            @endforeach
-                                                <th scope="col" class="px-6 py-3">Nebalsuota</th>
+                                            <th class="px-6 py-4" colspan="{{ count(\App\Models\Vote::STATUSES) + 1 }}">
+                                                Voting choice
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -283,10 +283,9 @@
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
                                         <th scope="col" class="px-6 py-3">Question</th>
-                                        @foreach (\App\Models\Vote::STATUSES as $status)
-                                            <th scope="col" class="px-6 py-3">{{ $status }}</th>
-                                        @endforeach
-                                        <th scope="col" class="px-6 py-3">Nebalsuota</th>
+                                        <th class="px-6 py-4" colspan="{{ count(\App\Models\Vote::STATUSES) + 1 }}">
+                                            Voting choice
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -313,7 +312,7 @@
                                                 </td>
                                             @endforeach
                                             <td class="px-6 py-4">
-                                                @if (!$question->voteByUser(auth()->user()))
+                                                @if ($question->voteByUser(auth()->user()))
                                                     <span class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-md font-semibold text-xs uppercase tracking-widest">
                                                         Nebalsuota
                                                     </span>
@@ -330,6 +329,7 @@
 
                         @endif
                     </details>
+                @endif
                 </div>
             </div>
         </div>

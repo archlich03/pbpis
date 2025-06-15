@@ -34,7 +34,9 @@ class VoteController extends Controller
             $vote->user_id = Auth::user()->user_id;
         }
         $vote->choice = $request->input('choice');
-        $vote->save();
+        if (now() <= $meeting->vote_end && now() >= $meeting->vote_start) {            
+            $vote->save();
+        }
 
         return redirect()->route('meetings.show', ['meeting' => $meeting]);
     }
