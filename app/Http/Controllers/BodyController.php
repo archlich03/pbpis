@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Body;
 use App\Models\User;
 use App\Models\Meeting;
+use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -156,6 +157,10 @@ class BodyController extends Controller
         // Delete all meetings, that are assigned to this body
         $meetings = Meeting::where('body_id', $id)->get();
         foreach ($meetings as $meeting) {
+            $questions = Question::where('meeting_id', $meeting->meeting_id)->get();
+            foreach ($questions as $question) {
+                $question->delete();
+            }
             $meeting->delete();
         }
 

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 
 class Meeting extends Model
 {
@@ -68,6 +70,16 @@ class Meeting extends Model
     public function body(): BelongsTo
     {
         return $this->belongsTo(Body::class, 'body_id');
+    }
+
+    /**
+     * Get all of the questions for the Meeting
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function questions(): HasMany
+    {
+        return $this->hasMany(Question::class, 'meeting_id');
     }
 
     /**

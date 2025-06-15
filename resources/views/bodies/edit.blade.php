@@ -51,7 +51,7 @@
                             <div class="flex items-center">
                                 <input id="members_{{ $user->user_id }}" type="checkbox" name="members[]" value="{{ $user->user_id }}" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" {{ $body->members->contains($user) ? 'checked' : '' }} />
                                 <label for="members_{{ $user->user_id }}" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                                    {{ $user->name }} ({{ $user->pedagogical_name }})
+                                    {{ $user->name }}{{ $user->pedagogical_name ? ' (' . $user->pedagogical_name . ')' : '' }}
                                 </label>
                             </div>
                         @endforeach
