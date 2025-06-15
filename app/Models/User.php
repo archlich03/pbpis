@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable
 {
@@ -54,6 +55,38 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+        /**
+     * Check if the authenticated user is an administrator.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'IT administratorius';
+    }
+
+    /**
+     * Check if the authenticated user is a secretary.
+     */
+    public function isSecretary(): bool
+    {
+        return $this->role === 'Sekretorius';
+    }
+
+    /**
+     * Check if the authenticated user is a voter.
+     */
+    public function isVoter(): bool
+    {
+        return $this->role === 'Balsuojantysis';
+    }
+
+        /**
+     * Check if the authenticated user is an administrator or secretary.
+     */
+    public function isPrivileged(): bool
+    {
+        return in_array($this->role, ['IT administratorius', 'Sekretorius']);
     }
 }
 

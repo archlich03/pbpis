@@ -16,7 +16,7 @@
                             </a>
                         </x-primary-button>
                     </div>
-                    @if (in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
+                    @if (Auth::user()->isPrivileged())
                         <table class="table-fixed w-full mt-4">
                             <thead>
                                 <tr class="bg-gray-100 dark:bg-gray-700">

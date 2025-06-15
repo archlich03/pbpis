@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Body;
 use App\Models\User;
+use App\Models\Meeting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,7 +30,7 @@ class BodyController extends Controller
      */
     public function create()
     {
-        if (!in_array(Auth::user()->role, ['IT administratorius'])) {
+        if (!Auth::user()->isAdmin()) {
             abort(403);
         }
         $users = User::orderBy('name', 'asc')->get();
@@ -44,7 +45,7 @@ class BodyController extends Controller
      */
     public function store(Request $request)
     {
-        if (!in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius'])) {
+        if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
         $request->validate([
@@ -59,6 +60,7 @@ class BodyController extends Controller
         $body = new Body();
         $body->title = $request->input('title');
         $body->classification = $request->input('classification');
+        $body->is_ba_sp = $request->input('is_ba_sp');
         $body->chairman_id = $request->input('chairman_id');
         
         $members = $request->input('members', []);
@@ -79,10 +81,10 @@ class BodyController extends Controller
     public function show($id)
     {
         $body = Body::findOrFail($id);
-        $membersIds = $body->members ?? [];
-        $members = User::whereIn('user_id', $membersIds)->orderBy('name')->get();
+        //$membersIds = $body->members ?? [];
+        //$members = User::whereIn('user_id', $membersIds)->orderBy('name')->get();
 
-        return view('bodies.show', ['body' => $body, 'members' => $members]);
+        return view('bodies.show', ['body' => $body]);//, 'members' => $members]);
     }
 
     /**
@@ -93,7 +95,7 @@ class BodyController extends Controller
      */
     public function edit($id)
     {
-        if (!in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius'])) {
+        if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
         $body = Body::findOrFail($id);
@@ -110,7 +112,7 @@ class BodyController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius'])) {
+        if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
         $request->validate([
@@ -145,11 +147,18 @@ class BodyController extends Controller
      */
     public function destroy($id)
     {
-        if (!in_array(Auth::user()->role, ['IT administratorius'])) {
+        if (!Auth::user()->isAdmin()) {
             abort(403);
         }
 
         $body = Body::findOrFail($id);
+
+        // Delete all meetings, that are assigned to this body
+        $meetings = Meeting::where('body_id', $id)->get();
+        foreach ($meetings as $meeting) {
+            $meeting->delete();
+        }
+
         $body->delete();
 
         return redirect()->route('bodies.panel');

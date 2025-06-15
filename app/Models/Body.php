@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 
 class Body extends Model
 {
@@ -52,6 +55,23 @@ class Body extends Model
         return $this->belongsTo(User::class, 'chairman_id');
     }
 
+    public function getMembersAttribute()
+    {
+        $ids = $this->attributes['members'] ? json_decode($this->attributes['members'], true) : [];
+
+        return User::whereIn('user_id', $ids)->get();
+    }
+
+    /**
+     * Get all of the meetings for the Body
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function meetings(): HasMany
+    {
+        return $this->hasMany(Meeting::class, 'body_id')->orderByDesc('meeting_date');
+    }
+
     /**
      * The "booted" method of the model.
      */
@@ -66,4 +86,5 @@ class Body extends Model
         });
     }
 }
+
 
