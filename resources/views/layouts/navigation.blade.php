@@ -18,7 +18,7 @@
                     <x-nav-link :href="route('bodies.panel')" :active="request()->routeIs('bodies.create')">
                         {{ __('Bodies') }}
                     </x-nav-link>
-                    @if (in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
+                    @if (Auth::user()->isPrivileged())
                         <x-nav-link :href="route('users.panel')" :active="request()->routeIs('users.panel')">
                             {{ __('Users') }}
                         </x-nav-link>
@@ -84,7 +84,7 @@
                 {{ __('Bodies') }}
             </x-responsive-nav-link>
             
-            @if (in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
+            @if (Auth::user()->isPrivileged())
                 <x-responsive-nav-link :href="route('users.panel')" :active="request()->routeIs('users.panel')">
                     {{ __('Users') }}
                 </x-responsive-nav-link>

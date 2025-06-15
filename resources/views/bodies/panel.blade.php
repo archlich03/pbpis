@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                @if (in_array(Auth::user()->role, ['IT administratorius']))
+                @if (Auth::user()->isAdmin())
                     <div class="px-6 py-4">
                         <a href="{{ route('bodies.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-600 focus:outline-none focus:border-gray-900 dark:focus:border-gray-300 focus:ring focus:ring-gray-300 dark:focus:ring-gray-800 disabled:opacity-25 transition">
                             Create new body
@@ -38,7 +38,7 @@
                                     <td class="border px-4 py-2">{{ $body->is_ba_sp ? 'BA' : 'MA' }}</td>
                                     <td class="border px-4 py-2">
                                         <a href="{{ route('bodies.show', $body) }}">View</a>
-                                        @if (in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
+                                        @if (Auth::user()->isPrivileged())
                                             | <a href="{{ route('bodies.edit', $body) }}">Edit</a>
                                         @endif
                                     </td>

@@ -89,5 +89,4 @@ class UserController extends Controller
 
         return redirect()->route('users.panel');
     }
-
 }
