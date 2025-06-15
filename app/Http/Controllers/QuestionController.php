@@ -108,7 +108,7 @@ class QuestionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Question $question)
+    public function update(Request $request, Meeting $meeting, Question $question)
     {
         if (!Auth::user()->isPrivileged()) {
             abort(403);
@@ -118,7 +118,7 @@ class QuestionController extends Controller
             'title' => ['required', 'string'],
             'decision' => ['nullable', 'string'],
             'presenter_id' => ['required', 'integer', 'exists:users,user_id'],
-            'type' => ['required', 'string', 'in:nebalsuoti,balsuoti'],
+            'type' => ['required', 'string'],
             'summary' => ['nullable', 'string'],
         ]);
 
@@ -130,7 +130,7 @@ class QuestionController extends Controller
         $question->save();
         $users = User::orderBy('name', 'asc')->get();
 
-        return redirect()->route('questions.show', ['question' => $question]);
+        return redirect()->route('meetings.show', ['meeting' => $meeting]);
     }
 
     /**

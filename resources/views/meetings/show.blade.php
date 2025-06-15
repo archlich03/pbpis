@@ -130,33 +130,71 @@
                                 </a>
                             </x-primary-button>
                         @endif
+                        <div class="ml-4">
+                            @foreach ($meeting->questions as $question)
+                                <details class="mb-4">
+                                    <summary class="font-semibold cursor-pointer">{{ $loop->iteration }}. {{ $question->title }}</summary>
+                                    <div class="ml-4">
+                                        @if (!Auth::User()->isPrivileged())
+                                            <p><strong>Presenter:</strong> {{ optional($question->presenter)->pedagogical_name ?? '' }} {{ optional($question->presenter)->name ?? '' }}</p>
+                                            @if (!empty($question->decision))
+                                                <p><strong>Decision:</strong> {{ $question->decision }}</p>
+                                            @endif
+                                            @if (!empty($question->summary))
+                                                <p><strong>Summary:</strong> {{ $question->summary }}</p>
+                                            @endif
+                                        @else
+                                            <form method="POST" action="{{ route('questions.update', [$meeting, $question]) }}" class="dark:text-gray-800">
+                                                @csrf
+                                                @method('PATCH')
 
-                        <table class="table-auto w-full">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Question</th>
-                                    <th>Presenter</th>
-                                    @if (Auth::User()->isPrivileged())
-                                        <th>Actions</th>
-                                    @endif
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($meeting->questions as $question)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}.</td>
-                                        <td>{{ $question->title }}</td>
-                                        <td class="text-right">{{ optional($question->presenter)->pedagogical_name ?? '' }} {{ optional($question->presenter)->name ?? '' }}</td>
-                                        @if (Auth::User()->isPrivileged())
-                                            <td class="text-right">
-                                                <a href="{{ route('questions.edit', [$meeting, $question]) }}" class="text-blue-500 hover:underline"><b>Edit</b></a>
-                                            </td>
+                                                <div class="mt-4">
+                                                    <x-input-label for="title" value="Title" />
+                                                    <x-text-input id="title" name="title" type="text" class="block mt-1 w-full" value="{{ $question->title }}" required />
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <x-input-label for="type" value="Type" />
+                                                    <select id="type" name="type" class="block mt-1 w-full">
+                                                        @foreach (\App\Models\Question::STATUSES as $status)
+                                                            <option value="{{ $status }}" {{ $question->type == $status ? 'selected' : '' }}>{{ $status }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <x-input-label for="presenter_id" value="Presenter" />
+                                                    <select id="presenter_id" name="presenter_id" class="block mt-1 w-full">
+                                                        @foreach ($users as $user)
+                                                            @if ($user->isSecretary())
+                                                                <option value="{{ $user->user_id }}" {{ $question->presenter_id == $user->user_id ? 'selected' : '' }}>{{ $user->pedagogical_name }} {{ $user->name }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <x-input-label for="decision" value="Decision" />
+                                                    <x-text-input id="decision" name="decision" type="text" class="block mt-1 w-full" value="{{ $question->decision }}" />
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <x-input-label for="summary" value="Summary" />
+                                                    <textarea id="summary" name="summary" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="3">{{ $question->summary }}</textarea>
+                                                </div>
+
+                                                <div class="flex items-center justify-end mt-4">
+                                                    <x-primary-button class="ml-4">
+                                                        {{ __('Update Question') }}
+                                                    </x-primary-button>
+                                                </div>
+                                            </form>
+
                                         @endif
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                    </div>
+                                </details>
+                            @endforeach
+                        </div>
                     </details>
                 </div>
             </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Body;
 use App\Models\User;
 use App\Models\Meeting;
+use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
