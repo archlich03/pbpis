@@ -17,7 +17,7 @@ class UserController extends Controller
     {
         $users = User::orderBy('name', 'asc')->get(); // Fetch all users sorted by name
 
-        return view('users-panel', ['users' => $users]); // Pass users to the view
+        return view('users.panel', ['users' => $users]); // Pass users to the view
     }
 
     
