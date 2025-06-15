@@ -57,7 +57,7 @@ class User extends Authenticatable
         ];
     }
 
-        /**
+    /**
      * Check if the authenticated user is an administrator.
      */
     public function isAdmin(): bool

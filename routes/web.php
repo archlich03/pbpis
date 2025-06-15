@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BodyController;
+use App\Http\Controllers\VoteController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\MeetingController;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/meetings/{meeting}/{question}', function($meeting, $question){
         return redirect()->route('meetings.show', $meeting);
     })->name('questions.redirect');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::put('/meetings/{meeting}/{question}/vote', [VoteController::class, 'store'])->name('votes.store');
+    Route::delete('/meetings/{meeting}/{question}/vote', [VoteController::class, 'destroy'])->name('votes.destroy');
 });
 
 Route::middleware('auth')->group(function () {
