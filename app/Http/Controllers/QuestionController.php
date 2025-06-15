@@ -79,13 +79,13 @@ class QuestionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    /*public function show($id)
     {
         $question = Question::findOrFail($id);
         $users = User::orderBy('name', 'asc')->get();
 
         return view('questions.show', ['question' => $question, 'users' => $users]);
-    }
+    }*/
 
     /**
      * Show the form for editing the specified resource.
@@ -139,17 +139,19 @@ class QuestionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Meeting $meeting, Question $question)
     {
         if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
 
-        $question = Question::findOrFail($id);
+        if ($meeting != $question->meeting) {
+            abort(402);
+        }
         $meeting = $question->meeting;
         $question->delete();
 
-        return redirect()->route('meetings.show', $meeting);
+        return redirect()->route('meetings.show', ['meeting' => $meeting]);
     }
 }
 

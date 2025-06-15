@@ -189,7 +189,13 @@
                                                     </x-primary-button>
                                                 </div>
                                             </form>
-
+                                            <form method="POST" action="{{ route('questions.destroy', [$meeting, $question]) }}" class="dark:text-gray-800">
+                                                @csrf
+                                                @method('DELETE')
+                                                <x-danger-button class="mt-4">
+                                                    {{ __('Delete Question') }}
+                                                </x-danger-button>
+                                            </form>
                                         @endif
                                     </div>
                                 </details>

@@ -48,6 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/meetings/{meeting}/questions', [QuestionController::class, 'store'])->name('questions.store');
     Route::get('/meetings/{meeting}/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
     Route::patch('/meetings/{meeting}/{question}', [QuestionController::class, 'update'])->name('questions.update');
+    Route::delete('/meetings/{meeting}/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
 });
 
 Route::middleware('auth')->group(function () {
