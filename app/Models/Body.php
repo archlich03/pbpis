@@ -69,7 +69,7 @@ class Body extends Model
      */
     public function meetings(): HasMany
     {
-        return $this->hasMany(Meeting::class, 'body_id');
+        return $this->hasMany(Meeting::class, 'body_id')->orderByDesc('meeting_date');
     }
 
     /**
