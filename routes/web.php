@@ -14,11 +14,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
     Route::get('/users', [UserController::class, 'index'])->name('users.panel');
     Route::patch('/users/{user}/profile', [UserController::class, 'updateProfile'])->name('users.updateProfile');
     Route::patch('/users/{user}/password', [UserController::class, 'updatePassword'])->name('users.updatePassword');
