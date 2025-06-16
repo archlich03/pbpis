@@ -41,6 +41,13 @@ class Question extends Model
     public const STATUSES = [
         'Nebalsuoti',
         'Balsuoti dauguma',
+        '2/3 dauguma'
+    ];
+
+    public const MINIMUM_VOTES = [
+        0,
+        (1/2),
+        (2/3),
     ];
 
     /**

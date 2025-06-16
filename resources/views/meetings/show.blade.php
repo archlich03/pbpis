@@ -72,6 +72,16 @@
                                 </x-primary-button>
                             </form>
                             @if (Auth::user()->isPrivileged())
+                                <x-primary-button>
+                                    <a href="{{ route('meetings.protocol', $meeting) }}" class="w-full" target="_blank">
+                                        {{ __('View HTML Protocol') }}
+                                    </a>
+                                </x-primary-button>
+                                <x-primary-button>
+                                    <a href="{{ route('meetings.pdf', $meeting) }}" class="w-full" target="_blank">
+                                        {{ __('Download PDF Protocol') }}
+                                    </a>
+                                </x-primary-button>
                                 <div x-data="{ confirmingMeetingDeletion: false }"
                                     class="relative">
                                     <x-danger-button
@@ -131,6 +141,26 @@
                                 <details class="mb-4">
                                     <summary class="font-semibold cursor-pointer">{{ $loop->iteration }}. {{ $question->title }}</summary>
                                     <div class="ml-4">
+                                        @if ($question->type != 'Nebalsuoti')
+                                            @php
+                                                $statuses = [];
+                                                $minVotes = \App\Models\Question::MINIMUM_VOTES[array_search($question->type, \App\Models\Question::STATUSES)] * $question->meeting->body->members->count();
+                                                foreach (\App\Models\Vote::STATUSES as $status) {
+                                                    $count = $question->votes()->where('choice', $status)->count();
+                                                    array_push($statuses, [$status, $count]);
+                                                }
+                                            @endphp
+                                            <span><strong>
+                                                {{ ($statuses[0][1] > $minVotes)? 'Klausimas priimtas' : 'Klausimas nepriimtas' }}
+                                            </strong></span><br>
+                                        @endif
+                                        <span>
+                                            @foreach ($statuses as $status)
+                                                <span>
+                                                    {{ $status[0] }}: {{ $status[1] }}{{ $loop->last ? '.' : ';' }}
+                                                </span>
+                                            @endforeach
+                                        </span>
                                         @if (!Auth::User()->isPrivileged())
                                             <p><strong>Presenter:</strong> {{ optional($question->presenter)->pedagogical_name ?? '' }} {{ optional($question->presenter)->name ?? '' }}</p>
                                             @if (!empty($question->decision))
@@ -162,9 +192,7 @@
                                                     <x-input-label for="presenter_id" value="Presenter" />
                                                     <select id="presenter_id" name="presenter_id" class="block mt-1 w-full">
                                                         @foreach ($users as $user)
-                                                            @if ($user->isSecretary())
-                                                                <option value="{{ $user->user_id }}" {{ $question->presenter_id == $user->user_id ? 'selected' : '' }}>{{ $user->pedagogical_name }} {{ $user->name }}</option>
-                                                            @endif
+                                                            <option value="{{ $user->user_id }}" {{ $question->presenter_id == $user->user_id ? 'selected' : '' }}>{{ $user->pedagogical_name }} {{ $user->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>

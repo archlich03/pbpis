@@ -34,6 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/bodies/{body}', [BodyController::class, 'destroy'])->name('bodies.destroy');
 });
 
+// Body routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/bodies/{body}/meeting', [MeetingController::class, 'create'])->name('meetings.create');
     Route::get('/meetings', [MeetingController::class, 'index'])->name('meetings.panel');
@@ -44,17 +45,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/meetings/{meeting}', [MeetingController::class, 'destroy'])->name('meetings.destroy');
 });
 
+// Meeting routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/meetings/{meeting}/questions', [QuestionController::class, 'create'])->name('questions.create');
     Route::post('/meetings/{meeting}/questions', [QuestionController::class, 'store'])->name('questions.store');
     Route::get('/meetings/{meeting}/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
     Route::patch('/meetings/{meeting}/{question}', [QuestionController::class, 'update'])->name('questions.update');
     Route::delete('/meetings/{meeting}/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
-    Route::get('/meetings/{meeting}/{question}', function($meeting, $question){
+    /*Route::get('/meetings/{meeting}/{question}', function($meeting, $question){
         return redirect()->route('meetings.show', $meeting);
-    })->name('questions.redirect');
+    })->name('questions.redirect');*/
+    Route::get('/meetings/{meeting}/protocolHTML', [MeetingController::class, 'protocol'])->name('meetings.protocol');
+    Route::get('/meetings/{meeting}/protocolPDF', [MeetingController::class, 'protocolPDF'])->name('meetings.pdf');
 });
 
+// Vote routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/meetings/{meeting}/{question}/vote', [VoteController::class, 'store'])->name('votes.store');
     Route::delete('/meetings/{meeting}/{question}/vote', [VoteController::class, 'destroy'])->name('votes.destroy');
