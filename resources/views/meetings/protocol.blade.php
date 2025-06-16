@@ -78,7 +78,7 @@
                             @endforeach
                         </span>
                     @endif
-                    @if ($question->status != "Nebalsuoti")
+                    @if ($question->type != "Nebalsuoti")
                         <span><br>
                             {{ $question->decision != ''? 'NUTARTA. ' : '' }}{{ $question->decision }}
                         </span>

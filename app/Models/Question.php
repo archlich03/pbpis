@@ -43,6 +43,11 @@ class Question extends Model
         'Balsuoti dauguma',
     ];
 
+    public const MINIMUM_VOTES = [
+        0,
+        (1/2),
+    ];
+
     /**
      * Get the meeting that owns the Question
      *
