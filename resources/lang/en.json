@@ -1,6 +1,14 @@
 {
-    "Dashboard": "Dashboard",
-    "Bodies": "Bodies",
-    "Meetings": "Meetings",
-    "Users": "Users"
+    "IT administratorius": "IT administrator",
+    "Sekretorius": "Secretary",
+    "Balsuojantysis": "Voter",
+    "Už": "For",
+    "Prieš": "Against",
+    "Susilaiko": "Abstain",
+    "Nebalsuota": "Not voted",
+    "Suplanuotas": "Planned",
+    "Vyksta": "Started",
+    "Baigtas": "Finished",
+    "Klausimas priimtas": "Question passed",
+    "Klausimas nepriimtas": "Question not passed"
 }

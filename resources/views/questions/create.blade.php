@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Create Question') }}
         </h2>
     </x-slot>
@@ -13,12 +13,12 @@
                         @csrf
 
                         <div>
-                            <x-input-label for="title" value="Title" />
+                            <x-input-label for="title" value="{{ __('Title') }}:" />
                             <x-text-input id="title" name="title" type="text" class="block mt-1 w-full" value="{{ old('title') }}" />
                         </div>
 
                         <div class="mt-4">
-                            <x-input-label for="type" value="Type" />
+                            <x-input-label for="type" value="{{ __('Type') }}:" />
                             <select id="type" name="type" class="block mt-1 w-full">
                                 @foreach (\App\Models\Question::STATUSES as $status)
                                     <option value="{{ $status }}" {{ old('type') == $status ? 'selected' : '' }}>{{ $status }}</option>
@@ -27,7 +27,7 @@
                         </div>
 
                         <div class="mt-4">
-                            <x-input-label for="presenter_id" value="Presenter" />
+                            <x-input-label for="presenter_id" value="{{ __('Presenter') }}:" />
                             <select id="presenter_id" name="presenter_id" class="block mt-1 w-full">
                                 @foreach ($users as $user)
                                     @if (!$user->isSecretary()) continue; @endif
@@ -37,12 +37,12 @@
                         </div>
 
                         <div class="mt-4">
-                            <x-input-label for="decision" value="Decision" />
+                            <x-input-label for="decision" value="{{ ('Question decision') }}:" />
                             <x-text-input id="decision" name="decision" type="text" class="block mt-1 w-full" value="{{ old('decision') }}" />
                         </div>
 
                         <div class="mt-4">
-                            <x-input-label for="summary" value="Summary" />
+                            <x-input-label for="summary" value="{{ __('Question summary') }}:" />
                             <textarea id="summary" name="summary" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="3">{{ old('summary') }}</textarea>
                         </div>
 

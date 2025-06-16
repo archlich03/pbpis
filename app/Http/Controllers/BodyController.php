@@ -8,6 +8,7 @@ use App\Models\Meeting;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BodyController extends Controller
 {
@@ -85,6 +86,17 @@ class BodyController extends Controller
         //$membersIds = $body->members ?? [];
         //$members = User::whereIn('user_id', $membersIds)->orderBy('name')->get();
 
+        $meetings = $body->meetings()->orderBy('meeting_date', 'desc')->limit(5)->get();
+        foreach ($meetings as $meeting) {
+            if ($meeting->status != 'Vyksta' && now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
+                $meeting->status = 'Vyksta';
+                $meeting->save();
+            } elseif ($meeting->status != 'Baigtas' && now() >= $meeting->vote_end) {
+                $meeting->status = 'Baigtas';
+                $meeting->save();
+            }
+        }
+
         return view('bodies.show', ['body' => $body]);//, 'members' => $members]);
     }
 
@@ -154,18 +166,26 @@ class BodyController extends Controller
 
         $body = Body::findOrFail($id);
 
-        // Delete all meetings, that are assigned to this body
-        $meetings = Meeting::where('body_id', $id)->get();
-        foreach ($body->meetings as $meeting) {
-            foreach ($meeting->questions as $question) {
-                foreach($question->votes() as $vote) {
-                    $vote->delete();
-                }
-                $question->delete();
+        // Get all meetings belonging to this body
+        $meetings = $body->meetings; // This fetches the collection of Meeting models
+
+        foreach ($meetings as $meeting) {
+            // For each meeting, get its questions
+            $questions = $meeting->questions; // This fetches the collection of Question models
+
+            foreach ($questions as $question) {
+                // For each question, delete its votes
+                $question->votes()->delete(); // Correctly delete votes
             }
-            $meeting->delete();
+
+            // After deleting all votes for questions in this meeting, delete the questions
+            $meeting->questions()->delete(); // Correctly delete questions
         }
 
+        // After deleting all questions (and their votes) for all meetings, delete the meetings
+        $body->meetings()->delete(); // Correctly delete meetings
+
+        // Finally, delete the body itself
         $body->delete();
 
         return redirect()->route('bodies.panel');

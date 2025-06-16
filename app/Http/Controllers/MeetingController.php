@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MeetingController extends Controller
 {
@@ -170,18 +171,27 @@ class MeetingController extends Controller
         }
 
         $meeting = Meeting::findOrFail($id);
-        foreach ($meeting->questions as $question) {
-            foreach($question->votes() as $vote) {
-                $vote->delete();
-            };
-            $question->delete();
-        };
+        $body = $meeting->body; // Get the associated body before deleting the meeting
 
-        $body = $meeting->body;
+        // Step 1: Get all questions related to this meeting
+        $questions = $meeting->questions; // This fetches the collection of Question models
+
+        // Step 2: Iterate through each question and delete its associated votes
+        foreach ($questions as $question) {
+            $question->votes()->delete(); // Correctly deletes votes for each question
+        }
+
+        // Step 3: After all votes are deleted, delete the questions belonging to this meeting
+        $meeting->questions()->delete(); // Correctly deletes questions associated with this meeting
+
+        // Step 4: Finally, delete the meeting itself
         $meeting->delete();
 
-        return redirect()->route('bodies.show', $body);
+        // Redirect back to the show page of the parent body
+        return redirect()->route('bodies.show', $body)
+                         ->with('success', 'Meeting and all related data deleted successfully.');
     }
+
     
     public function protocol(Meeting $meeting)
     {
