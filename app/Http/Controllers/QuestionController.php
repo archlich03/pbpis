@@ -65,7 +65,7 @@ class QuestionController extends Controller
         $question->meeting_id = $meeting->meeting_id;
         $question->title = rtrim($request->input('title'), '.');
         $question->decision = ucfirst($request->input('decision'));
-        if (!preg_match('/[;.]\z/', $question->decision)) {
+        if (!preg_match('/[;.]\z/', $question->decision) && $question->decision != '') {
             $question->decision .= '.';
         }
         $question->presenter_id = $request->input('presenter_id');
@@ -127,7 +127,7 @@ class QuestionController extends Controller
 
         $question->title = rtrim($request->input('title'), '.');
         $question->decision = ucfirst($request->input('decision'));
-        if (!preg_match('/[;.]\z/', $question->decision)) {
+        if (!preg_match('/[;.]\z/', $question->decision) && $question->decision != '') {
             $question->decision .= '.';
         }
         $question->presenter_id = $request->input('presenter_id');
