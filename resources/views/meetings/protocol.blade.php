@@ -59,26 +59,26 @@
                     <span>
                         {{ $question->summary? $question->summary : 'Vyko diskusija.' }}
                     </span><br>
-                    @php
-                        $statuses = [];
-                        foreach (\App\Models\Vote::STATUSES as $status) {
-                            $count = $question->votes()->where('choice', $status)->count();
-                            array_push($statuses, [$status, $count]);
-                        }
-                    @endphp
-                    @if (collect($statuses)->firstWhere(0, 'Už')[1] >= count($meeting->body->members))
-                        <span>Pritarta bendru sutarimu.</span>
-                    @else
-                        <span>
-                            Balsuojama: 
-                            @foreach ($statuses as $status)
-                                <span>
-                                    {{ $status[0] }}: {{ $status[1] }}{{ $loop->last ? '.' : ';' }}
-                                </span>
-                            @endforeach
-                        </span>
-                    @endif
                     @if ($question->type != "Nebalsuoti")
+                        @php
+                            $statuses = [];
+                            foreach (\App\Models\Vote::STATUSES as $status) {
+                                $count = $question->votes()->where('choice', $status)->count();
+                                array_push($statuses, [$status, $count]);
+                            }
+                        @endphp
+                        @if (collect($statuses)->firstWhere(0, 'Už')[1] >= count($meeting->body->members))
+                            <span>Pritarta bendru sutarimu.</span>
+                        @else
+                            <span>
+                                Balsuojama: 
+                                @foreach ($statuses as $status)
+                                    <span>
+                                        {{ $status[0] }}: {{ $status[1] }}{{ $loop->last ? '.' : ';' }}
+                                    </span>
+                                @endforeach
+                            </span>
+                        @endif
                         <span><br>
                             {{ $question->decision != ''? 'NUTARTA. ' : '' }}{{ $question->decision }}
                         </span>

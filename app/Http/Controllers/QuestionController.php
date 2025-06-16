@@ -63,8 +63,11 @@ class QuestionController extends Controller
 
         $question = new Question();
         $question->meeting_id = $meeting->meeting_id;
-        $question->title = $request->input('title');
-        $question->decision = $request->input('decision');
+        $question->title = rtrim($request->input('title'), '.');
+        $question->decision = ucfirst($request->input('decision'));
+        if (!preg_match('/[;.]\z/', $question->decision)) {
+            $question->decision .= '.';
+        }
         $question->presenter_id = $request->input('presenter_id');
         $question->type = $request->input('type');
         $question->summary = $request->input('summary');
@@ -122,8 +125,11 @@ class QuestionController extends Controller
             'summary' => ['nullable', 'string'],
         ]);
 
-        $question->title = $request->input('title');
-        $question->decision = $request->input('decision');
+        $question->title = rtrim($request->input('title'), '.');
+        $question->decision = ucfirst($request->input('decision'));
+        if (!preg_match('/[;.]\z/', $question->decision)) {
+            $question->decision .= '.';
+        }
         $question->presenter_id = $request->input('presenter_id');
         $question->type = $request->input('type');
         $question->summary = $request->input('summary');
