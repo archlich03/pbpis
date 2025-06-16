@@ -8,9 +8,48 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    {{ __("You're logged in!") }}
-                </div>
+                <details class="md:grid md:grid-cols-2 lg:grid-cols-3 gap-4" open>
+                    <summary class="p-6 text-gray-900 dark:text-gray-100">
+                        <strong>{{ __('Upcoming Meetings') }}</strong>
+                    </summary>
+                    <div class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-4 rounded shadow">
+                        @foreach ($bodies as $body)
+                            @foreach ($body->meetings->sortBy('meeting_date') as $meeting)
+                                @if ($meeting->status === 'Baigtas')
+                                    @continue
+                                @endif
+                                <div class="hover:bg-gray-300 dark:hover:bg-gray-500">
+                                    <a href="{{ route('meetings.show', $meeting) }}" class="text-blue-500 hover:text-blue-700 hover:underline hover:bg-gray-300 dark:hover:bg-gray-500">
+                                        <h2 class="text-xl font-semibold">{{ $meeting->body->title }} ({{ $body->is_ba_sp ? 'BA' : 'MA' }}) - {{ $meeting->meeting_date->format('Y-m-d') }}</h2>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                                            {{ __($meeting->status) }}
+                                        </p>
+                                    </a>
+                                </div>
+                            @endforeach
+                        @endforeach
+                    </div>
+                </details>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <details class="md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <summary class="p-6 text-gray-900 dark:text-gray-100">
+                        <strong>{{ __('Related Bodies') }}</strong>
+                    </summary>
+                    <div class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-4 rounded shadow">
+                        @foreach ($bodies as $body)
+                            <div class="hover:bg-gray-300 dark:hover:bg-gray-500">
+                                <a href="{{ route('bodies.show', $body) }}" class="text-blue-500 hover:text-blue-700 hover:underline hover:bg-gray-300 dark:hover:bg-gray-500">
+                                    <h2 class="text-xl font-semibold">{{ $body->title }} ({{ $body->is_ba_sp ? 'BA' : 'MA' }})</h2>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        {{ __('View') }}
+                                    </p>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                </details>
             </div>
         </div>
     </div>

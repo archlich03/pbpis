@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Body;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -88,5 +89,17 @@ class UserController extends Controller
         }
 
         return redirect()->route('users.panel');
+    }
+
+    public function dashboard(): View
+    {
+        $temp_bodies = Body::orderBy('title', 'asc')->get();
+        $bodies = collect();
+        foreach ($temp_bodies as $body) {
+            if ($body->members->contains(Auth::user())) {
+                $bodies->add($body);
+            }
+        }
+        return view('dashboard', ['bodies' => $bodies]);
     }
 }
