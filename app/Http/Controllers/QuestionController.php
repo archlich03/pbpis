@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class QuestionController extends Controller
 {
@@ -155,10 +156,7 @@ class QuestionController extends Controller
             abort(402);
         }
 
-        foreach($question->votes() as $vote) {
-            $vote->delete();
-        };
-        
+        $question->votes()->delete();
         $question->delete();
 
         return redirect()->route('meetings.show', ['meeting' => $meeting]);

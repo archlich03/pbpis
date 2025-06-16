@@ -7,56 +7,56 @@
 
                     <div class="mt-6 text-center">
                         <h2 class="text-3xl font-bold mt-6 mb-2 text-gray-800 dark:text-gray-200">
-                            New meeting for {{ $body->title }} ({{ $body->is_ba_sp ? 'BA' : 'MA' }})
+                            {{ __('New meeting for') }} {{ $body->title }} ({{ $body->is_ba_sp ? 'BA' : 'MA' }})
                         </h2>
                     </div>
 
                     <div class="mt-6">
-                        <x-input-label for="secretary_id" value="Secretary" />
+                        <x-input-label for="secretary_id" value="{{ __('Associated secretary') }}:" />
                         <select id="secretary_id" name="secretary_id" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            <option value="">Select secretary</option>
+                            <option value="">{{ __('Select secretary') }}</option>
                             @foreach ($users as $user)
                                 @if ($user->isSecretary())
                                     <option value="{{ $user->user_id }}"
                                         @if ($user == Auth::user() && Auth::user()->isSecretary()) selected @endif
-                                        required>{{ $user->pedagogical_name }} {{ $user->name }}</option>
+                                        required>{{ $user->name }}</option>
                                 @endif
                             @endforeach
                         </select>
                     </div>
 
                     <div class="mt-6">
-                        <x-input-label for="is_evote" value="Meeting type" class="flex items-center" />
+                        <x-input-label for="is_evote" value="{{ __('Meeting type') }}:" class="flex items-center" />
                         <div class="mt-1 flex items-center space-x-4">
                             <div class="flex items-center">
                                 <input id="is_evote_0" type="radio" name="is_evote" value="0" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" required />
                                 <label for="is_evote_0" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                                    Physical
+                                    {{ __('Physical') }}
                                 </label>
                             </div>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <div class="flex items-center">
                                 <input id="is_evote_1" type="radio" name="is_evote" value="1" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" required />
                                 <label for="is_evote_1" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                                    Electronic
+                                    {{ __('Electronic') }}
                                 </label>
                             </div>
                         </div>
                     </div>
 
                     <div class="mt-6">
-                        <x-input-label for="meeting_date" value="Meeting date:" />
+                        <x-input-label for="meeting_date" value="{{ __('Meeting date') }}:" />
                         <x-text-input id="meeting_date" name="meeting_date" type="date" class="block w-full" />
                     </div>
 
 
                     <div class="mt-6">
-                        <x-input-label for="vote_start" value="Vote start:" />
+                        <x-input-label for="vote_start" value="{{ __('Vote start') }}:" />
                         <x-text-input id="vote_start" name="vote_start" type="datetime-local" class="block w-full" />
                     </div>
 
                     <div class="mt-6">
-                        <x-input-label for="vote_end" value="Vote end:" />
+                        <x-input-label for="vote_end" value="{{ __('Vote end') }}:" />
                         <x-text-input id="vote_end" name="vote_end" type="datetime-local" class="block w-full" />
                     </div>
 

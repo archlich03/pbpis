@@ -7,6 +7,8 @@ use App\Http\Controllers\VoteController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\MeetingController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('welcome');
@@ -70,5 +72,18 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
+Route::get('/locale', function (Request $request) { // Change route to /locale and expect 'locale' in request
+    $locale = $request->query('locale'); // Get locale from query parameter
+
+    if ($locale && in_array($locale, array_keys(config('app.available_locales')))) { // Validate locale
+        Session::put('locale', $locale);
+        App::setLocale($locale); // Set locale immediately
+    }
+
+    // Redirect back, or to a default dashboard if no previous URL exists
+    return redirect()->back();
+})->name('locale.change');
 
 require __DIR__.'/auth.php';
