@@ -181,5 +181,14 @@ class MeetingController extends Controller
 
         return redirect()->route('bodies.show', $body);
     }
-}
+    
+    public function protocol(Meeting $meeting)
+    {
+        if (!Auth::user()->isPrivileged()) {
+            abort(403);
+        }
 
+        return view('meetings.protocol', ['meeting' => $meeting]);
+    }
+
+}

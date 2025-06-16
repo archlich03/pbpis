@@ -72,6 +72,11 @@
                                 </x-primary-button>
                             </form>
                             @if (Auth::user()->isPrivileged())
+                                <x-primary-button>
+                                    <a href="{{ route('meetings.protocol', $meeting) }}" class="w-full" target="_blank">
+                                        {{ __('View HTML Protocol') }}
+                                    </a>
+                                </x-primary-button>
                                 <div x-data="{ confirmingMeetingDeletion: false }"
                                     class="relative">
                                     <x-danger-button
@@ -162,9 +167,7 @@
                                                     <x-input-label for="presenter_id" value="Presenter" />
                                                     <select id="presenter_id" name="presenter_id" class="block mt-1 w-full">
                                                         @foreach ($users as $user)
-                                                            @if ($user->isSecretary())
-                                                                <option value="{{ $user->user_id }}" {{ $question->presenter_id == $user->user_id ? 'selected' : '' }}>{{ $user->pedagogical_name }} {{ $user->name }}</option>
-                                                            @endif
+                                                            <option value="{{ $user->user_id }}" {{ $question->presenter_id == $user->user_id ? 'selected' : '' }}>{{ $user->pedagogical_name }} {{ $user->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
