@@ -7,6 +7,7 @@ use App\Models\Meeting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MeetingController extends Controller
 {
@@ -191,4 +192,14 @@ class MeetingController extends Controller
         return view('meetings.protocol', ['meeting' => $meeting]);
     }
 
+    public function protocolPDF(Meeting $meeting)
+    {
+        if (!Auth::user()->isPrivileged()) {
+            abort(403);
+        }
+
+        $pdf = PDF::loadView('meetings.protocol', ['meeting' => $meeting]);
+        $name = $meeting->body->title . ' ' . ($meeting->body->is_ba_sp ? 'BA' : 'MA') . ' ' . $meeting->meeting_date->format('Y-m-d') . ' protokolas.pdf';
+        return $pdf->download($name); 
+    }
 }

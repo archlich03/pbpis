@@ -1,0 +1,8 @@
+{
+    "times": {
+        "normal": "\/var\/www\/storage\/fonts\/times_normal_83cc44a8ed80ac50023fc3c73de4509b",
+        "bold": "\/var\/www\/storage\/fonts\/times_bold_3d7ce784ef3fbb4587192948e19d022c",
+        "italic": "\/var\/www\/storage\/fonts\/times_italic_36aac8c292d9e774f9d3af8337c6a142",
+        "bold_italic": "times_bold_italic_62bdaf98beaf2ccef535403dc753c77d"
+    }
+}

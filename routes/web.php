@@ -55,7 +55,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     /*Route::get('/meetings/{meeting}/{question}', function($meeting, $question){
         return redirect()->route('meetings.show', $meeting);
     })->name('questions.redirect');*/
-    Route::get('/meetings/{meeting}/protocol', [MeetingController::class, 'protocol'])->name('meetings.protocol');
+    Route::get('/meetings/{meeting}/protocolHTML', [MeetingController::class, 'protocol'])->name('meetings.protocol');
+    Route::get('/meetings/{meeting}/protocolPDF', [MeetingController::class, 'protocolPDF'])->name('meetings.pdf');
 });
 
 // Vote routes

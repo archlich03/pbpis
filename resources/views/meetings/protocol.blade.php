@@ -1,22 +1,61 @@
+<style>
+@font-face {
+    font-family:'Times';
+    src:url("{{ storage_path('fonts/LiberationSerif-Regular.ttf') }}") format("truetype");
+    font-weight:normal;
+    font-style:normal;
+}
+@font-face {
+    font-family:'Times';
+    src:url("{{ storage_path('fonts/LiberationSerif-Bold.ttf') }}") format("truetype");
+    font-weight:bold;
+    font-style:normal;
+}
+@font-face {
+    font-family:'Times';
+    src:url("{{ storage_path('fonts/LiberationSerif-Italic.ttf') }}") format("truetype");
+    font-weight:normal;
+    font-style:italic;
+}
+@font-face {
+    font-family:'Times';
+    src:url("{{ storage_path('fonts/LiberationSerif-BoldItalic.ttf') }}") format("truetype");
+    font-weight:bold;
+    font-style:italic;
+}
+body {
+    font-family:'Times', serif;
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+    line-height: 1;  /* 1 means single spacing */
+}
+
+p, div, h1, h2, h3 {
+    margin: 0;
+    padding: 0;
+    line-height: 1; 
+}
+</style>
 <div style="margin: 0 auto; width: 100%;">
-    <div style="text-align: center; font-weight: bold;"
-        <span style="font-family: 'Times New Roman', Times, serif; font-size: 16px;">
+    <div style="text-align: center; font-weight: bold; font-family: Times, serif; font-size: 16px;">
+        <span>
             VILNIAUS UNIVERSITETO<br>KAUNO FAKULTETO
         </span><br>
         <br>
-        <span style="font-family: 'Times New Roman', Times, serif; font-size: 16px;">
+        <span>
             {{ $meeting->body->is_ba_sp? 'PIRMOSIOS' : 'ANTROSIOS' }} PAKOPOS STUDIJŲ PROGRAMOS
         </span><br>
 
-        <span style="font-family: 'Times New Roman', Times, serif; font-size: 16px;">
+        <span>
             „{{ strtoupper($meeting->body->title) }}“ KOMITETAS<br>
         </span><br>
         
-        <span style="font-family: 'Times New Roman', Times, serif; font-size: 16px;">
+        <span>
             {{ $meeting->is_evote? 'ELEKTRONINIO' : '' }} POSĖDŽIO PROTOKOLAS<br>
         </span><br>
     </div>
-    <div style="text-ident: 50px; font-family: 'Times New Roman', Times, serif; font-size: 16px; text-align: justify;">
+    <div>
         @if ($meeting->is_evote)
             <span>
                 Balsavimas el. būdu vyko nuo {{ $meeting->vote_start->format('Y-m-d H:i') }} iki {{ $meeting->vote_end->format('Y-m-d H:i') }}.
