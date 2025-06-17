@@ -139,6 +139,8 @@ services:
     working_dir: /var/www
     volumes:
       - ./pbpis:/var/www
+    ports:
+     - "5173:5173"
     networks:
       - laravel
     depends_on:
@@ -172,20 +174,40 @@ services:
     networks:
       - laravel
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - laravel
+
 networks:
   laravel:
 
 volumes:
   mysql_data:
+
 ```
 4. Pakeiskite DB prisijungimo duomenis `.env` ir `docker-compose.yml` failuose.
-5. Paleiskite aplikaciją:
+5. Suteikite vykdymo teises `entrypoint.sh` failui:
+```sh
+sudo chmod +x ~/Documents/pbpis/docker/entrypoint.sh
+```
+6. Paleiskite aplikaciją:
 ```sh
 cd ~/Documents/pbpis;
 sudo docker compose up -d;
 ```
-6. Įvykdyti DB migracijas: `sudo docker exec pbpis php artisan migrate:fresh --seed`
-7. Atidarykite web aplikaciją per naršyklę: `http://localhost:8000`
+7. Įvykdyti DB migracijas: `sudo docker exec pbpis php artisan migrate:fresh --seed`
+8. Atidarykite web aplikaciją per naršyklę: `http://localhost:8000`
 
 ## Licencija
 
