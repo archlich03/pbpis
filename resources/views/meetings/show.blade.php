@@ -120,7 +120,7 @@
 
                     <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
 
-                @if ($meeting->body->members->contains(Auth::user()))
+                @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
                     <details class="mb-4">
                         <summary class="text-xl font-semibold"><span class="cursor-pointer">{{ __('Questions') }}</span></summary>
                         @if (Auth::User()->isPrivileged())
@@ -225,7 +225,7 @@
 
                     <details class="mb-4" open>
                         <summary class="text-xl font-semibold"><span class="cursor-pointer">{{ __('Voting process') }}</span></summary>
-                        @if ($meeting->status == "Vyksta")
+                        @if ($meeting->status == "Vyksta" && $meeting->body->members()->contains(Auth::user()))
                             <div class="w-full">
                                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

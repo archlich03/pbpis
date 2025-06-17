@@ -40,7 +40,6 @@ cd ~/Documents;
 mkdir -p pbpis/docker;
 cd pbpis;
 git clone https://github.com/archlich03/pbpis.git;
-cp ~/Documents/pbpis/pbpis/.env.example ~/Documents/pbpis/pbpis/.env
 ```
 2. Į `~/Documents/pbpis/docker` aplanką įterpkite šiuos failus:
 - **~/Documents/pbpis/docker/Dockerfile**
@@ -198,8 +197,9 @@ volumes:
   mysql_data:
 ```
 4. Pakeiskite DB prisijungimo duomenis `.env` ir `docker-compose.yml` failuose.
-5. Suteikite vykdymo teises `entrypoint.sh` failui:
+5. Dar kelios komandos:
 ```sh
+cp ~/Documents/pbpis/pbpis/.env.example ~/Documents/pbpis/pbpis/.env
 sudo chmod +x ~/Documents/pbpis/docker/entrypoint.sh
 ```
 6. Paleiskite aplikaciją:
@@ -207,7 +207,11 @@ sudo chmod +x ~/Documents/pbpis/docker/entrypoint.sh
 cd ~/Documents/pbpis;
 sudo docker compose up -d;
 ```
-7. Įvykdyti DB migracijas: `sudo docker exec pbpis php artisan migrate:fresh --seed`
+7. Įvykdyti DB migracijas ir pirminę konfigūraciją:
+```sh
+sudo docker exec pbpis php artisan migrate:fresh --seed
+sudo docker exec pbpis php artisan key:generate
+```
 8. Atidarykite web aplikaciją per naršyklę: `http://localhost:8000`
 
 ## Licencija

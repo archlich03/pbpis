@@ -29,7 +29,7 @@
                                 <td class="px-4 py-2"><a href="{{ route('bodies.show', $meeting->body) }}">{{ $meeting->body->title }} ({{ $meeting->body->is_ba_sp? 'BA' : 'MA' }})</a></td>
                                 <td class="px-4 py-2">{{ $meeting->is_evote ? __('Electronic') : __('Physical') }}</td>
                                 <td class="px-4 py-2">{{ __($meeting->status) }}</td>
-                                <td class="px-4 py-2">{{ optional($meeting->secretary)->pedagogical_name ?? '' }} {{ optional($meeting->secretary)->name ?? '' }}</td>
+                                <td class="px-4 py-2">{{ optional($meeting->secretary)->name ?? '' }}</td>
                                 <td class="px-4 py-2">{{ $meeting->vote_start->format('Y-m-d H:i') }}</td>
                                 <td class="px-4 py-2">{{ $meeting->vote_end->format('Y-m-d H:i') }}</td>
                                 <td class="px-4 py-2">

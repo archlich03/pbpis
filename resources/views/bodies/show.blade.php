@@ -70,12 +70,12 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h3 class="text-xl font-semibold mb-4">{{ __('Body Information') }}</h3>
                     <ul class="list-disc pl-4">
-                        <li><strong>{{ __('Name') }}:</strong> {{ $body->title }} ({{ $body->is_ba_sp ? 'BA' : 'MA' }})</li>
+                        <li><strong>{{ __('Title') }}:</strong> {{ $body->title }} ({{ $body->is_ba_sp ? 'BA' : 'MA' }})</li>
                         <li><strong>{{ $body->chairman->gender ? __('Chairman') : __('Chairwoman') }}:</strong> {{ optional($body->chairman)->pedagogical_name ?? '' }} {{ optional($body->chairman)->name ?? '' }}</li>
                         <li><strong>{{ __('Members') }}:</strong>
                             <ul class="list-disc pl-8">
                                 @foreach ($body->members as $member)
-                                    <li>- {{ $member->pedagogical_name ?? '' }} {{ $member->name ?? '' }}</li>
+                                    <li>{{ $member->pedagogical_name ?? '' }} {{ $member->name ?? '' }}</li>
                                 @endforeach
                             </ul>
                         </li>

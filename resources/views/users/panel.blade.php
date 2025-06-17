@@ -34,7 +34,7 @@
                                     @if (Auth::user()->isPrivileged())
                                         <tr>
                                             <td class="border px-4 py-2">{{ $user->pedagogical_name }} {{ $user->name }}</td>
-                                            <td class="border px-4 py-2">{{ $user->email }}</td>
+                                            <td class="border px-4 py-2 break-words">{{ $user->email }}</td>
                                             @if (Auth::user()->isAdmin())
                                                 <td class="border px-4 py-2">{{ __($user->role) }}</td>
                                             @endif
