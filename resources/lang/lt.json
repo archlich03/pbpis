@@ -110,5 +110,13 @@
     "Register New User": "Registruoti naują vartotoją",
     "You are not authorized to view this page.": "Jūs neturite prieigos peržiūrėti šį puslapį",
     "Upcoming Meetings": "Artėjantys posėdžiai",
-    "Related Bodies": "Susiję dariniai"
+    "Related Bodies": "Susiję dariniai",
+    "Main functions of PBPIS": "Pagrindinės PBPIS funkcijos",
+    "Meeting and body management": "Posėdžių ir darinių valdymas",
+    "Voting process for questions": "Klausimų balsavimo procesas",
+    "Automated protocol generation": "Automatizuotas protokolų generavimas",
+    "User and role management": "Naudotojų ir rolių valdymas",
+    "Go to Dashboard": "Eiti į valdymo panelę",
+    "Log in to PBPIS": "Prisijungti prie PBPIS",
+    "The Voting and Protocol Management Information System (PBPIS) is designed for the administration of electronic meetings of Study Program Committees at Vilnius University Kaunas Faculty. It assists members in participating in meetings, casting their votes and generating minutes in a convenient, unified platform.": "<strong>Balsavimo ir protokolavimo informacinė sistema (PBPIS)</strong> skirta Vilniaus universiteto Kauno fakulteto studijų programų komitetų elektroniniams posėdžiams administruoti. Ji padeda nariams dalyvauti posėdžiuose, balsuoti patogioje, vieningoje platformoje."
 }

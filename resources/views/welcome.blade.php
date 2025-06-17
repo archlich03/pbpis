@@ -1,30 +1,53 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth dark">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>PBPIS</title>
-
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 h-screen flex flex-col justify-center">
-    <div class="max-w-md mx-auto p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-        <div class="flex items-center justify-center">
-            <a href="https://laravel.com">
-                <x-application-logo class="block h-12 w-auto fill-current text-gray-800 dark:text-gray-200" />
+<body class="h-screen flex flex-col justify-center bg-gray-900">
+    <div class="max-w-md mx-auto p-4 bg-gray-800 rounded-lg shadow-lg">
+        <div class="flex items-center justify-center mb-6">
+            <a href="login/">
+                <x-application-logo class="block h-12 w-auto fill-current text-gray-200" />
             </a>
         </div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center">PBPIS</h1>
-        <p class="mt-2 text-gray-800 dark:text-gray-200">Voting and Protocol Management Information System - IS, which is intended for the administration of electronic meetings of the Study Program Committees of Vilnius University Kaunas Faculty and generating protocols. This IS is being developed to fulfill the requirements set by the Information Systems and Cybersecurity "Coursework" module.</p>
-        <p class="mt-2 text-gray-800 dark:text-gray-200">IS functions:</p>
-        <ul class="list-disc pl-4 text-gray-800 dark:text-gray-200">
-            <li>meeting and document management;</li>
-            <li>user voting process;</li>
-            <li>protocol generation;</li>
-            <li>user management.</li>
+
+        <h1 class="text-3xl font-bold text-gray-100 text-center mb-4">
+            PBPIS
+        </h1>
+
+        <p class="text-gray-300 mb-4">
+            {!! __('The Voting and Protocol Management Information System (PBPIS) is designed for the administration of electronic meetings of Study Program Committees at Vilnius University Kaunas Faculty. It assists members in participating in meetings, casting their votes and generating minutes in a convenient, unified platform.') !!}
+        </p>
+
+        <p class="text-gray-300 mb-4">
+            {{ __('Main functions of PBPIS') }}:
+        </p>
+
+        <ul class="list-disc pl-4 text-gray-300 mb-6">
+            <li>{{ __('Meeting and body management') }}.</li>
+            <li>{{ __('Voting process for questions') }}.</li>
+            <li>{{ __('Automated protocol generation') }}.</li>
+            <li>{{ __('User and role management') }}.</li>
         </ul>
-        <p class="mt-4"><a href="{{ route('login') }}" class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-600">Log in</a></p>
+
+        <div class="text-center">
+            @auth
+                <a 
+                    href="{{ route('dashboard') }}"
+                    class="px-4 py-2 bg-blue-500 text-gray-100 font-semibold rounded-md hover:bg-blue-600 transition">
+                    {{ __('Go to Dashboard') }}
+                </a>
+            @else
+                <a 
+                    href="{{ route('login') }}"
+                    class="px-4 py-2 bg-blue-500 text-gray-100 font-semibold rounded-md hover:bg-blue-600 transition">
+                    {{ __('Log in to PBPIS') }}
+                </a>
+            @endauth
+        </div>
     </div>
 </body>
 </html>
