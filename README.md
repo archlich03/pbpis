@@ -43,7 +43,7 @@ git clone https://github.com/archlich03/pbpis.git;
 cp ~/Documents/pbpis/pbpis/.env.example ~/Documents/pbpis/pbpis/.env
 ```
 2. Į `~/Documents/pbpis/docker` aplanką įterpkite šiuos failus:
-- **Dockerfile**
+- **~/Documents/pbpis/docker/Dockerfile**
 ```dockerfile
 FROM php:8.2-fpm
 
@@ -86,7 +86,7 @@ RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 ```
-- **entrypoint.sh**
+- **~/Documents/pbpis/docker/entrypoint.sh**
 ```sh
 #!/bin/bash
 
@@ -94,6 +94,9 @@ ENTRYPOINT ["/entrypoint.sh"]
 # sleep 10
 
 # Laravel setup
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+chmod -R 777 /var/www/storage /var/www/bootstrap/cache
+composer install
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
@@ -102,7 +105,7 @@ php artisan key:generate
 # Start PHP-FPM
 exec php-fpm
 ```
-- **nginx.conf**
+- **~/Documents/pbpis/docker/nginx.conf**
 ```conf
 server {
     listen 80;
@@ -124,7 +127,7 @@ server {
 }
 ```
 3. Į `~/Documents/pbpis` įterpkite šį failą:
-- **docker-compose.yml**
+- **~/Documents/pbpis/docker-compose.yml**
 ```yml
 services:
   pbpis:
@@ -181,7 +184,7 @@ volumes:
 cd ~/Documents/pbpis;
 sudo docker compose up -d;
 ```
-6. Įvykdyti DB migracijas: `sudo docker exec pbpis php artisan migrate`
+6. Įvykdyti DB migracijas: `sudo docker exec pbpis php artisan migrate:fresh --seed`
 7. Atidarykite web aplikaciją per naršyklę: `http://localhost:8000`
 
 ## Licencija
