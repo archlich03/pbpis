@@ -13,20 +13,15 @@
                         <strong>{{ __('Upcoming Meetings') }}</strong>
                     </summary>
                     <div class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-4 rounded shadow">
-                        @foreach ($bodies as $body)
-                            @foreach ($body->meetings->sortBy('meeting_date') as $meeting)
-                                @if ($meeting->status === 'Baigtas')
-                                    @continue
-                                @endif
+                        @foreach ($meetings as $meeting)
                                 <div class="hover:bg-gray-300 dark:hover:bg-gray-500">
                                     <a href="{{ route('meetings.show', $meeting) }}" class="text-gray-300">
-                                        <h2 class="text-xl font-semibold">{{ $meeting->body->title }} ({{ $body->is_ba_sp ? 'BA' : 'MA' }}) - {{ $meeting->meeting_date->format('Y-m-d') }}</h2>
+                                        <h2 class="text-xl font-semibold">{{ $meeting->body->title }} ({{ $meeting->body->is_ba_sp ? 'BA' : 'MA' }}) - {{ $meeting->meeting_date->format('Y-m-d') }}</h2>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">
                                             {{ __($meeting->status) }}
                                         </p>
                                     </a>
                                 </div>
-                            @endforeach
                         @endforeach
                     </div>
                 </details>

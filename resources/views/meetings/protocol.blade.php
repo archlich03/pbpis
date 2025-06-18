@@ -1,5 +1,5 @@
 <style>
-@font-face {
+/*@font-face {
     font-family:'Times';
     src:url("{{ storage_path('fonts/LiberationSerif-Regular.ttf') }}") format("truetype");
     font-weight:normal;
@@ -22,9 +22,34 @@
     src:url("{{ storage_path('fonts/LiberationSerif-BoldItalic.ttf') }}") format("truetype");
     font-weight:bold;
     font-style:italic;
+}*/
+
+@font-face {
+    font-family:'FreeSerif';
+    src:url("{{ storage_path('fonts/FreeSerif-Regular.ttf') }}") format("truetype");
+    font-weight:normal;
+    font-style:normal;
+}
+@font-face {
+    font-family:'FreeSerif';
+    src:url("{{ storage_path('fonts/FreeSerif-Bold.ttf') }}") format("truetype");
+    font-weight:bold;
+    font-style:normal;
+}
+@font-face {
+    font-family:'FreeSerif';
+    src:url("{{ storage_path('fonts/FreeSerif-Italic.ttf') }}") format("truetype");
+    font-weight:normal;
+    font-style:italic;
+}
+@font-face {
+    font-family:'FreeSerif';
+    src:url("{{ storage_path('fonts/FreeSerif-BoldItalic.ttf') }}") format("truetype");
+    font-weight:bold;
+    font-style:italic;
 }
 body {
-    font-family:'Times', serif;
+    font-family: 'Times New Roman', 'FreeSerif', 'Times', 'DejaVu Sans', serif;
     font-size: 16px;
     margin: 0;
     padding: 0;
@@ -38,7 +63,7 @@ p, div, h1, h2, h3 {
 }
 </style>
 <div style="margin: 0 auto; width: 100%;">
-    <div style="text-align: center; font-weight: bold; font-family: Times, serif; font-size: 16px;">
+    <div style="text-align: center; font-weight: bold; font-size: 16px;">
         <span>
             VILNIAUS UNIVERSITETO<br>KAUNO FAKULTETO
         </span><br>

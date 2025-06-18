@@ -225,7 +225,7 @@
 
                     <details class="mb-4" open>
                         <summary class="text-xl font-semibold"><span class="cursor-pointer">{{ __('Voting process') }}</span></summary>
-                        @if ($meeting->status == "Vyksta" && $meeting->body->members()->contains(Auth::user()))
+                        @if ($meeting->status == "Vyksta" && $meeting->body->members->contains(Auth::user()))
                             <div class="w-full">
                                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -250,9 +250,9 @@
                                                     <form method="POST" action="{{ route('votes.store', [$meeting, $question]) }}" class="inline-block">
                                                         @csrf
                                                         @method('PUT')
-                                                        <input type="hidden" name="choice" value="{{ __($status) }}">
+                                                        <input type="hidden" name="choice" value="{{ $status }}">
                                                         <td class="px-6 py-4">
-                                                            @if ($question->voteByUser(auth()->user()) && $question->voteByUser(auth()->user())->choice == $status)
+                                                            @if ($question->voteByUser(auth::user()) && $question->voteByUser(auth::user())->choice == $status)
                                                                 <x-danger-button type="submit" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest">
                                                                     {{ __($status) }}
                                                                 </x-danger-button>

@@ -100,6 +100,17 @@ class UserController extends Controller
                 $bodies->add($body);
             }
         }
-        return view('dashboard', ['bodies' => $bodies]);
+
+        $meetings = collect();
+        foreach ($bodies as $body) {
+            foreach ($body->meetings as $meeting) {
+                if ($meeting->status !== 'Baigtas') {
+                    $meetings->add($meeting);
+                }
+            }
+        }
+        $meetings = $meetings->sortByDesc('meeting_date');
+        
+        return view('dashboard', ['bodies' => $bodies, 'meetings' => $meetings]);
     }
 }
