@@ -88,7 +88,10 @@ class BodyController extends Controller
 
         $meetings = $body->meetings()->orderBy('meeting_date', 'desc')->limit(5)->get();
         foreach ($meetings as $meeting) {
-            if ($meeting->status != 'Vyksta' && now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
+            if ($meeting->status != 'Suplanuotas' && now() < $meeting->vote_start && now()) {
+                $meeting->status = 'Suplanuotas';
+                $meeting->save();
+            } elseif ($meeting->status != 'Vyksta' && now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
                 $meeting->status = 'Vyksta';
                 $meeting->save();
             } elseif ($meeting->status != 'Baigtas' && now() >= $meeting->vote_end) {

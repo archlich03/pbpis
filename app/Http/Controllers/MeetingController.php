@@ -87,7 +87,10 @@ class MeetingController extends Controller
         $meeting = Meeting::findOrFail($id);
         $users = User::orderBy('name', 'asc')->get();
         
-        if ($meeting->status != 'Vyksta' && now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
+        if ($meeting->status != 'Suplanuotas' && now() < $meeting->vote_start && now()) {
+            $meeting->status = 'Suplanuotas';
+            $meeting->save();
+        } elseif ($meeting->status != 'Vyksta' && now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
             $meeting->status = 'Vyksta';
             $meeting->save();
         } elseif ($meeting->status != 'Baigtas' && now() >= $meeting->vote_end) {
