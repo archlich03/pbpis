@@ -37,7 +37,7 @@
                         </div>
 
                         <div class="mt-4">
-                            <x-input-label for="decision" value="{{ ('Question decision') }}:" />
+                            <x-input-label for="decision" value="{{ __('Question decision') }}:" />
                             <x-text-input id="decision" name="decision" type="text" class="block mt-1 w-full" value="{{ old('decision') }}" />
                         </div>
 

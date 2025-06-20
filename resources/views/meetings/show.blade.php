@@ -135,15 +135,15 @@
                                 <details class="mb-4">
                                     <summary class="font-semibold cursor-pointer">{{ $loop->iteration }}. {{ $question->title }}</summary>
                                     <div class="ml-4">
+                                        @php
+                                            $statuses = [];
+                                            $minVotes = \App\Models\Question::MINIMUM_VOTES[array_search($question->type, \App\Models\Question::STATUSES)] * $question->meeting->body->members->count();
+                                            foreach (\App\Models\Vote::STATUSES as $status) {
+                                                $count = $question->votes()->where('choice', $status)->count();
+                                                array_push($statuses, [$status, $count]);
+                                            }
+                                        @endphp
                                         @if ($question->type != 'Nebalsuoti')
-                                            @php
-                                                $statuses = [];
-                                                $minVotes = \App\Models\Question::MINIMUM_VOTES[array_search($question->type, \App\Models\Question::STATUSES)] * $question->meeting->body->members->count();
-                                                foreach (\App\Models\Vote::STATUSES as $status) {
-                                                    $count = $question->votes()->where('choice', $status)->count();
-                                                    array_push($statuses, [$status, $count]);
-                                                }
-                                            @endphp
                                             <span><strong>
                                                 {{ ($statuses[0][1] > $minVotes)? __('Klausimas priimtas') : __('Klausimas nepriimtas') }}
                                             </strong></span><br>
