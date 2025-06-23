@@ -26,6 +26,7 @@ Pirmą kartą paleidus IS, sukuriami šie vartotojai. Esant poreikiui, IT admini
 ```shell
 cd ~/Documents;
 git clone https://github.com/archlich03/pbpis.git;
+cp .env.example .env
 sudo docker compose up -d;
 ```
 2. Pirmą kartą paleidžiant įvykdykite DB migraciją ir pirminę konfigūraciją:
