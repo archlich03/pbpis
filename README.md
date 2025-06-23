@@ -28,12 +28,13 @@ cd ~/Documents;
 git clone https://github.com/archlich03/pbpis.git;
 sudo docker compose up -d;
 ```
-2. Pirmą kartą paleidžiant įvykdyti DB migraciją ir pirminę konfigūraciją:
+2. Pirmą kartą paleidžiant įvykdykite DB migraciją ir pirminę konfigūraciją:
 ```sh
 sudo docker exec pbpis php artisan migrate:fresh --seed
 sudo docker exec pbpis php artisan key:generate
+sudo docker compose restart pbpis
 ```
-8. Atidarykite web aplikaciją per naršyklę: `http://localhost:8000`
+3. Atidarykite web aplikaciją per naršyklę: `http://localhost:8000`
 
 ## Licencija
 
