@@ -15,28 +15,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name' => 'Rokas Stankūnas',
-            'role' => 'IT administratorius',
-            'email' => 'admin@knf.vu.lt',
-            'password' => bcrypt('admin123'),
+            'name' => 'IT admin',
+            'role' => 'IT admin',
+            'email' => env('DEFAULT_EMAIL', 'admin@knf.vu.lt'),
+            'password' => Hash::make(env('DEFAULT_PASSWORD', 'admin123')),
             'gender' => 1,
-        ]);
-
-        User::factory()->create([
-            'name' => 'Meduolis Šaunuolis',
-            'role' => 'Sekretorius',
-            'email' => 'meduolis.saunuolis@knf.vu.lt',
-            'password' => bcrypt('sekre123'),
-            'gender' => 1,
-        ]);
-
-        User::factory()->create([
-            'name' => 'Umėdė Garduolė',
-            'role' => 'Balsuojantysis',
-            'email' => 'umede.garduole@knf.vu.lt',
-            'password' => bcrypt('balsa123'),
-            'gender' => 0,
-            'pedagogical_name' => "lekt.",
         ]);
     }
 }
