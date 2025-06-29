@@ -27,7 +27,7 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'gender' => ['required', 'boolean'],
             'role' => ['required', 'string', 'max:32'],
-            'pedagogical_name' => ['string', 'max:32'],
+            'pedagogical_name' => ['nullable', 'string', 'max:32'],
         ];
     }
 }
