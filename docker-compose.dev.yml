@@ -2,7 +2,7 @@ services:
   pbpis:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./docker/dev/Dockerfile
     container_name: pbpis
     restart: unless-stopped
     working_dir: /var/www
@@ -23,7 +23,7 @@ services:
       - "8000:80"
     volumes:
       - ./:/var/www
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - pbpis
     networks:
@@ -40,6 +40,19 @@ services:
       - MYSQL_PASSWORD=${DB_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - laravel
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      - PMA_HOST=mysql
+      - PMA_USER=${DB_USERNAME}
+      - PMA_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "8080:80"
     networks:
       - laravel
 

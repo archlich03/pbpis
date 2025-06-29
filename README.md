@@ -13,24 +13,21 @@ Posėdžių balsavimo ir protokolavimo informacinė sistema - IS, kuri skirta Vi
 - Įrašyta [Docker Engine](https://docs.docker.com/engine/install/debian/) programinė įranga (privalo būti suinstaliuotas Docker Compose).
 
 ## Prisijungimo informacija:
-Pirmą kartą paleidus IS, sukuriami šie vartotojai. Esant poreikiui, IT administratoriaus rolę turintis naudotojas gali juos ištrinti:
-- **IT administratorius:** 
-  - El. paštas: `admin@knf.vu.lt`
-  - Slaptažodis: `admin123`
-
-Įprastas DB prisijungimas specifikuotas .env faile.
+Pirmą kartą paleidus IS, sukuriamas IT administratoriaus rolę turintis naudotojas. Prisijungimo duomenys specifikuoti .env faile.
 
 ## Instaliacijos instrukcija
 
 1. Įvykdykite šias komandas:
-```shell
+```sh
 cd ~/Documents;
 git clone https://github.com/archlich03/pbpis.git;
-cp .env.example .env
+cd pbpis;
+cp .env.example .env;
 sudo docker compose up -d;
 ```
 2. Pirmą kartą paleidžiant įvykdykite DB migraciją ir pirminę konfigūraciją:
 ```sh
+sleep 5;
 sudo docker exec pbpis php artisan migrate:fresh --seed
 sudo docker exec pbpis php artisan key:generate
 sudo docker compose restart pbpis

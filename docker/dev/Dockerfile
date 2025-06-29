@@ -33,7 +33,7 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
 COPY .env.example /var/www/.env
 
 # Entrypoint to run artisan tasks and start PHP-FPM
-COPY entrypoint.sh /entrypoint.sh
+COPY ./docker/dev/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
