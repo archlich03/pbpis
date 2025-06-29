@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         User::factory()->create([
             'name' => 'IT admin',
-            'role' => 'IT admin',
+            'role' => 'IT administratorius',
             'email' => env('DEFAULT_EMAIL', 'admin@knf.vu.lt'),
             'password' => Hash::make(env('DEFAULT_PASSWORD', 'admin123')),
             'gender' => 1,
