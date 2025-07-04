@@ -91,9 +91,9 @@ jobs:
         cp .env.example .env
         echo "✅ Copied .env.example to .env"
         
-        # Step 1: docker compose up -d
+        # Step 1: docker compose up -d --quiet-pull
         echo "Starting services with docker compose up -d..."
-        docker compose up -d
+        docker compose up -d --quiet-pull
         
         # Check if services started successfully
         echo "Checking service status..."
@@ -154,7 +154,7 @@ jobs:
             if [[ $response == *"<html"* ]] || [[ $response == *"Laravel"* ]] || [[ $response == *"PBPIS"* ]]; then
               echo "✅ Application is serving proper HTML content"
               echo "First 200 characters of response:"
-              echo "$response" | head -c 200
+              echo "$response"
             else
               echo "⚠️  Application responds but content might be unexpected"
               echo "First 200 characters of response:"
