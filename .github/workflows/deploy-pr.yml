@@ -153,6 +153,8 @@ jobs:
             response=$(curl -s http://localhost:8000)
             if [[ $response == *"<html"* ]] || [[ $response == *"Laravel"* ]] || [[ $response == *"PBPIS"* ]]; then
               echo "✅ Application is serving proper HTML content"
+              echo "First 200 characters of response:"
+              echo "$response" | head -c 200
             else
               echo "⚠️  Application responds but content might be unexpected"
               echo "First 200 characters of response:"
