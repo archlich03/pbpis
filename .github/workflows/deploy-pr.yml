@@ -140,17 +140,17 @@ jobs:
     - name: Step 3 - Test web application access
       run: |
         echo "=== Testing web application access ==="
-        echo "Testing http://localhost:8000 (as per installation instructions)"
+        echo "Testing http://localhost:8000/login (as per installation instructions)"
         
-        # Test if the application responds at localhost:8000
+        # Test if the application responds at localhost:8000/login
         for i in {1..12}; do
           echo "Attempt $i: Testing application..."
           
-          if curl -f -s http://localhost:8000 > /dev/null; then
-            echo "✅ SUCCESS: Web application is accessible at http://localhost:8000"
+          if curl -f -s http://localhost:8000/login > /dev/null; then
+            echo "✅ SUCCESS: Web application is accessible at http://localhost:8000/login"
             
             # Get the actual response to verify it's working
-            response=$(curl -s http://localhost:8000)
+            response=$(curl -s http://localhost:8000/login)
             if [[ $response == *"<html"* ]] || [[ $response == *"Laravel"* ]] || [[ $response == *"PBPIS"* ]]; then
               echo "✅ Application is serving proper HTML content"
               echo "First 200 characters of response:"
