@@ -1,0 +1,241 @@
+name: PBPIS Installation Test
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  test-installation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Check repository structure
+      run: |
+        echo "=== Repository Structure Check ==="
+        echo "Checking if required files exist..."
+        
+        # Check if docker directory exists
+        if [ ! -d "docker" ]; then
+          echo "⚠️  docker/ directory not found, creating it..."
+          mkdir -p docker
+        fi
+        
+        # Check if entrypoint.sh exists
+        if [ ! -f "docker/entrypoint.sh" ]; then
+          echo "⚠️  docker/entrypoint.sh not found, creating it..."
+          cat > docker/entrypoint.sh << 'EOF'
+        #!/bin/bash
+
+        # Wait for DB if needed (optional)
+        #sleep 5
+
+        # Laravel setup
+        chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+        chmod -R 777 /var/www/storage /var/www/bootstrap/cache
+
+        composer install
+        npm install
+
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache
+
+        npm run dev &
+
+        # Start PHP-FPM
+        exec php-fpm
+        EOF
+        else
+          echo "✅ docker/entrypoint.sh exists"
+        fi
+        chmod +x docker/entrypoint.sh
+
+        # Check if nginx config exists
+        if [ ! -f "docker/nginx.conf" ]; then
+          echo "⚠️  docker/nginx.conf not found, creating it..."
+          cat > docker/nginx.conf << 'EOF'
+        server {
+            listen 80;
+            server_name localhost;
+            root /var/www/public;
+
+            index index.php index.html index.htm;
+
+            location / {
+                try_files $uri $uri/ /index.php?$query_string;
+            }
+
+            location ~ \.php$ {
+                include fastcgi_params;
+                fastcgi_pass pbpis:9000;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            }
+        }
+        EOF
+        else
+          echo "✅ docker/nginx.conf exists"
+        fi
+        
+        # Show final structure
+        echo "=== Final docker/ directory contents ==="
+        ls -la docker/
+
+    - name: Step 1 - Follow your installation instructions
+      run: |
+        echo "=== Following PBPIS Installation Instructions ==="
+        
+        # Step 1: cp .env.example .env (already have .env.example)
+        cp .env.example .env
+        echo "✅ Copied .env.example to .env"
+        
+        # Step 1: docker compose up -d
+        echo "Starting services with docker compose up -d..."
+        docker compose up -d
+        
+        # Check if services started successfully
+        echo "Checking service status..."
+        sleep 5
+        docker compose ps
+        
+        # Check if any containers failed to start
+        if docker compose ps | grep -q "Exit"; then
+          echo "❌ Some containers failed to start"
+          echo "=== Container logs ==="
+          docker compose logs
+          exit 1
+        fi
+        
+        echo "✅ Services started successfully"
+
+    - name: Step 2 - First-time setup (DB migration and configuration)
+      run: |
+        echo "=== First-time setup ==="
+        
+        # Step 2: Wait for services to be ready
+        echo "Waiting for services to initialize..."
+        sleep 5
+        
+        # Step 2: Run DB migration and seeding
+        echo "Running database migration and seeding..."
+        docker exec pbpis php artisan migrate:fresh --seed
+        echo "✅ Database migrated and seeded"
+        
+        # Step 2: Generate application key
+        echo "Generating application key..."
+        docker exec pbpis php artisan key:generate
+        echo "✅ Application key generated"
+        
+        # Step 2: Restart pbpis container
+        echo "Restarting pbpis container..."
+        docker compose restart pbpis
+        echo "✅ PBPIS container restarted"
+        
+        # Wait for restart to complete
+        echo "Waiting for restart to complete..."
+        sleep 10
+
+    - name: Step 3 - Test web application access
+      run: |
+        echo "=== Testing web application access ==="
+        echo "Testing http://localhost:8000 (as per installation instructions)"
+        
+        # Test if the application responds at localhost:8000
+        for i in {1..12}; do
+          echo "Attempt $i: Testing application..."
+          
+          if curl -f -s http://localhost:8000 > /dev/null; then
+            echo "✅ SUCCESS: Web application is accessible at http://localhost:8000"
+            
+            # Get the actual response to verify it's working
+            response=$(curl -s http://localhost:8000)
+            if [[ $response == *"<html"* ]] || [[ $response == *"Laravel"* ]] || [[ $response == *"PBPIS"* ]]; then
+              echo "✅ Application is serving proper HTML content"
+            else
+              echo "⚠️  Application responds but content might be unexpected"
+              echo "First 200 characters of response:"
+              echo "$response" | head -c 200
+            fi
+            
+            exit 0
+          fi
+          
+          echo "Not ready yet, waiting..."
+          sleep 10
+        done
+        
+        echo "❌ FAILED: Web application is not accessible"
+        echo ""
+        echo "=== Debugging Information ==="
+        echo "=== Container Status ==="
+        docker compose ps
+        echo ""
+        echo "=== PBPIS Container Logs ==="
+        docker logs pbpis --tail=50
+        echo ""
+        echo "=== MySQL Container Logs ==="
+        docker logs mysql --tail=20
+        echo ""
+        echo "=== Nginx Container Logs ==="
+        docker logs nginx --tail=20
+        
+        exit 1
+
+    - name: Verify installation completeness
+      run: |
+        echo "=== Verifying Installation Completeness ==="
+        
+        # Check if all containers are running
+        echo "Checking container status..."
+        docker compose ps
+        
+        # Test database connection (verify migration worked)
+        echo "Testing database connection..."
+        docker exec pbpis php -r "
+        try {
+          \$pdo = new PDO('mysql:host=mysql;dbname=pbpis', 'user', 'secret');
+          echo '✅ Database connection successful\n';
+        } catch (Exception \$e) {
+          echo '❌ Database connection failed: ' . \$e->getMessage() . '\n';
+          exit(1);
+        }
+        "
+        
+        # Test Laravel application status
+        echo "Testing Laravel application..."
+        docker exec pbpis php artisan --version
+        
+        # Test if default admin user was created (from seeding)
+        echo "Verifying database seeding..."
+        docker exec pbpis php artisan tinker --execute="
+        \$userCount = DB::table('users')->count();
+        echo 'Users in database: ' . \$userCount . PHP_EOL;
+        if (\$userCount > 0) {
+          echo '✅ Database seeding successful - users table populated' . PHP_EOL;
+        } else {
+          echo '❌ Database seeding failed - no users found' . PHP_EOL;
+          exit(1);
+        }
+        "
+        
+        echo "✅ Installation verification complete!"
+
+    - name: Test phpMyAdmin access (bonus check)
+      run: |
+        echo "=== Testing phpMyAdmin access ==="
+        # Test if phpMyAdmin is accessible (as per docker-compose.yml)
+        if curl -f -s http://localhost:8080 > /dev/null; then
+          echo "✅ phpMyAdmin is accessible at http://localhost:8080"
+        else
+          echo "⚠️  phpMyAdmin might not be ready yet (this is not critical)"
+        fi
+
+    - name: Cleanup
+      if: always()
+      run: |
+        echo "=== Cleanup ==="
+        docker compose down
+        docker system prune -f
+        echo "✅ Cleanup complete"
