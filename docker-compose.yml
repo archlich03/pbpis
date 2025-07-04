@@ -2,7 +2,7 @@ services:
   pbpis:
     build:
       context: .
-      dockerfile: ./docker/dev/Dockerfile
+      dockerfile: ./docker/Dockerfile
     container_name: pbpis
     restart: unless-stopped
     working_dir: /var/www
