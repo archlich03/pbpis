@@ -25,7 +25,7 @@
                                 type="text"
                                 name="search"
                                 value="{{ request('search') }}"
-                                placeholder="Search by name or email"
+                                placeholder="{{ __('Search by name or email') }}"
                                 class="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white"
                             />
 
