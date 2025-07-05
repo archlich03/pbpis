@@ -30,12 +30,12 @@
                             />
 
                             <x-secondary-button type="submit">
-                                Search
+                                {{ __('Search') }}
                             </x-secondary-button>
 
                             @if(request('search'))
                                 <a href="{{ route('users.panel', request()->except('search', 'page')) }}" class="text-sm text-gray-200 hover:underline ml-2">
-                                    Clear
+                                    {{ __('Clear') }}
                                 </a>
                             @endif
                         </form>
