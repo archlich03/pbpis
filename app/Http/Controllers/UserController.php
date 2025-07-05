@@ -19,20 +19,27 @@ class UserController extends Controller
         $perPage = request('perPage', 20);
         $sort = request('sort', 'name');
         $direction = request('direction', 'asc');
+        $search = request('search');
 
-        if (!in_array($sort, ['name', 'email'])) {
-            $sort = 'name';
+        $query = User::query();
+
+        // Apply search if present
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                ->orWhere('email', 'like', '%' . $search . '%');
+            });
         }
 
-        if (!in_array($direction, ['asc', 'desc'])) {
-            $direction = 'asc';
-        }
+        // Validate and apply sorting
+        if (!in_array($sort, ['name', 'email'])) $sort = 'name';
+        if (!in_array($direction, ['asc', 'desc'])) $direction = 'asc';
 
-        $users = User::orderBy($sort, $direction)
+        $users = $query->orderBy($sort, $direction)
             ->paginate($perPage)
             ->withQueryString();
 
-    return view('users.panel', compact('users'));
+        return view('users.panel', compact('users'));
     }
 
     

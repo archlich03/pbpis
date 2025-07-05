@@ -9,12 +9,36 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <div class="flex items-center gap-4">
-                        <x-primary-button>
+                    <div class="flex flex-wrap items-center gap-4 mb-4">
+                        <x-secondary-button>
                             <a href="{{ route('register') }}" class="w-full">
                                 {{ __('Register New User') }}
                             </a>
-                        </x-primary-button>
+                        </x-secondary-button>
+
+                        <form method="GET" class="flex flex-1 items-center gap-2">
+                            @foreach(request()->except('search', 'page') as $key => $value)
+                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @endforeach
+
+                            <input
+                                type="text"
+                                name="search"
+                                value="{{ request('search') }}"
+                                placeholder="Search by name or email"
+                                class="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white"
+                            />
+
+                            <x-secondary-button type="submit">
+                                Search
+                            </x-secondary-button>
+
+                            @if(request('search'))
+                                <a href="{{ route('users.panel', request()->except('search', 'page')) }}" class="text-sm text-gray-200 hover:underline ml-2">
+                                    Clear
+                                </a>
+                            @endif
+                        </form>
                     </div>
                     @if (Auth::user()->isPrivileged())
                         @php
