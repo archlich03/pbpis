@@ -16,9 +16,23 @@ class UserController extends Controller
      */
     public function index(): View
     {
-        $users = User::orderBy('name', 'asc')->get(); // Fetch all users sorted by name
+        $perPage = request('perPage', 20);
+        $sort = request('sort', 'name');
+        $direction = request('direction', 'asc');
 
-        return view('users.panel', ['users' => $users]); // Pass users to the view
+        if (!in_array($sort, ['name', 'email'])) {
+            $sort = 'name';
+        }
+
+        if (!in_array($direction, ['asc', 'desc'])) {
+            $direction = 'asc';
+        }
+
+        $users = User::orderBy($sort, $direction)
+            ->paginate($perPage)
+            ->withQueryString();
+
+    return view('users.panel', compact('users'));
     }
 
     

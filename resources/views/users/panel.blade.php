@@ -17,11 +17,29 @@
                         </x-primary-button>
                     </div>
                     @if (Auth::user()->isPrivileged())
+                        @php
+                            function sortLink($column, $label) {
+                                $currentSort = request('sort', 'name');
+                                $currentDir = request('direction', 'asc');
+
+                                $isCurrent = $currentSort === $column;
+                                $newDir = ($isCurrent && $currentDir === 'asc') ? 'desc' : 'asc';
+
+                                $query = request()->except('page');
+                                $query['sort'] = $column;
+                                $query['direction'] = $newDir;
+
+                                $url = url()->current() . '?' . http_build_query($query);
+                                $icon = $isCurrent ? ($currentDir === 'asc' ? '↑' : '↓') : '';
+
+                                return '<a href="' . $url . '" class="hover:underline">' . $label . ' ' . $icon . '</a>';
+                            }
+                        @endphp
                         <table class="table-fixed w-full mt-4">
                             <thead>
                                 <tr class="bg-gray-100 dark:bg-gray-700">
-                                    <th class="px-4 py-2 w-1/6">{{ __('Name') }}</th>
-                                    <th class="px-4 py-2 w-1/6">{{ __('Email') }}</th>
+                                    <th class="px-4 py-2 w-1/6">{!! sortLink('name', __('Name')) !!}</th>
+                                    <th class="px-4 py-2 w-1/6">{!! sortLink('email', __('Email')) !!}</th>
                                     @if (Auth::user()->isAdmin())
                                         <th class="px-4 py-2 w-1/6">{{ __('Role') }}</th>
                                     @endif
@@ -47,6 +65,22 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="mt-4">
+                            <form method="GET" class="mb-4 flex items-center space-x-2">
+                                <!-- Preserve other query params -->
+                                @foreach(request()->except('perPage', 'page') as $key => $value)
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endforeach
+
+                                <x-select-dropdown
+                                    label="{{ __('Records per page') }}:"
+                                    name="perPage"
+                                    :options="[10 => '10', 20 => '20', 50 => '50', 100 => '100']"
+                                    :selected="request('perPage', 20)"
+                                />
+                            </form>
+                            {{ $users->links() }}
+                        </div>
                     @else
                         <p class="text-center text-lg">{{ __('You are not authorized to view this page.') }}</p>
                     @endif
