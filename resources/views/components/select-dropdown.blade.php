@@ -17,7 +17,7 @@
         id="{{ $id ?? $name }}"
         name="{{ $name }}"
         onchange="this.form.submit()"
-        class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 pr-5 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white"
+        class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 pr-10 py-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white"
     >
         @foreach ($options as $value => $display)
             <option value="{{ $value }}" {{ $value == $selected ? 'selected' : '' }}>
