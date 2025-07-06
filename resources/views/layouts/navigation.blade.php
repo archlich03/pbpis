@@ -15,7 +15,7 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('bodies.panel')" :active="request()->routeIs('bodies.create')">
+                    <x-nav-link :href="route('bodies.index')" :active="request()->routeIs('bodies.create')">
                         {{ __('Bodies') }}
                     </x-nav-link>
                     @if (Auth::user()->isPrivileged())
@@ -90,7 +90,7 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('bodies.panel')" :active="request()->routeIs('bodies.panel')">
+            <x-responsive-nav-link :href="route('bodies.index')" :active="request()->routeIs('bodies.index')">
                 {{ __('Bodies') }}
             </x-responsive-nav-link>
             

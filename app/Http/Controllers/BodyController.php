@@ -22,7 +22,7 @@ class BodyController extends Controller
         $bodies = Body::orderBy('title', 'asc')->get();
         $users = User::orderBy('name', 'asc')->get();
 
-        return view('bodies.panel', ['bodies' => $bodies, 'users' => $users]);
+        return view('bodies.index', ['bodies' => $bodies, 'users' => $users]);
     }
 
     /**
@@ -71,7 +71,7 @@ class BodyController extends Controller
         $body->members = $members;
         $body->save();
 
-        return redirect()->route('bodies.panel');
+        return redirect()->route('bodies.index');
     }
 
     /**
@@ -152,7 +152,7 @@ class BodyController extends Controller
         $body->members = $members;
         $body->save();
 
-        return redirect()->route('bodies.panel');
+        return redirect()->route('bodies.index');
     }
 
     /**
@@ -191,7 +191,7 @@ class BodyController extends Controller
         // Finally, delete the body itself
         $body->delete();
 
-        return redirect()->route('bodies.panel');
+        return redirect()->route('bodies.index');
     }
 }
 
