@@ -17,12 +17,21 @@ class BodyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $bodies = Body::orderBy('title', 'asc')->get();
+        $search = $request->input('search');
+        $perPage = (int) $request->input('per_page', 1);
+
+        $bodies = Body::when($search, function ($query, $search) {
+                return $query->where('title', 'like', '%' . $search . '%');
+            })
+            ->orderBy('title', 'asc')
+            ->paginate($perPage)
+            ->withQueryString();
+
         $users = User::orderBy('name', 'asc')->get();
 
-        return view('bodies.panel', ['bodies' => $bodies, 'users' => $users]);
+        return view('bodies.panel', compact('bodies', 'users', 'perPage'));
     }
 
     /**
