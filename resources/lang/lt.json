@@ -4,6 +4,7 @@
   "Are you sure you want to delete your account?": "Ar tikrai norite ištrinti paskyrą?",
   "Associated secretary": "Priskirtas sekretorius (-ė)",
   "Automated protocol generation": "Automatizuotas protokolų generavimas",
+  "auth.failed": "Autentifikacija nepavyko",
   "Back": "Atgal",
   "Baigtas": "Baigtas",
   "Balsuojantysis": "Balsuojantysis",

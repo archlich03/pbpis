@@ -185,6 +185,11 @@ jobs:
         
         exit 1
 
+    - name: Step 4 - Run Tests inside pbpis container
+      run: |
+        echo "=== Running PHP Tests ==="
+        docker exec pbpis ./vendor/bin/pest --colors=always
+        
     - name: Verify installation completeness
       run: |
         echo "=== Verifying Installation Completeness ==="
