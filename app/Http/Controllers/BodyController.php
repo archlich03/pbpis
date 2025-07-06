@@ -20,7 +20,7 @@ class BodyController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $perPage = in_array((int) $request->input('perPage'), [10, 20, 50]) ? (int) $request->input('perPage') : 20;
+        $perPage = in_array((int) $request->input('perPage'), [10, 20, 50, 100]) ? (int) $request->input('perPage') : 20;
 
         $bodies = Body::when($search, function ($query, $search) {
                 return $query->where('title', 'like', '%' . $search . '%');
