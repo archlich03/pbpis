@@ -59,16 +59,16 @@
                                 return '<a href="' . $url . '" class="hover:underline">' . $label . ' ' . $icon . '</a>';
                             }
                         @endphp
-                        <table class="table-fixed w-full mt-4">
+                        <table class="table-auto w-full mt-4">
                             <thead>
                                 <tr class="bg-gray-100 dark:bg-gray-700">
-                                    <th class="px-4 py-2 w-1/6">{!! sortLink('name', __('Name')) !!}</th>
-                                    <th class="px-4 py-2 w-1/6">{!! sortLink('email', __('Email')) !!}</th>
+                                    <th class="px-4 py-2">{!! sortLink('name', __('Name')) !!}</th>
+                                    <th class="px-4 py-2">{!! sortLink('email', __('Email')) !!}</th>
                                     @if (Auth::user()->isAdmin())
-                                        <th class="px-4 py-2 w-1/6">{{ __('Role') }}</th>
+                                        <th class="px-2 py-2 whitespace-nowrap w-[1%]">{{ __('Role') }}</th>
                                     @endif
-                                    <th class="px-4 py-2 w-1/6">{{ __('Gender') }}</th>
-                                    <th class="px-4 py-2 w-1/6">{{ __('Actions') }}</th>
+                                    <th class="px-2 py-2 whitespace-nowrap w-[1%]">{{ __('Gender') }}</th>
+                                    <th class="px-2 py-2 whitespace-nowrap w-[1%]">{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -78,11 +78,13 @@
                                             <td class="border px-4 py-2">{{ $user->pedagogical_name }} {{ $user->name }}</td>
                                             <td class="border px-4 py-2 break-words">{{ $user->email }}</td>
                                             @if (Auth::user()->isAdmin())
-                                                <td class="border px-4 py-2">{{ __($user->role) }}</td>
+                                                <td class="border px-2 py-2 whitespace-nowrap text-sm">{{ __($user->role) }}</td>
                                             @endif
-                                            <td class="border px-4 py-2">{{ $user->gender == '0' ? __('Female') : __('Male') }}</td>
-                                            <td class="border px-4 py-2">
-                                                <a href="{{ route('users.edit', $user) }}" class="hover:underline"><b>{{ __('Edit') }}</b></a>
+                                            <td class="border px-2 py-2 whitespace-nowrap text-sm">
+                                                {{ $user->gender == '0' ? __('Female') : __('Male') }}
+                                            </td>
+                                            <td class="border px-2 py-2 whitespace-nowrap text-sm">
+                                                <a href="{{ route('users.edit', $user) }}" class="hover:underline font-semibold">{{ __('Edit') }}</a>
                                             </td>
                                         </tr>
                                     @endif
