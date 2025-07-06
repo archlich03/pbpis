@@ -39,7 +39,7 @@ class UserController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        return view('users.panel', compact('users'));
+        return view('users.index', compact('users'));
     }
 
     
@@ -59,7 +59,7 @@ class UserController extends Controller
     {
         $user->delete();
 
-        return redirect()->route('users.panel');
+        return redirect()->route('users.index');
     }
 
     
@@ -92,7 +92,7 @@ class UserController extends Controller
             'role' => $request->input('role'),
         ]);
 
-        return redirect()->route('users.panel');
+        return redirect()->route('users.index');
     }
 
 
@@ -109,7 +109,7 @@ class UserController extends Controller
             $user->update(['password' => bcrypt($request->input('password'))]);
         }
 
-        return redirect()->route('users.panel');
+        return redirect()->route('users.index');
     }
 
     public function dashboard(): View
