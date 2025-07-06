@@ -22,7 +22,7 @@
                         <x-nav-link :href="route('meetings.panel')" :active="request()->routeIs('meetings.panel')">
                             {{ __('Meetings') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('users.panel')" :active="request()->routeIs('users.panel')">
+                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                             {{ __('Users') }}
                         </x-nav-link>
                     @endif
@@ -98,7 +98,7 @@
                 <x-responsive-nav-link :href="route('meetings.panel')" :active="request()->routeIs('meetings.panel')">
                     {{ __('Meetings') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('users.panel')" :active="request()->routeIs('users.panel')">
+                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                     {{ __('Users') }}
                 </x-responsive-nav-link>
             @endif

@@ -53,6 +53,6 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        return redirect(route('users.panel', absolute: false));
+        return redirect(route('users.index', absolute: false));
     }
 }

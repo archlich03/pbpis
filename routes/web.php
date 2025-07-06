@@ -15,8 +15,8 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
-    Route::get('/users', [UserController::class, 'index'])->name('users.panel');
+    Route::get('/users/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/profile', [UserController::class, 'updateProfile'])->name('users.updateProfile');
     Route::patch('/users/{user}/password', [UserController::class, 'updatePassword'])->name('users.updatePassword');
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');

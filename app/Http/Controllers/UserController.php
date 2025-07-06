@@ -18,7 +18,7 @@ class UserController extends Controller
     {
         $users = User::orderBy('name', 'asc')->get(); // Fetch all users sorted by name
 
-        return view('users.panel', ['users' => $users]); // Pass users to the view
+        return view('users.index', ['users' => $users]); // Pass users to the view
     }
 
     
@@ -38,7 +38,7 @@ class UserController extends Controller
     {
         $user->delete();
 
-        return redirect()->route('users.panel');
+        return redirect()->route('users.index');
     }
 
     
@@ -71,7 +71,7 @@ class UserController extends Controller
             'role' => $request->input('role'),
         ]);
 
-        return redirect()->route('users.panel');
+        return redirect()->route('users.index');
     }
 
 
@@ -88,7 +88,7 @@ class UserController extends Controller
             $user->update(['password' => bcrypt($request->input('password'))]);
         }
 
-        return redirect()->route('users.panel');
+        return redirect()->route('users.index');
     }
 
     public function dashboard(): View
