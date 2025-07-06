@@ -34,7 +34,7 @@ class MeetingController extends Controller
             ->paginate($perPage)
             ->appends($request->query());
 
-        return view('meetings.panel', compact('meetings'));
+        return view('meetings.index', compact('meetings'));
     }
 
     /**

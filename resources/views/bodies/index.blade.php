@@ -34,7 +34,7 @@
                             </x-secondary-button>
 
                             @if(request('search'))
-                                <a href="{{ route('bodies.panel', request()->except('search', 'page')) }}" class="text-sm text-gray-200 hover:underline ml-2">
+                                <a href="{{ route('bodies.index', request()->except('search', 'page')) }}" class="text-sm text-gray-200 hover:underline ml-2">
                                     {{ __('Clear') }}
                                 </a>
                             @endif

@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="mb-4 flex justify-between">
-        <a class="text-base font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-100" href="{{ route('users.panel') }}">
+        <a class="text-base font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-100" href="{{ route('users.index') }}">
             {{ __('Back') }}
         </a>
     </div>
