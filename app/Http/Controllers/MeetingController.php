@@ -22,9 +22,19 @@ class MeetingController extends Controller
         if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
-        $meetings = Meeting::orderBy('meeting_date', 'desc')->get();
 
-        return view('meetings.panel', ['meetings' => $meetings]);
+        $sortable = ['meeting_date', 'status', 'vote_start', 'vote_end', 'secretary_id', 'body_id'];
+        $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'meeting_date';
+        $direction = $request->get('direction') === 'asc' ? 'asc' : 'desc';
+
+        $perPage = in_array($request->get('perPage'), ['10', '20', '50', '100']) ? $request->get('perPage') : 20;
+
+        $meetings = Meeting::with(['body', 'secretary'])
+            ->orderBy($sort, $direction)
+            ->paginate($perPage)
+            ->appends($request->query());
+
+        return view('meetings.panel', compact('meetings'));
     }
 
     /**

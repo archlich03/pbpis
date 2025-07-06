@@ -32,13 +32,12 @@
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <form action="{{ route('locale.change') }}" method="GET">
-                    <select name="locale" onchange="this.form.submit()">
-                        @foreach(config('app.available_locales') as $code => $name)
-                            <option value="{{ $code }}" {{ app()->getLocale() == $code ? 'selected' : '' }}>
-                                {{ $name }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <x-select-dropdown
+                        name="locale"
+                        :options="config('app.available_locales')"
+                        :selected="app()->getLocale()"
+                        onchange="this.form.submit()"
+                    />
                 </form>
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
