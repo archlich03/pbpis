@@ -20,12 +20,12 @@ class BodyController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $perPage = (int) $request->input('per_page', 1);
+        $perPage = in_array((int) $request->input('perPage'), [10, 20, 50]) ? (int) $request->input('perPage') : 20;
 
         $bodies = Body::when($search, function ($query, $search) {
                 return $query->where('title', 'like', '%' . $search . '%');
             })
-            ->orderBy('title', 'asc')
+            ->orderBy($request->input('sort', 'title'), $request->input('direction', 'asc'))
             ->paginate($perPage)
             ->withQueryString();
 

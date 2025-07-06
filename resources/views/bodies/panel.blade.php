@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 @if (Auth::user()->isAdmin())
-                    <div class="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div class="px-6 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <x-secondary-button>
                             <a href="{{ route('bodies.create') }}">
                                 {{ __('Create new body') }}
@@ -43,10 +43,29 @@
                 @endif
 
                 <div class="p-6 text-gray-900 dark:text-gray-100">
+                    @php
+                        function sortLink($column, $label) {
+                            $currentSort = request('sort', 'title');
+                            $currentDir = request('direction', 'asc');
+
+                            $isCurrent = $currentSort === $column;
+                            $newDir = ($isCurrent && $currentDir === 'asc') ? 'desc' : 'asc';
+
+                            $query = request()->except('page');
+                            $query['sort'] = $column;
+                            $query['direction'] = $newDir;
+
+                            $url = url()->current() . '?' . http_build_query($query);
+                            $icon = $isCurrent ? ($currentDir === 'asc' ? '↑' : '↓') : '';
+
+                            return '<a href="' . $url . '" class="hover:underline">' . $label . ' ' . $icon . '</a>';
+                        }
+                    @endphp
+
                     <table class="table-auto w-full">
                         <thead>
                             <tr class="bg-gray-100 dark:bg-gray-700">
-                                <th class="px-4 py-2">{{ __('Name') }}</th>
+                                <th class="px-4 py-2">{!! sortLink('title', __('Name')) !!}</th>
                                 <th class="px-4 py-2">{{ __('Chairperson') }}</th>
                                 <th class="px-2 py-2 whitespace-nowrap w-[1%]">{{ __('Type') }}</th>
                                 <th class="px-2 py-2 whitespace-nowrap w-[1%]" colspan="{{ Auth::user()->isPrivileged() ? 2 : 1 }}">{{ __('Actions') }}</th>
@@ -75,10 +94,21 @@
                             @endforeach
                         </tbody>
                     </table>
-                </div>
-                
-                <div class="px-6 py-4">
-                    {{ $bodies->links() }}
+                    <div class="mt-4">
+                        <form method="GET" class="mb-4 flex items-center space-x-2">
+                            @foreach(request()->except('perPage', 'page') as $key => $value)
+                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @endforeach
+
+                            <x-select-dropdown
+                                label="{{ __('Records per page') }}:"
+                                name="perPage"
+                                :options="[10 => '10', 20 => '20', 50 => '50', 100 => '100']"
+                                :selected="request('perPage', 20)"
+                            />
+                        </form>
+                        {{ $bodies->links() }}
+                    </div>
                 </div>
             </div>
         </div>

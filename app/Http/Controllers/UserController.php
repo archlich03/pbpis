@@ -16,7 +16,7 @@ class UserController extends Controller
      */
     public function index(): View
     {
-        $perPage = request('perPage', 20);
+        $perPage = in_array((int) request('perPage'), [10, 20, 50, 100]) ? (int) request('perPage') : 20;
         $sort = request('sort', 'name');
         $direction = request('direction', 'asc');
         $search = request('search');
