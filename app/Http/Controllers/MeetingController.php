@@ -24,7 +24,7 @@ class MeetingController extends Controller
         }
         $meetings = Meeting::orderBy('meeting_date', 'desc')->get();
 
-        return view('meetings.panel', ['meetings' => $meetings]);
+        return view('meetings.index', ['meetings' => $meetings]);
     }
 
     /**

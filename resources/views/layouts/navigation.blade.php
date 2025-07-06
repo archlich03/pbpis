@@ -19,7 +19,7 @@
                         {{ __('Bodies') }}
                     </x-nav-link>
                     @if (Auth::user()->isPrivileged())
-                        <x-nav-link :href="route('meetings.panel')" :active="request()->routeIs('meetings.panel')">
+                        <x-nav-link :href="route('meetings.index')" :active="request()->routeIs('meetings.index')">
                             {{ __('Meetings') }}
                         </x-nav-link>
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
@@ -95,7 +95,7 @@
             </x-responsive-nav-link>
             
             @if (Auth::user()->isPrivileged())
-                <x-responsive-nav-link :href="route('meetings.panel')" :active="request()->routeIs('meetings.panel')">
+                <x-responsive-nav-link :href="route('meetings.index')" :active="request()->routeIs('meetings.index')">
                     {{ __('Meetings') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
