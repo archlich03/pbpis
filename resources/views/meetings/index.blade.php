@@ -10,6 +10,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     @php
+                    if (!function_exists('sortLink')) {
                         function sortLink($column, $label) {
                             $currentSort = request('sort', 'meeting_date');
                             $currentDir = request('direction', 'desc');
@@ -26,6 +27,7 @@
 
                             return '<a href="' . $url . '" class="hover:underline whitespace-nowrap">' . $label . ' ' . $icon . '</a>';
                         }
+                    }
                     @endphp
 
                     <table class="table-auto w-full">

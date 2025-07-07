@@ -6,17 +6,17 @@ beforeEach(function () {
 });
 
 it('redirects guests from dashboard to login page', function() {
-    $response = $this->get('/user/dashboard');
-    $response->assertRedirect('/login');
+    $response = $this->get(route('dashboard'));
+    $response->assertRedirect(route('login'));
 });
 
-it('does not allow login with invalid email', function () {
+it('prevents login with invalid email', function () {
     User::factory()->create([
         'email' => 'real@example.com',
         'password' => bcrypt('correct-password'),
     ]);
 
-    $response = $this->post('/login', [
+    $response = $this->post(route('login'), [
         'email' => 'fake@example.com',
         'password' => 'correct-password',
         '_token' => 'test_token',
@@ -27,13 +27,13 @@ it('does not allow login with invalid email', function () {
     $this->assertGuest();
 });
 
-it('does not allow login with invalid password', function () {
+it('prevents login with invalid password', function () {
     User::factory()->create([
         'email' => 'real@example.com',
         'password' => bcrypt('correct-password'),
     ]);
 
-    $response = $this->post('/login', [
+    $response = $this->post(route('login'), [
         'email' => 'real@example.com',
         'password' => 'wrong-password',
         '_token' => 'test_token',
@@ -50,13 +50,13 @@ it('allows user to log in with correct credentials', function () {
         'password' => bcrypt('password123'),
     ]);
 
-    $response = $this->post('/login', [
+    $response = $this->post(route('login'), [
         'email' => 'user@example.com',
         'password' => 'password123',
         '_token' => 'test_token',
     ]);
 
-    $response->assertRedirect('/user/dashboard');
+    $response->assertRedirect(route('dashboard'));
     $this->assertAuthenticatedAs($user);
 });
 
@@ -65,7 +65,7 @@ it('logs the user out', function () {
 
     $this->actingAs($user);
 
-    $response = $this->post('/logout', [
+    $response = $this->post(route('logout'), [
         '_token' => 'test_token',
     ]);
 

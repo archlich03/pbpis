@@ -16,6 +16,9 @@ class UserController extends Controller
      */
     public function index(): View
     {
+        if (!Auth::user()->isPrivileged()) {
+            abort(403);
+        }
         $perPage = in_array((int) request('perPage'), [10, 20, 50, 100]) ? (int) request('perPage') : 20;
         $sort = request('sort', 'name');
         $direction = request('direction', 'asc');
@@ -48,6 +51,11 @@ class UserController extends Controller
      */
     public function edit(User $user): View
     {
+
+        if (!Auth::user()->isPrivileged()) {
+            abort(403);
+        }
+
         return view('users.edit', ['user' => $user]);
     }
 
@@ -57,6 +65,21 @@ class UserController extends Controller
      */
     public function destroy(User $user): RedirectResponse
     {
+        // Check if user is authenticated
+        $authenticatedUser = auth()->user();
+        if (!$authenticatedUser) {
+            return redirect()->route('login');
+        }
+     
+        if (!Auth::user()->isAdmin()) {
+            abort(403);
+        }
+        
+        // You can add admin check here if needed:
+        if ($authenticatedUser->role !== 'IT administratorius') {
+            abort(403);
+        }
+        
         $user->delete();
 
         return redirect()->route('users.index');
@@ -68,16 +91,41 @@ class UserController extends Controller
      */
     public function updateProfile(Request $request, User $user): RedirectResponse
     {
-        $role = Auth::user()->role;
+        $authenticatedUser = auth()->user();
 
+        if (!$authenticatedUser) {
+            return redirect()->route('login');
+        }
+
+        if (! $authenticatedUser->isPrivileged()) {
+            abort(403);
+        }
+
+        $authRole = $authenticatedUser->role;
+        $targetRole = $user->role;
+
+        // Authorization logic:
+        // - Users can update their own profile
+        // - IT administrators can update anyone
+        // - Secretaries can update only voters (Balsuojantysis)
+        // - Everyone else forbidden to update other users
+        if ($authenticatedUser->user_id !== $user->user_id) {
+            if ($authRole === 'Sekretorius' && $targetRole !== 'Balsuojantysis') {
+                abort(403);
+            } elseif ($authRole !== 'IT administratorius' && $authRole !== 'Sekretorius') {
+                abort(403);
+            }
+        }
+
+        // Validation rules depend on authenticated user's role
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->user_id . ',user_id'],
             'pedagogical_name' => ['nullable', 'string', 'max:255'],
             'gender' => ['integer', 'in:0,1'],
-            'role' => $role === 'Sekretorius'
+            'role' => $authRole === 'Sekretorius'
                 ? ['string', 'in:Balsuojantysis']
-                : ($role === 'IT administratorius'
+                : ($authRole === 'IT administratorius'
                     ? ['string', 'in:Balsuojantysis,IT administratorius,Sekretorius']
                     : ['prohibited']),
         ]);
@@ -96,11 +144,25 @@ class UserController extends Controller
     }
 
 
+
     /**
      * Update the specified user's password in storage.
      */
     public function updatePassword(Request $request, User $user): RedirectResponse
     {
+        $authenticatedUser = auth()->user();
+        if (!$authenticatedUser) {
+            return redirect()->route('login');
+        }
+        
+        if (!Auth::user()->isPrivileged()) {
+            abort(403);
+        }
+
+        if ($authenticatedUser->id !== $user->id) {
+            abort(403);
+        }
+        
         $request->validate([
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
