@@ -42,6 +42,7 @@
                     </div>
                     @if (Auth::user()->isPrivileged())
                         @php
+                        if (!function_exists('sortLink')) {
                             function sortLink($column, $label) {
                                 $currentSort = request('sort', 'name');
                                 $currentDir = request('direction', 'asc');
@@ -58,6 +59,7 @@
 
                                 return '<a href="' . $url . '" class="hover:underline">' . $label . ' ' . $icon . '</a>';
                             }
+                        }
                         @endphp
                         <table class="table-auto w-full mt-4">
                             <thead>

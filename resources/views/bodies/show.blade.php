@@ -12,7 +12,7 @@
                     <div class="flex space-x-2 px-6 py-4">
                         <x-primary-button>
                             <a href="{{ route('bodies.edit', $body) }}" class="w-full">
-                                {{ __('Edit Body') }}
+                                {{ __('Edit body') }}
                             </a>
                         </x-primary-button>
 

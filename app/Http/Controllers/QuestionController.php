@@ -99,10 +99,10 @@ class QuestionController extends Controller
      */
     public function edit(Question $question)
     {
-        if (!Auth::user()->isPrivileged()) {
+        /*if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
-        return view('questions.edit', ['question' => $question]);
+        return view('questions.edit', ['question' => $question]);*/
     }
 
     /**
