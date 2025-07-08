@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
 class BodyController extends Controller
 {
     /**
@@ -56,7 +57,7 @@ class BodyController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Auth::user()->isPrivileged()) {
+        if (!Auth::user()->isAdmin()) {
             abort(403);
         }
         $request->validate([
@@ -92,8 +93,6 @@ class BodyController extends Controller
     public function show($id)
     {
         $body = Body::findOrFail($id);
-        //$membersIds = $body->members ?? [];
-        //$members = User::whereIn('user_id', $membersIds)->orderBy('name')->get();
 
         $meetings = $body->meetings()->orderBy('meeting_date', 'desc')->limit(5)->get();
         foreach ($meetings as $meeting) {
@@ -109,7 +108,7 @@ class BodyController extends Controller
             }
         }
 
-        return view('bodies.show', ['body' => $body]);//, 'members' => $members]);
+        return view('bodies.show', ['body' => $body]);
     }
 
     /**
