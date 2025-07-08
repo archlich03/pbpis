@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
 
 class MeetingController extends Controller
 {
@@ -96,7 +97,11 @@ class MeetingController extends Controller
     {
         $meeting = Meeting::findOrFail($id);
         $users = User::orderBy('name', 'asc')->get();
-        
+
+        if (!Auth::user()->isPrivileged() && !$meeting->body->members->contains(Auth::user())) {
+            abort(403);
+        }
+
         if ($meeting->status != 'Suplanuotas' && now() < $meeting->vote_start && now()) {
             $meeting->status = 'Suplanuotas';
             $meeting->save();
@@ -140,7 +145,7 @@ class MeetingController extends Controller
         if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
-    
+
         $request->validate([
             'secretary_id' => ['required', 'integer', 'exists:users,user_id'],
             'is_evote' => ['required', 'in:0,1'],
@@ -153,22 +158,30 @@ class MeetingController extends Controller
             }],
         ]);
 
-        $meeting->status = 'Suplanuotas';
-        if (now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
-            $meeting->status = 'Vyksta';
-        } elseif (now() >= $meeting->vote_end) {
-            $meeting->status = 'Baigtas';
-        }
+        // First update the meeting fields with the new input values
         $meeting->secretary_id = $request->input('secretary_id');
         $meeting->is_evote = $request->input('is_evote');
         $meeting->meeting_date = $request->input('meeting_date');
         $meeting->vote_start = $request->input('vote_start');
         $meeting->vote_end = $request->input('vote_end');
+
+        $now = Carbon::now();
+        $voteStart = Carbon::parse($meeting->vote_start);
+        $voteEnd = Carbon::parse($meeting->vote_end);
+
+        if ($now->lt($voteStart)) {
+            $meeting->status = 'Suplanuotas';  // Planned
+        } elseif ($now->between($voteStart, $voteEnd)) {
+            $meeting->status = 'Vyksta';       // Started
+        } else {
+            $meeting->status = 'Baigtas';      // Finished
+        }
+
         $meeting->save();
-        $users = User::orderBy('name', 'asc')->get();
 
         return redirect()->route('meetings.show', ['meeting' => $meeting]);
     }
+
 
 
     /**
@@ -208,7 +221,7 @@ class MeetingController extends Controller
     
     public function protocol(Meeting $meeting)
     {
-        if (!Auth::user()->isPrivileged()) {
+        if (!Auth::user()->isPrivileged() && !$meeting->body->members->contains(Auth::user())) {
             abort(403);
         }
 
@@ -217,7 +230,7 @@ class MeetingController extends Controller
 
     public function protocolPDF(Meeting $meeting)
     {
-        if (!Auth::user()->isPrivileged()) {
+        if (!Auth::user()->isPrivileged() && !$meeting->body->members->contains(Auth::user())) {
             abort(403);
         }
 

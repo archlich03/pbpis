@@ -46,8 +46,8 @@ it('allows secretary to view a body', function () {
         });
 });
 
-it('allows voter to view a body', function () {
-    actingAs($this->voterUser)
+it('allows member to view a body', function () {
+    actingAs($this->members->first())
         ->get(route('bodies.show', $this->body))
         ->assertOk()
         ->assertViewIs('bodies.show')
@@ -59,4 +59,17 @@ it('allows voter to view a body', function () {
 it('redirects guest to login when viewing a body', function () {
     get(route('bodies.show', $this->body))
         ->assertRedirect(route('login'));
+});
+
+it('returns 404 if body not found', function () {
+    actingAs($this->adminUser)
+        ->get(route('bodies.show', 'non-existing'))
+        ->assertNotFound();
+});
+
+it('returns 403 if user is not part of body', function () {
+    actingAs($this->voterUser);
+
+    get(route('bodies.show', $this->body))
+        ->assertForbidden();
 });

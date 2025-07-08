@@ -57,7 +57,7 @@ it('forbids secretary from creating a body', function () {
 });
 
 it('forbids voter from creating a body', function () {
-    actingAs($this->voterUser)
+    actingAs($this->members->first())
         ->post(route('bodies.store'), $this->payload)
         ->assertForbidden();
 

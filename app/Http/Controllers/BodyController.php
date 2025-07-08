@@ -94,6 +94,10 @@ class BodyController extends Controller
     {
         $body = Body::findOrFail($id);
 
+        if (!Auth::user()->isPrivileged() && !$body->members->contains(Auth::user())) {
+            abort(403);
+        }
+
         $meetings = $body->meetings()->orderBy('meeting_date', 'desc')->limit(5)->get();
         foreach ($meetings as $meeting) {
             if ($meeting->status != 'Suplanuotas' && now() < $meeting->vote_start && now()) {
