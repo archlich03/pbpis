@@ -40,7 +40,6 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
-            'email_verified_at' => now(),
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
