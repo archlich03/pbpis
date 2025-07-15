@@ -52,7 +52,6 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
@@ -89,4 +88,5 @@ class User extends Authenticatable
         return in_array($this->role, ['IT administratorius', 'Sekretorius']);
     }
 }
+
 
