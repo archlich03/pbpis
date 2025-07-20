@@ -56,6 +56,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/meetings/{meeting}/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
     Route::patch('/meetings/{meeting}/{question}', [QuestionController::class, 'update'])->name('questions.update');
     Route::delete('/meetings/{meeting}/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+    Route::post('/meetings/{meeting}/questions/reorder', [QuestionController::class, 'reorder'])->name('questions.reorder');
 });
 
 // Vote routes

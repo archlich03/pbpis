@@ -79,7 +79,7 @@ class Meeting extends Model
      */
     public function questions(): HasMany
     {
-        return $this->hasMany(Question::class, 'meeting_id');
+        return $this->hasMany(Question::class, 'meeting_id')->orderBy('position');
     }
 
     /**

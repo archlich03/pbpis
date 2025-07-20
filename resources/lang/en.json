@@ -43,5 +43,12 @@
     "Vyksta": "Started",
     "Baigtas": "Finished",
     "Klausimas priimtas": "Question passed",
-    "Klausimas nepriimtas": "Question not passed"
+    "Klausimas nepriimtas": "Question not passed",
+    "Reorder Questions": "Reorder Questions",
+    "Done Reordering": "Done Reordering",
+    "Drag and drop questions to reorder them. Changes will be saved automatically.": "Use the up and down buttons to reorder questions. Changes will be saved automatically.",
+    "Questions reordered successfully": "Questions reordered successfully",
+    "Move Up": "Move Up",
+    "Move Down": "Move Down",
+    "You cannot modify the role of an IT administrator.": "You cannot modify the role of an IT administrator."
 }

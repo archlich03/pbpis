@@ -31,6 +31,7 @@ class Question extends Model
         'presenter_id',
         'type',
         'summary',
+        'position',
     ];
 
     /**

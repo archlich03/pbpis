@@ -123,17 +123,55 @@
                 @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
                     <details class="mb-4">
                         <summary class="text-xl font-semibold"><span class="cursor-pointer">{{ __('Questions') }}</span></summary>
-                        @if (Auth::User()->isPrivileged())
-                            <x-primary-button>
-                                <a href="{{ route('questions.create', $meeting) }}" class="w-full">
-                                    {{ __('Create New Question') }}
-                                </a>
-                            </x-primary-button>
-                        @endif
-                        <div class="ml-4">
+                        <div class="ml-4" x-data="questionReorder()">
+                            @if (Auth::User()->isPrivileged())
+                                <div class="mb-4">
+                                    <div class="flex space-x-2 mb-2">
+                                        <x-primary-button>
+                                            <a href="{{ route('questions.create', $meeting) }}" class="block">
+                                                {{ __('Create New Question') }}
+                                            </a>
+                                        </x-primary-button>
+                                        
+                                        @if($meeting->questions->count() > 1)
+                                            <x-secondary-button @click="reorderMode = !reorderMode">
+                                                <span x-text="reorderMode ? '{{ __('Done Reordering') }}' : '{{ __('Reorder Questions') }}'" class="text-sm"></span>
+                                            </x-secondary-button>
+                                        @endif
+                                    </div>
+                                    
+                                    @if($meeting->questions->count() > 1)
+                                        <div x-show="reorderMode" class="text-sm text-gray-600 dark:text-gray-400">
+                                            {{ __('Drag and drop questions to reorder them. Changes will be saved automatically.') }}
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
                             @foreach ($meeting->questions as $question)
-                                <details class="mb-4">
-                                    <summary class="font-semibold cursor-pointer">{{ $loop->iteration }}. {{ $question->title }}</summary>
+                                <details class="mb-4" data-question-id="{{ $question->question_id }}">
+                                    <summary class="font-semibold cursor-pointer flex items-center justify-between">
+                                        <span>{{ $loop->iteration }}. {{ $question->title }}</span>
+                                        @if (Auth::User()->isPrivileged() && $meeting->questions->count() > 1)
+                                            <div class="flex space-x-1 ml-4" x-show="reorderMode">
+                                                @if (!$loop->first)
+                                                    <button type="button" 
+                                                            onclick="moveQuestion({{ $question->question_id }}, 'up')"
+                                                            class="px-2 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                            title="{{ __('Move Up') }}">
+                                                        ↑
+                                                    </button>
+                                                @endif
+                                                @if (!$loop->last)
+                                                    <button type="button" 
+                                                            onclick="moveQuestion({{ $question->question_id }}, 'down')"
+                                                            class="px-2 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                            title="{{ __('Move Down') }}">
+                                                        ↓
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </summary>
                                     <div class="ml-4">
                                         @php
                                             $statuses = [];
@@ -351,6 +389,93 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function questionReorder() {
+            return {
+                reorderMode: false
+            }
+        }
+        
+        // Global function to handle question movement
+        function moveQuestion(questionId, direction) {
+            const questionsContainer = document.querySelector('[x-data="questionReorder()"]');
+            const questionElements = Array.from(questionsContainer.querySelectorAll('details[data-question-id]'));
+            
+            // Find the current question element
+            const currentElement = questionElements.find(el => el.dataset.questionId == questionId);
+            if (!currentElement) return;
+            
+            const currentIndex = questionElements.indexOf(currentElement);
+            let newIndex;
+            
+            if (direction === 'up' && currentIndex > 0) {
+                newIndex = currentIndex - 1;
+            } else if (direction === 'down' && currentIndex < questionElements.length - 1) {
+                newIndex = currentIndex + 1;
+            } else {
+                return; // Can't move further
+            }
+            
+            // Swap elements in DOM
+            const targetElement = questionElements[newIndex];
+            if (direction === 'up') {
+                targetElement.parentNode.insertBefore(currentElement, targetElement);
+            } else {
+                targetElement.parentNode.insertBefore(currentElement, targetElement.nextSibling);
+            }
+            
+            // Get new order of question IDs
+            const newQuestionIds = [];
+            questionsContainer.querySelectorAll('details[data-question-id]').forEach(element => {
+                newQuestionIds.push(parseInt(element.dataset.questionId));
+            });
+            
+            // Save new order
+            saveQuestionOrder(newQuestionIds);
+        }
+        
+        // Function to save the new question order
+        function saveQuestionOrder(questionIds) {
+            fetch(`{{ route('questions.reorder', $meeting) }}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    questions: questionIds
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('{{ __('Questions reordered successfully') }}');
+                    // Update question numbers in the UI
+                    updateQuestionNumbers();
+                } else {
+                    console.error('Failed to reorder questions');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+        // Function to update question numbers after reordering
+        function updateQuestionNumbers() {
+            const questionsContainer = document.querySelector('[x-data="questionReorder()"]');
+            const questionElements = questionsContainer.querySelectorAll('details[data-question-id]');
+            
+            questionElements.forEach((element, index) => {
+                const summarySpan = element.querySelector('summary span');
+                if (summarySpan) {
+                    const titleText = summarySpan.textContent.replace(/^\d+\.\s*/, '');
+                    summarySpan.textContent = `${index + 1}. ${titleText}`;
+                }
+            });
+        }
+    </script>
 </x-app-layout>
 
 
