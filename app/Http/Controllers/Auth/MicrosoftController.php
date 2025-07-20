@@ -240,12 +240,13 @@ class MicrosoftController extends Controller
             
             // Create new user with Microsoft information
             $user = new User();
-            $user->name = $msGraphData['displayName'] ?? 'Microsoft User';
+            $userName = $msGraphData['displayName'] ?? 'Microsoft User';
+            $user->name = $userName;
             $user->email = $email;
             $user->ms_id = $msGraphData['id'] ?? null;
             $user->password = Hash::make(Str::random(24)); // Generate a secure random password
             $user->role = 'Balsuojantysis'; // Default role
-            $user->gender = false; // Default gender
+            $user->gender = User::detectGenderFromLithuanianName($userName); // Auto-detect gender
             
             Log::info('New user created', ['email' => $email]);
         }

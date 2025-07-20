@@ -36,8 +36,11 @@
             <x-input-label for="role" :value="__('Role')" />
             <select id="role" name="role" class="block mt-1 w-full">
                 @if (Auth::user()->role === 'Sekretorius')
+                    <!-- Secretary can only set users to Balsuojantysis or Sekretorius -->
+                    <option value="Sekretorius" {{ old('role') == 'Sekretorius' || $user->role == 'Sekretorius' ? 'selected' : '' }}>{{ __('Sekretorius') }}</option>
                     <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || $user->role == 'Balsuojantysis' ? 'selected' : '' }}>{{ __('Balsuojantysis') }}</option>
                 @else
+                    <!-- IT Admin can set all roles -->
                     <option value="IT administratorius" {{ old('role') == 'IT administratorius' || $user->role == 'IT administratorius' ? 'selected' : '' }}>{{ __('IT administratorius') }}</option>
                     <option value="Sekretorius" {{ old('role') == 'Sekretorius' || $user->role == 'Sekretorius' ? 'selected' : '' }}>{{ __('Sekretorius') }}</option>
                     <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || $user->role == 'Balsuojantysis' ? 'selected' : '' }}>{{ __('Balsuojantysis') }}</option>

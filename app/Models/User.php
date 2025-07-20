@@ -87,6 +87,85 @@ class User extends Authenticatable
     {
         return in_array($this->role, ['IT administratorius', 'Sekretorius']);
     }
+    
+    /**
+     * Determine gender based on Lithuanian name patterns.
+     * Analyzes the last name (surname) to determine if it's typically male or female.
+     * 
+     * @param string $fullName The full name to analyze
+     * @return int 0 for female, 1 for male (defaults to 1 if uncertain)
+     */
+    public static function detectGenderFromLithuanianName(string $fullName): int
+    {
+        // Split the name to get the last name (surname)
+        $nameParts = explode(' ', trim($fullName));
+        $lastName = end($nameParts);
+        
+        if (empty($lastName)) {
+            return 1; // Default to male if no last name
+        }
+        
+        $lastName = strtolower($lastName);
+        
+        // Common Lithuanian female surname endings
+        $femaleEndings = [
+            'ienė',     // married women (most common)
+            'aitė',     // unmarried women
+            'ytė',      // unmarried women
+            'utė',      // unmarried women
+            'ūtė',      // unmarried women
+            'iūtė',     // unmarried women
+            'ėtė',      // unmarried women
+            'otė',      // unmarried women
+            'akė',      // some surnames
+            'ckė',      // some surnames
+            'skė',      // some surnames
+            'nė',       // some surnames
+        ];
+        
+        // Common Lithuanian male surname endings
+        $maleEndings = [
+            'as',       // most common male ending
+            'is',       // common male ending
+            'us',       // common male ending
+            'ys',       // common male ending
+            'ius',      // common male ending
+            'auskas',   // specific male pattern
+            'inskas',   // specific male pattern
+            'owski',    // Polish-origin surnames
+            'evičius',  // patronymic surnames
+            'avičius',  // patronymic surnames
+        ];
+        
+        // Check for female endings first (more specific)
+        foreach ($femaleEndings as $ending) {
+            if (str_ends_with($lastName, $ending)) {
+                return 0; // Female
+            }
+        }
+        
+        // Check for male endings
+        foreach ($maleEndings as $ending) {
+            if (str_ends_with($lastName, $ending)) {
+                return 1; // Male
+            }
+        }
+        
+        // Additional checks for common patterns
+        // If surname ends with 'a' but not in female endings, likely female
+        if (str_ends_with($lastName, 'a') && !str_ends_with($lastName, 'auskas')) {
+            return 0; // Female
+        }
+        
+        // If surname ends with consonant, likely male
+        $lastChar = substr($lastName, -1);
+        if (in_array($lastChar, ['s', 't', 'n', 'r', 'l', 'k', 'g', 'p', 'b', 'd', 'v', 'z', 'ž', 'š', 'č'])) {
+            return 1; // Male
+        }
+        
+        // Default to male if uncertain
+        return 1;
+    }
 }
 
 

@@ -55,11 +55,20 @@
 
         <div>
             <x-input-label for="role" :value="__('Role')" />
-            <select id="role" name="role" class="block mt-1 w-full">
-                <option value="IT administratorius" {{ old('role') == 'IT administratorius' || $user->role == 'IT administratorius' ? 'selected' : '' }}>{{ __('IT administratorius') }}</option>
-                <option value="Sekretorius" {{ old('role') == 'Sekretorius' || $user->role == 'Sekretorius' ? 'selected' : '' }}>{{ __('Sekretorius') }}</option>
-                <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || $user->role == 'Balsuojantysis' ? 'selected' : '' }}>{{ __('Balsuojantysis') }}</option>
-            </select>
+            @if(Auth::user()->role === 'Balsuojantysis')
+                <!-- Balsuojantysis users can't change their role -->
+                <select id="role" name="role" class="block mt-1 w-full" disabled>
+                    <option value="Balsuojantysis" selected>{{ __('Balsuojantysis') }}</option>
+                </select>
+                <input type="hidden" name="role" value="Balsuojantysis">
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('You cannot change your own role.') }}</p>
+            @else
+                <select id="role" name="role" class="block mt-1 w-full">
+                    <option value="IT administratorius" {{ old('role') == 'IT administratorius' || $user->role == 'IT administratorius' ? 'selected' : '' }}>{{ __('IT administratorius') }}</option>
+                    <option value="Sekretorius" {{ old('role') == 'Sekretorius' || $user->role == 'Sekretorius' ? 'selected' : '' }}>{{ __('Sekretorius') }}</option>
+                    <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || $user->role == 'Balsuojantysis' ? 'selected' : '' }}>{{ __('Balsuojantysis') }}</option>
+                </select>
+            @endif
             <x-input-error class="mt-2" :messages="$errors->get('role')" />
         </div>
 

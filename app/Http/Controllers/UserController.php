@@ -63,7 +63,7 @@ class UserController extends Controller
     /**
      * Remove the specified user from storage.
      */
-    public function destroy(User $user): RedirectResponse
+    public function destroy(Request $request, User $user): RedirectResponse
     {
         // Check if user is authenticated
         $authenticatedUser = auth()->user();
@@ -78,6 +78,13 @@ class UserController extends Controller
         // You can add admin check here if needed:
         if ($authenticatedUser->role !== 'IT administratorius') {
             abort(403);
+        }
+        
+        // Only require password confirmation for non-Microsoft-linked admin accounts
+        if (empty($authenticatedUser->ms_id)) {
+            $request->validateWithBag('userDeletion', [
+                'password' => ['required', 'current_password'],
+            ]);
         }
         
         $user->delete();
@@ -124,7 +131,7 @@ class UserController extends Controller
             'pedagogical_name' => ['nullable', 'string', 'max:255'],
             'gender' => ['integer', 'in:0,1'],
             'role' => $authRole === 'Sekretorius'
-                ? ['string', 'in:Balsuojantysis']
+                ? ['string', 'in:Balsuojantysis,Sekretorius']
                 : ($authRole === 'IT administratorius'
                     ? ['string', 'in:Balsuojantysis,IT administratorius,Sekretorius']
                     : ['prohibited']),
@@ -157,6 +164,14 @@ class UserController extends Controller
         
         if (!Auth::user()->isPrivileged()) {
             abort(403);
+        }
+
+        // Prevent password updates for Microsoft-linked accounts
+        if (!empty($user->ms_id)) {
+            return redirect()->route('users.edit', $user)
+                ->withErrors([
+                    'password' => __('Password changes are not allowed for Microsoft-linked accounts.')
+                ], 'updatePassword');
         }
 
         if ($authenticatedUser->id !== $user->id) {

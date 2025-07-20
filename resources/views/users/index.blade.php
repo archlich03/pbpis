@@ -70,6 +70,7 @@
                                         <th class="px-2 py-2 whitespace-nowrap w-[1%]">{{ __('Role') }}</th>
                                     @endif
                                     <th class="px-2 py-2 whitespace-nowrap w-[1%]">{{ __('Gender') }}</th>
+                                    <th class="px-2 py-2 whitespace-nowrap w-[1%]">{{ __('Microsoft') }}</th>
                                     <th class="px-2 py-2 whitespace-nowrap w-[1%]">{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
@@ -84,6 +85,13 @@
                                             @endif
                                             <td class="border px-2 py-2 whitespace-nowrap text-sm">
                                                 {{ $user->gender == '0' ? __('Female') : __('Male') }}
+                                            </td>
+                                            <td class="border px-2 py-2 whitespace-nowrap text-sm text-center">
+                                                @if(!empty($user->ms_id))
+                                                    <span class="text-blue-600 dark:text-blue-400" title="{{ __('Microsoft Account Linked') }}">✅</span>
+                                                @else
+                                                    <span class="text-gray-400" title="{{ __('No Microsoft Account') }}">❌</span>
+                                                @endif
                                             </td>
                                             <td class="border px-2 py-2 whitespace-nowrap text-sm">
                                                 <a href="{{ route('users.edit', $user) }}" class="hover:underline font-semibold">{{ __('Edit') }}</a>

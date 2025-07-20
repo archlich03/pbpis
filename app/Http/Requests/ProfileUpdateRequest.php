@@ -15,6 +15,8 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = $this->user();
+        
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -23,10 +25,12 @@ class ProfileUpdateRequest extends FormRequest
                 'lowercase',
                 'email',
                 'max:255',
-                Rule::unique(User::class)->ignore($this->user()->user_id, 'user_id'),
+                Rule::unique(User::class)->ignore($user->user_id, 'user_id'),
             ],
             'gender' => ['required', 'boolean'],
-            'role' => ['required', 'string', 'max:32'],
+            'role' => $user->role === 'Balsuojantysis' 
+                ? ['required', 'string', 'in:Balsuojantysis'] // Balsuojantysis can't change their role
+                : ['required', 'string', 'max:32'],
             'pedagogical_name' => ['nullable', 'string', 'max:32'],
         ];
     }
