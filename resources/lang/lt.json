@@ -163,5 +163,12 @@
   "Voting process is not available.": "Šiuo metu nevyksta balsavimo procesas.",
   "Vyksta": "Vyksta",
   "You are not authorized to view this page.": "Jūs neturite prieigos peržiūrėti šį puslapį",
-  "You're logged in!": "Sėkmingai prisijungėte!"
+  "You're logged in!": "Sėkmingai prisijungėte!",
+  "Your password has been reset.": "Jūsų slaptažodis buvo atstatytas.",
+  "Theme": "Tema",
+  "Light Mode": "Šviesus režimas",
+  "Dark Mode": "Tamsus režimas",
+  "Toggle theme": "Perjungti temą",
+  "Switch to light mode": "Perjungti į šviesų režimą",
+  "Switch to dark mode": "Perjungti į tamsų režimą"
 }
