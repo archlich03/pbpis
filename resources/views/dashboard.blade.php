@@ -27,7 +27,7 @@
                 </details>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <details>
                     <summary class="p-6 text-gray-900 dark:text-gray-100">
                         <strong>{{ __('Related Bodies') }}</strong>

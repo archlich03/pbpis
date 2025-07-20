@@ -48,7 +48,6 @@
                                 <option value="{{ $user->user_id }}" {{ $body->chairman_id === $user->user_id ? 'selected' : '' }}>{{ $user->name }}</option>
                             @endforeach
                         </select>
-
                     </div>
 
                     <div class="mt-6 space-y-2">

@@ -34,7 +34,6 @@
                                     {{ __('Physical') }}
                                 </label>
                             </div>
-                            &nbsp;&nbsp;&nbsp;&nbsp;
                             <div class="flex items-center">
                                 <input id="is_evote_1" type="radio" name="is_evote" value="1" class="focus:ring-indigo-500 dark:focus:ring-indigo-600 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded" required />
                                 <label for="is_evote_1" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">

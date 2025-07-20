@@ -10,8 +10,11 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <form method="post" action="{{ route('bodies.store') }}" class="p-6 space-y-6">
                     @csrf
-                    <x-input-label for="title" value="{{ __('Body name') }}" />
-                    <x-text-input id="title" name="title" type="text" class="block w-full" />
+                    
+                    <div>
+                        <x-input-label for="title" value="{{ __('Body name') }}" />
+                        <x-text-input id="title" name="title" type="text" class="mt-1 block w-full" />
+                    </div>
 
                     <div class="mt-6">
                         <x-input-label for="classification" value="{{ __('Classification') }}" />
@@ -46,7 +49,6 @@
                                 <option value="{{ $user->user_id }}">{{ $user->name }}</option>
                             @endforeach
                         </select>
-
                     </div>
 
                     <div class="mt-6 space-y-2">

@@ -128,7 +128,7 @@
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-                <form action="{{ route('locale.change') }}" method="GET">
+                <form action="{{ route('locale.change') }}" method="GET" class="mt-2">
                     <select name="locale" onchange="this.form.submit()" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm text-sm">
                         @foreach(config('app.available_locales') as $code => $name)
                             <option value="{{ $code }}" {{ app()->getLocale() == $code ? 'selected' : '' }}>
