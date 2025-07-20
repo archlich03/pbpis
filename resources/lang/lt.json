@@ -170,5 +170,12 @@
   "Dark Mode": "Tamsus režimas",
   "Toggle theme": "Perjungti temą",
   "Switch to light mode": "Perjungti į šviesų režimą",
-  "Switch to dark mode": "Perjungti į tamsų režimą"
+  "Switch to dark mode": "Perjungti į tamsų režimą",
+  "Reorder Questions": "Pertvarkyti klausimus",
+  "Done Reordering": "Baigti pertvarkymą",
+  "Drag and drop questions to reorder them. Changes will be saved automatically.": "Naudokite aukštyn ir žemyn mygtukus klausimams pertvarkyti. Pakeitimai bus išsaugoti automatiškai.",
+  "Questions reordered successfully": "Klausimai sėkmingai pertvarkti",
+  "Move Up": "Perkelti aukštyn",
+  "Move Down": "Perkelti žemyn",
+  "You cannot modify the role of an IT administrator.": "Jūs negalite keisti IT administratoriaus vaidmens."
 }

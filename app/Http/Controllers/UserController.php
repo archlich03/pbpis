@@ -115,8 +115,14 @@ class UserController extends Controller
         // - Users can update their own profile
         // - IT administrators can update anyone
         // - Secretaries can update only voters (Balsuojantysis)
+        // - Voters and Secretaries cannot edit IT administrators
         // - Everyone else forbidden to update other users
         if ($authenticatedUser->user_id !== $user->user_id) {
+            // Prevent Voters and Secretaries from editing IT administrators
+            if ($targetRole === 'IT administratorius' && $authRole !== 'IT administratorius') {
+                abort(403);
+            }
+            
             if ($authRole === 'Sekretorius' && $targetRole !== 'Balsuojantysis') {
                 abort(403);
             } elseif ($authRole !== 'IT administratorius' && $authRole !== 'Sekretorius') {

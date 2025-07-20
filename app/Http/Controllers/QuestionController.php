@@ -72,6 +72,11 @@ class QuestionController extends Controller
         $question->presenter_id = $request->input('presenter_id');
         $question->type = $request->input('type');
         $question->summary = $request->input('summary');
+        
+        // Set position to the highest existing position + 1
+        $maxPosition = $meeting->questions()->max('position') ?? -1;
+        $question->position = $maxPosition + 1;
+        
         $question->save();
 
         return redirect()->route('meetings.show', ['meeting' => $meeting]);
@@ -160,6 +165,36 @@ class QuestionController extends Controller
         $question->delete();
 
         return redirect()->route('meetings.show', ['meeting' => $meeting]);
+    }
+
+    /**
+     * Reorder questions within a meeting.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Meeting  $meeting
+     * @return \Illuminate\Http\Response
+     */
+    public function reorder(Request $request, Meeting $meeting)
+    {
+        if (!Auth::user()->isPrivileged()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'questions' => ['required', 'array'],
+            'questions.*' => ['required', 'integer', 'exists:questions,question_id'],
+        ]);
+
+        $questions = $request->input('questions');
+        
+        // Update positions for each question
+        foreach ($questions as $position => $questionId) {
+            Question::where('question_id', $questionId)
+                ->where('meeting_id', $meeting->meeting_id)
+                ->update(['position' => $position]);
+        }
+
+        return response()->json(['success' => true]);
     }
 }
 

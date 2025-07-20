@@ -34,18 +34,24 @@
 
         <div>
             <x-input-label for="role" :value="__('Role')" />
-            <select id="role" name="role" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full">
-                @if (Auth::user()->role === 'Sekretorius')
-                    <!-- Secretary can only set users to Balsuojantysis or Sekretorius -->
-                    <option value="Sekretorius" {{ old('role') == 'Sekretorius' || $user->role == 'Sekretorius' ? 'selected' : '' }}>{{ __('Sekretorius') }}</option>
-                    <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || $user->role == 'Balsuojantysis' ? 'selected' : '' }}>{{ __('Balsuojantysis') }}</option>
-                @else
-                    <!-- IT Admin can set all roles -->
-                    <option value="IT administratorius" {{ old('role') == 'IT administratorius' || $user->role == 'IT administratorius' ? 'selected' : '' }}>{{ __('IT administratorius') }}</option>
-                    <option value="Sekretorius" {{ old('role') == 'Sekretorius' || $user->role == 'Sekretorius' ? 'selected' : '' }}>{{ __('Sekretorius') }}</option>
-                    <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || $user->role == 'Balsuojantysis' ? 'selected' : '' }}>{{ __('Balsuojantysis') }}</option>
-                @endif
-            </select>
+            @if ($user->role === 'IT administratorius' && Auth::user()->role !== 'IT administratorius')
+                <!-- Non-IT admins cannot edit IT administrator roles -->
+                <x-text-input id="role" name="role" type="text" class="mt-1 block w-full bg-gray-100 dark:bg-gray-700" value="{{ __('IT administratorius') }}" readonly />
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ __('You cannot modify the role of an IT administrator.') }}</p>
+            @else
+                <select id="role" name="role" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full">
+                    @if (Auth::user()->role === 'Sekretorius')
+                        <!-- Secretary can only set users to Balsuojantysis or Sekretorius -->
+                        <option value="Sekretorius" {{ old('role') == 'Sekretorius' || $user->role == 'Sekretorius' ? 'selected' : '' }}>{{ __('Sekretorius') }}</option>
+                        <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || $user->role == 'Balsuojantysis' ? 'selected' : '' }}>{{ __('Balsuojantysis') }}</option>
+                    @else
+                        <!-- IT Admin can set all roles -->
+                        <option value="IT administratorius" {{ old('role') == 'IT administratorius' || $user->role == 'IT administratorius' ? 'selected' : '' }}>{{ __('IT administratorius') }}</option>
+                        <option value="Sekretorius" {{ old('role') == 'Sekretorius' || $user->role == 'Sekretorius' ? 'selected' : '' }}>{{ __('Sekretorius') }}</option>
+                        <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || $user->role == 'Balsuojantysis' ? 'selected' : '' }}>{{ __('Balsuojantysis') }}</option>
+                    @endif
+                </select>
+            @endif
             <x-input-error class="mt-2" :messages="$errors->get('role')" />
         </div>
 
