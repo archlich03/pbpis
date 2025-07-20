@@ -110,7 +110,18 @@ class MicrosoftController extends Controller
             // Get user info from Microsoft Graph API
             try {
                 $msGraphData = $this->getUserInfo($tokenResponse['access_token']);
-                Log::info('Microsoft Graph data retrieved', ['display_name' => $msGraphData['displayName'] ?? 'Unknown']);
+                
+                // Verify we have the Microsoft ID
+                if (!isset($msGraphData['id']) || empty($msGraphData['id'])) {
+                    Log::error('Microsoft ID missing in Graph API response', ['data' => $msGraphData]);
+                    return redirect()->route('login')
+                        ->with('error', __('Could not retrieve Microsoft ID. Please try again.'));
+                }
+                
+                Log::info('Microsoft Graph data retrieved', [
+                    'display_name' => $msGraphData['displayName'] ?? 'Unknown',
+                    'ms_id' => $msGraphData['id']
+                ]);
             } catch (GuzzleException $e) {
                 Log::error('Failed to get user info', ['error' => $e->getMessage()]);
                 return redirect()->route('login')
@@ -128,7 +139,7 @@ class MicrosoftController extends Controller
             
             Log::info('Processing Microsoft login for email', ['email' => $email]);
             
-            // Process user login/registration
+            // Regular login flow
             $user = $this->processUserLogin($email, $msGraphData, $tokenResponse);
             
             // Log the user in
@@ -184,7 +195,18 @@ class MicrosoftController extends Controller
             ]
         ]);
         
-        return json_decode((string) $response->getBody(), true);
+        $userData = json_decode((string) $response->getBody(), true);
+        
+        // Log the Microsoft Graph API response for debugging
+        Log::info('Microsoft Graph API response', [
+            'id' => $userData['id'] ?? 'Not found',
+            'displayName' => $userData['displayName'] ?? 'Not found',
+            'email' => $userData['mail'] ?? $userData['userPrincipalName'] ?? 'Not found',
+            'has_id' => isset($userData['id']),
+            'response_keys' => array_keys($userData)
+        ]);
+        
+        return $userData;
     }
     
     /**
@@ -239,6 +261,7 @@ class MicrosoftController extends Controller
         return $user;
     }
     
+    // Disconnect method removed as we're now using the simpler approach
     /**
      * Disconnect from Microsoft
      *

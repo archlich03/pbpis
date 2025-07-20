@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
         
-    // Microsoft Disconnect Route
-    Route::post('disconnect/microsoft', [MicrosoftController::class, 'disconnect'])
+    // Microsoft disconnect route removed as we're now using the simpler approach
+    Route::post('disconnect.microsoft', [MicrosoftController::class, 'disconnect'])
         ->name('disconnect.microsoft');
 });
