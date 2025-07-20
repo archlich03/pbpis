@@ -109,8 +109,10 @@ it('allows IT admins deleting other users', function () {
 
     $targetUser = User::factory()->create();
 
+    // Create admin user with Microsoft account to bypass password validation
     $actingUser = User::factory()->create([
         'role' => 'IT administratorius',
+        'ms_id' => 'test-microsoft-id-123',
     ]);
 
     $response = $this

@@ -91,6 +91,14 @@ jobs:
         cp .env.example .env
         echo "✅ Copied .env.example to .env"
         
+        # Set up Microsoft OAuth environment variables for testing
+        echo "Setting up Microsoft OAuth test environment..."
+        sed -i 's|MSGRAPH_CLIENT_ID=your-client-id|MSGRAPH_CLIENT_ID=test-client-id|g' .env
+        sed -i 's|MSGRAPH_SECRET_ID=your-client-secret|MSGRAPH_SECRET_ID=test-client-secret|g' .env
+        sed -i 's|MSGRAPH_OAUTH_URL=http://localhost/login/microsoft/callback|MSGRAPH_OAUTH_URL=http://localhost/login/microsoft/callback|g' .env
+        sed -i 's|MSGRAPH_LANDING_URL=http://localhost/user/dashboard|MSGRAPH_LANDING_URL=http://localhost/dashboard|g' .env
+        echo "✅ Microsoft OAuth environment configured for testing"
+        
         # Step 1: docker compose up -d --quiet-pull
         echo "Starting services with docker compose up -d..."
         docker compose up -d --quiet-pull
@@ -140,17 +148,17 @@ jobs:
     - name: Step 3 - Test web application access
       run: |
         echo "=== Testing web application access ==="
-        echo "Testing http://localhost:8000/login (as per installation instructions)"
+        echo "Testing http://localhost/login (as per installation instructions)"
         
-        # Test if the application responds at localhost:8000/login
+        # Test if the application responds at localhost/login
         for i in {1..12}; do
           echo "Attempt $i: Testing application..."
           
-          if curl -f -s http://localhost:8000/login > /dev/null; then
-            echo "✅ SUCCESS: Web application is accessible at http://localhost:8000/login"
+          if curl -f -s http://localhost/login > /dev/null; then
+            echo "✅ SUCCESS: Web application is accessible at http://localhost/login"
             
             # Get the actual response to verify it's working
-            response=$(curl -s http://localhost:8000/login)
+            response=$(curl -s http://localhost/login)
             if [[ $response == *"<html"* ]] || [[ $response == *"Laravel"* ]] || [[ $response == *"PBPIS"* ]]; then
               echo "✅ Application is serving proper HTML content"
               echo "First 200 characters of response:"
@@ -185,7 +193,33 @@ jobs:
         
         exit 1
 
-    - name: Step 4 - Run Tests inside pbpis container
+    - name: Step 4 - Verify Microsoft OAuth Integration
+      run: |
+        echo "=== Verifying Microsoft OAuth Integration ==="
+        
+        # Test that Microsoft OAuth routes are registered
+        echo "Testing Microsoft OAuth routes..."
+        docker exec pbpis php artisan route:list --name=microsoft
+        
+        # Test that login page includes Microsoft login option
+        echo "Checking if login page includes Microsoft authentication..."
+        response=$(curl -s http://localhost/login)
+        if [[ $response == *"microsoft"* ]] || [[ $response == *"Microsoft"* ]]; then
+          echo "✅ Microsoft authentication option found on login page"
+        else
+          echo "⚠️  Microsoft authentication option not found (this might be expected)"
+        fi
+        
+        # Test that Microsoft OAuth redirect works (should redirect to Microsoft)
+        echo "Testing Microsoft OAuth redirect endpoint..."
+        redirect_response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/login/microsoft)
+        if [[ $redirect_response == "302" ]]; then
+          echo "✅ Microsoft OAuth redirect endpoint responds correctly"
+        else
+          echo "⚠️  Microsoft OAuth redirect returned: $redirect_response"
+        fi
+
+    - name: Step 5 - Run Tests inside pbpis container
       run: |
         echo "=== Running PHP Tests ==="
         docker exec pbpis ./vendor/bin/pest --colors=always

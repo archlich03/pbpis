@@ -39,11 +39,15 @@ class RegisteredUserController extends Controller
             'pedagogical_name' => ['nullable', 'string', 'max:32'],
         ]);
 
+        // Auto-detect gender if not provided or use provided value
+        $detectedGender = User::detectGenderFromLithuanianName($request->name);
+        $finalGender = $request->filled('gender') ? $request->gender : $detectedGender;
+        
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'gender' => $request->gender,
+            'gender' => $finalGender,
             'role' => $request->role,
             'pedagogical_name' => $request->filled('pedagogical_name') 
                 ? strtolower($request->input('pedagogical_name')) 
