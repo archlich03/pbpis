@@ -66,6 +66,6 @@ Route::middleware('auth')->group(function () {
         ->name('logout');
         
     // Microsoft Disconnect Route
-    Route::get('disconnect/microsoft', [MicrosoftController::class, 'disconnect'])
+    Route::post('disconnect/microsoft', [MicrosoftController::class, 'disconnect'])
         ->name('disconnect.microsoft');
 });

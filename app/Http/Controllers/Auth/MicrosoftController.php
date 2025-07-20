@@ -62,7 +62,7 @@ class MicrosoftController extends Controller
             return redirect()->away($authUrl);
         } catch (\Exception $e) {
             Log::error('Error in Microsoft redirect', ['error' => $e->getMessage()]);
-            return redirect()->route('login')->with('error', 'Failed to connect to Microsoft: ' . $e->getMessage());
+            return redirect()->route('login')->with('error', __('Failed to connect to Microsoft: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -84,7 +84,7 @@ class MicrosoftController extends Controller
                     'expected' => session('microsoft_auth_state')
                 ]);
                 return redirect()->route('login')
-                    ->with('error', 'Invalid state token. Please try again.');
+                    ->with('error', __('Invalid state token. Please try again.'));
             }
             
             // Check for error response
@@ -94,7 +94,7 @@ class MicrosoftController extends Controller
                     'description' => $request->error_description
                 ]);
                 return redirect()->route('login')
-                    ->with('error', 'Microsoft authentication error: ' . $request->error_description);
+                    ->with('error', __('Microsoft authentication error: :description', ['description' => $request->error_description]));
             }
             
             // Exchange authorization code for access token
@@ -104,7 +104,7 @@ class MicrosoftController extends Controller
             } catch (GuzzleException $e) {
                 Log::error('Failed to get access token', ['error' => $e->getMessage()]);
                 return redirect()->route('login')
-                    ->with('error', 'Failed to authenticate with Microsoft. Please try again.');
+                    ->with('error', __('Failed to authenticate with Microsoft. Please try again.'));
             }
             
             // Get user info from Microsoft Graph API
@@ -114,7 +114,7 @@ class MicrosoftController extends Controller
             } catch (GuzzleException $e) {
                 Log::error('Failed to get user info', ['error' => $e->getMessage()]);
                 return redirect()->route('login')
-                    ->with('error', 'Failed to retrieve your Microsoft account information. Please try again.');
+                    ->with('error', __('Failed to retrieve your Microsoft account information. Please try again.'));
             }
             
             // Get email from Microsoft account
@@ -123,7 +123,7 @@ class MicrosoftController extends Controller
             if (!$email) {
                 Log::error('No email found in Microsoft data');
                 return redirect()->route('login')
-                    ->with('error', 'Could not retrieve email from Microsoft account.');
+                    ->with('error', __('Could not retrieve email from Microsoft account.'));
             }
             
             Log::info('Processing Microsoft login for email', ['email' => $email]);
@@ -140,7 +140,7 @@ class MicrosoftController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in Microsoft callback', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return redirect()->route('login')
-                ->with('error', 'Authentication failed: ' . $e->getMessage());
+                ->with('error', __('Authentication failed: :error', ['error' => $e->getMessage()]));
         }
     }
     
@@ -258,6 +258,6 @@ class MicrosoftController extends Controller
         }
         
         return redirect()->route('dashboard')
-            ->with('success', 'Successfully disconnected from Microsoft.');
+            ->with('success', __('Successfully disconnected from Microsoft.'));
     }
 }
