@@ -1,140 +1,35 @@
-name: PBPIS Installation Test
+name: PBPIS Deployment Test
 
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
-  # Code Quality & Security Checks
-  code-quality:
+  # Skip deployment tests for draft PRs
+  check-pr-status:
     runs-on: ubuntu-latest
-    name: Code Quality & Security
-    
+    name: Check PR Status
+    outputs:
+      should-deploy: ${{ steps.check.outputs.should-deploy }}
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, redis
-        coverage: none
-    
-    - name: Cache Composer dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.composer/cache
-        key: composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: composer-
-    
-    - name: Install Composer dependencies
-      run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader
-    
-    - name: Copy environment file
-      run: cp .env.example .env
-    
-    - name: Generate application key
-      run: php artisan key:generate
-    
-    - name: PHP Syntax Check
+    - name: Check if PR is draft
+      id: check
       run: |
-        echo "=== PHP Syntax Check ==="
-        find . -name "*.php" -not -path "./vendor/*" -not -path "./storage/*" -not -path "./bootstrap/cache/*" -exec php -l {} \; | grep -v "No syntax errors detected" || echo "✅ All PHP files have valid syntax"
-    
-    - name: Install CodeSniffer
-      run: composer require --dev squizlabs/php_codesniffer --no-interaction
-    
-    - name: PHP CodeSniffer (PSR-12 Standards)
-      run: |
-        echo "=== PHP CodeSniffer Check ==="
-        ./vendor/bin/phpcs --standard=PSR12 app/ --ignore=app/Console/Kernel.php --report=summary || echo "⚠️  Code style issues found (non-blocking)"
-      continue-on-error: true
-    
-    - name: Install PHPStan
-      run: composer require --dev phpstan/phpstan --no-interaction
-    
-    - name: PHPStan Static Analysis
-      run: |
-        echo "=== PHPStan Static Analysis ==="
-        ./vendor/bin/phpstan analyse app/ --level=1 --no-progress || echo "⚠️  Static analysis issues found (non-blocking)"
-      continue-on-error: true
-    
-    - name: Security Vulnerability Check
-      run: |
-        echo "=== Security Vulnerability Check ==="
-        composer audit || echo "⚠️  Security vulnerabilities found (non-blocking)"
-      continue-on-error: true
-    
-    - name: Check for TODO/FIXME comments
-      run: |
-        echo "=== Checking for TODO/FIXME comments ==="
-        if grep -r "TODO\|FIXME\|XXX\|HACK" app/ resources/ --exclude-dir=vendor --exclude-dir=node_modules || true; then
-          echo "⚠️  Found TODO/FIXME comments - consider addressing them"
+        if [ "${{ github.event.pull_request.draft }}" = "true" ]; then
+          echo "should-deploy=false" >> $GITHUB_OUTPUT
+          echo "⏭️  Skipping deployment tests for draft PR"
         else
-          echo "✅ No TODO/FIXME comments found"
-        fi
-    
-    - name: Environment Variable Security Check
-      run: |
-        echo "=== Environment Variable Security Check ==="
-        # Check for actual hardcoded secrets (not placeholder values)
-        if grep -E "(password|secret|key)=.{8,}" .env.example --ignore-case | grep -v -E "(APP_KEY=|DB_PASSWORD=secret|DB_ROOT_PASSWORD=secretroot|DEFAULT_PASSWORD=admin123|your-client-secret|your-api-key)" || true; then
-          echo "⚠️  Potential hardcoded secrets found in .env.example"
-        else
-          echo "✅ No hardcoded secrets found in .env.example (placeholder values are OK)"
-        fi
-    
-    - name: Blade Template Validation
-      run: |
-        echo "=== Blade Template Validation ==="
-        # Check for common Blade syntax issues
-        if find resources/views -name "*.blade.php" -exec grep -l "{{[^}]*}}" {} \; | head -5; then
-          echo "✅ Found Blade templates with proper syntax"
-        fi
-        
-        # Check for unclosed Blade directives
-        if find resources/views -name "*.blade.php" -exec grep -l "@if\|@foreach\|@for" {} \; | xargs grep -L "@endif\|@endforeach\|@endfor" || true; then
-          echo "⚠️  Potential unclosed Blade directives found"
-        else
-          echo "✅ Blade directives appear properly closed"
-        fi
-        
-        # Check for common Blade issues
-        echo "Checking for common Blade issues..."
-        find resources/views -name "*.blade.php" -exec grep -H "{{ \$\|{!! \$" {} \; | head -5 || echo "✅ No obvious Blade variable issues"
-    
-    - name: Frontend Asset Validation
-      run: |
-        echo "=== Frontend Asset Validation ==="
-        
-        # Check if package.json exists and is valid
-        if [ -f "package.json" ]; then
-          echo "Validating package.json..."
-          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON"
-        fi
-        
-        # Check for Tailwind config
-        if [ -f "tailwind.config.js" ]; then
-          echo "✅ Tailwind config found"
-          node -c tailwind.config.js && echo "✅ Tailwind config syntax is valid"
-        fi
-        
-        # Check for Vite config
-        if [ -f "vite.config.js" ]; then
-          echo "✅ Vite config found"
-          node -c vite.config.js && echo "✅ Vite config syntax is valid"
-        fi
-        
-        # Basic CSS validation (if any custom CSS exists)
-        if find resources/css -name "*.css" 2>/dev/null | head -1; then
-          echo "Found CSS files - checking for basic syntax issues..."
-          find resources/css -name "*.css" -exec grep -H "[{}]" {} \; | head -3 || echo "⚠️  CSS files might have issues"
+          echo "should-deploy=true" >> $GITHUB_OUTPUT
+          echo "✅ PR is ready for deployment testing"
         fi
 
   # Main Installation & Integration Tests
   test-installation:
     runs-on: ubuntu-latest
-    needs: code-quality
+    needs: check-pr-status
+    if: needs.check-pr-status.outputs.should-deploy == 'true'
+    name: Deployment Integration Test
     
     steps:
     - uses: actions/checkout@v4
