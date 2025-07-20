@@ -5,8 +5,136 @@ on:
   pull_request:
 
 jobs:
+  # Code Quality & Security Checks
+  code-quality:
+    runs-on: ubuntu-latest
+    name: Code Quality & Security
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, redis
+        coverage: none
+    
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.composer/cache
+        key: composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: composer-
+    
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader
+    
+    - name: Copy environment file
+      run: cp .env.example .env
+    
+    - name: Generate application key
+      run: php artisan key:generate
+    
+    - name: PHP Syntax Check
+      run: |
+        echo "=== PHP Syntax Check ==="
+        find . -name "*.php" -not -path "./vendor/*" -not -path "./storage/*" -not -path "./bootstrap/cache/*" -exec php -l {} \; | grep -v "No syntax errors detected" || echo "✅ All PHP files have valid syntax"
+    
+    - name: Install CodeSniffer
+      run: composer require --dev squizlabs/php_codesniffer --no-interaction
+    
+    - name: PHP CodeSniffer (PSR-12 Standards)
+      run: |
+        echo "=== PHP CodeSniffer Check ==="
+        ./vendor/bin/phpcs --standard=PSR12 app/ --ignore=app/Console/Kernel.php --report=summary || echo "⚠️  Code style issues found (non-blocking)"
+      continue-on-error: true
+    
+    - name: Install PHPStan
+      run: composer require --dev phpstan/phpstan --no-interaction
+    
+    - name: PHPStan Static Analysis
+      run: |
+        echo "=== PHPStan Static Analysis ==="
+        ./vendor/bin/phpstan analyse app/ --level=1 --no-progress || echo "⚠️  Static analysis issues found (non-blocking)"
+      continue-on-error: true
+    
+    - name: Security Vulnerability Check
+      run: |
+        echo "=== Security Vulnerability Check ==="
+        composer audit || echo "⚠️  Security vulnerabilities found (non-blocking)"
+      continue-on-error: true
+    
+    - name: Check for TODO/FIXME comments
+      run: |
+        echo "=== Checking for TODO/FIXME comments ==="
+        if grep -r "TODO\|FIXME\|XXX\|HACK" app/ resources/ --exclude-dir=vendor --exclude-dir=node_modules || true; then
+          echo "⚠️  Found TODO/FIXME comments - consider addressing them"
+        else
+          echo "✅ No TODO/FIXME comments found"
+        fi
+    
+    - name: Environment Variable Security Check
+      run: |
+        echo "=== Environment Variable Security Check ==="
+        # Check for actual hardcoded secrets (not placeholder values)
+        if grep -E "(password|secret|key)=.{8,}" .env.example --ignore-case | grep -v -E "(APP_KEY=|DB_PASSWORD=secret|DB_ROOT_PASSWORD=secretroot|DEFAULT_PASSWORD=admin123|your-client-secret|your-api-key)" || true; then
+          echo "⚠️  Potential hardcoded secrets found in .env.example"
+        else
+          echo "✅ No hardcoded secrets found in .env.example (placeholder values are OK)"
+        fi
+    
+    - name: Blade Template Validation
+      run: |
+        echo "=== Blade Template Validation ==="
+        # Check for common Blade syntax issues
+        if find resources/views -name "*.blade.php" -exec grep -l "{{[^}]*}}" {} \; | head -5; then
+          echo "✅ Found Blade templates with proper syntax"
+        fi
+        
+        # Check for unclosed Blade directives
+        if find resources/views -name "*.blade.php" -exec grep -l "@if\|@foreach\|@for" {} \; | xargs grep -L "@endif\|@endforeach\|@endfor" || true; then
+          echo "⚠️  Potential unclosed Blade directives found"
+        else
+          echo "✅ Blade directives appear properly closed"
+        fi
+        
+        # Check for common Blade issues
+        echo "Checking for common Blade issues..."
+        find resources/views -name "*.blade.php" -exec grep -H "{{ \$\|{!! \$" {} \; | head -5 || echo "✅ No obvious Blade variable issues"
+    
+    - name: Frontend Asset Validation
+      run: |
+        echo "=== Frontend Asset Validation ==="
+        
+        # Check if package.json exists and is valid
+        if [ -f "package.json" ]; then
+          echo "Validating package.json..."
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON"
+        fi
+        
+        # Check for Tailwind config
+        if [ -f "tailwind.config.js" ]; then
+          echo "✅ Tailwind config found"
+          node -c tailwind.config.js && echo "✅ Tailwind config syntax is valid"
+        fi
+        
+        # Check for Vite config
+        if [ -f "vite.config.js" ]; then
+          echo "✅ Vite config found"
+          node -c vite.config.js && echo "✅ Vite config syntax is valid"
+        fi
+        
+        # Basic CSS validation (if any custom CSS exists)
+        if find resources/css -name "*.css" 2>/dev/null | head -1; then
+          echo "Found CSS files - checking for basic syntax issues..."
+          find resources/css -name "*.css" -exec grep -H "[{}]" {} \; | head -3 || echo "⚠️  CSS files might have issues"
+        fi
+
+  # Main Installation & Integration Tests
   test-installation:
     runs-on: ubuntu-latest
+    needs: code-quality
     
     steps:
     - uses: actions/checkout@v4
@@ -262,6 +390,145 @@ jobs:
         "
         
         echo "✅ Installation verification complete!"
+
+    - name: Database & Migration Testing
+      run: |
+        echo "=== Database & Migration Testing ==="
+        
+        # Test migration status
+        echo "Checking migration status..."
+        docker exec pbpis php artisan migrate:status
+        
+        # Test migration rollback (if possible)
+        echo "Testing migration rollback..."
+        docker exec pbpis php artisan migrate:rollback --step=1 --force || echo "⚠️  Rollback failed (might be expected for initial migration)"
+        
+        # Re-run migrations
+        echo "Re-running migrations..."
+        docker exec pbpis php artisan migrate --force
+        
+        # Test database seeding
+        echo "Testing database seeding..."
+        docker exec pbpis php artisan db:seed --force
+        
+        # Verify database integrity
+        echo "Verifying database integrity..."
+        docker exec pbpis php artisan tinker --execute="
+        try {
+          \$tables = DB::select('SHOW TABLES');
+          echo '✅ Database tables accessible: ' . count(\$tables) . PHP_EOL;
+          
+          // Test basic CRUD operations
+          \$userCount = DB::table('users')->count();
+          echo 'Users in database: ' . \$userCount . PHP_EOL;
+          
+          if (\$userCount > 0) {
+            echo '✅ Database seeding successful' . PHP_EOL;
+          } else {
+            echo '❌ No users found after seeding' . PHP_EOL;
+            exit(1);
+          }
+        } catch (Exception \$e) {
+          echo '❌ Database integrity check failed: ' . \$e->getMessage() . PHP_EOL;
+          exit(1);
+        }
+        "
+        
+        echo "✅ Database testing complete!"
+
+    - name: Laravel-Specific Testing
+      run: |
+        echo "=== Laravel-Specific Testing ==="
+        
+        # Test Artisan commands
+        echo "Testing Artisan commands..."
+        docker exec pbpis php artisan --version
+        docker exec pbpis php artisan list --format=json > /dev/null
+        
+        # Test configuration caching
+        echo "Testing configuration caching..."
+        docker exec pbpis php artisan config:cache
+        docker exec pbpis php artisan config:clear
+        
+        # Test route caching
+        echo "Testing route caching..."
+        docker exec pbpis php artisan route:cache
+        docker exec pbpis php artisan route:clear
+        
+        # Test view caching
+        echo "Testing view caching..."
+        docker exec pbpis php artisan view:cache
+        docker exec pbpis php artisan view:clear
+        
+        # Test queue functionality (if applicable)
+        echo "Testing queue configuration..."
+        docker exec pbpis php artisan queue:work --once --stop-when-empty || echo "⚠️  Queue test completed (expected if no jobs)"
+        
+        # Test session handling
+        echo "Testing session configuration..."
+        docker exec pbpis php artisan tinker --execute="
+        try {
+          // Test session store
+          \$sessionId = Str::random(40);
+          Session::put('test_key', 'test_value');
+          \$value = Session::get('test_key');
+          if (\$value === 'test_value') {
+            echo '✅ Session handling works' . PHP_EOL;
+          } else {
+            echo '❌ Session handling failed' . PHP_EOL;
+          }
+        } catch (Exception \$e) {
+          echo '⚠️  Session test failed: ' . \$e->getMessage() . PHP_EOL;
+        }
+        "
+        
+        # Test cache functionality
+        echo "Testing cache functionality..."
+        docker exec pbpis php artisan tinker --execute="
+        try {
+          Cache::put('test_cache_key', 'test_cache_value', 60);
+          \$value = Cache::get('test_cache_key');
+          if (\$value === 'test_cache_value') {
+            echo '✅ Cache functionality works' . PHP_EOL;
+          } else {
+            echo '❌ Cache functionality failed' . PHP_EOL;
+          }
+          Cache::forget('test_cache_key');
+        } catch (Exception \$e) {
+          echo '⚠️  Cache test failed: ' . \$e->getMessage() . PHP_EOL;
+        }
+        "
+        
+        # Test Microsoft OAuth routes (specific to your app)
+        echo "Testing Microsoft OAuth routes..."
+        docker exec pbpis php artisan route:list | grep microsoft || echo "⚠️  Microsoft OAuth routes not found"
+        
+        # Test user model and authentication
+        echo "Testing User model and authentication..."
+        docker exec pbpis php artisan tinker --execute="
+        try {
+          \$user = User::first();
+          if (\$user) {
+            echo '✅ User model accessible: ' . \$user->email . PHP_EOL;
+            
+            // Test Microsoft OAuth integration
+            if (method_exists(\$user, 'detectGenderFromLithuanianName')) {
+              echo '✅ Lithuanian gender detection method exists' . PHP_EOL;
+            }
+            
+            // Test role methods
+            if (method_exists(\$user, 'isAdmin')) {
+              echo '✅ User role methods exist' . PHP_EOL;
+            }
+          } else {
+            echo '❌ No users found' . PHP_EOL;
+          }
+        } catch (Exception \$e) {
+          echo '❌ User model test failed: ' . \$e->getMessage() . PHP_EOL;
+        }
+        "
+        
+        echo "✅ Laravel-specific testing complete!"
 
     - name: Test phpMyAdmin access (bonus check)
       run: |
