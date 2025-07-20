@@ -34,14 +34,14 @@
                                     </div>
                                     <div>
                                         <x-input-label for="is_evote" value="{{ __('Meeting type') }}:" />
-                                        <select id="is_evote" name="is_evote" class="block w-full">
+                                        <select id="is_evote" name="is_evote" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block w-full">
                                             <option value="0" {{ $meeting->is_evote === 0 ? 'selected' : '' }}>{{ __('Physical') }}</option>
                                             <option value="1" {{ $meeting->is_evote === 1 ? 'selected' : '' }}>{{ __('Electronic') }}</option>
                                         </select>
                                     </div>
                                     <div>
                                         <x-input-label for="secretary_id" value="{{ __('Associated secretary') }}:" />
-                                        <select id="secretary_id" name="secretary_id" class="block w-full">
+                                        <select id="secretary_id" name="secretary_id" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block w-full">
                                             <option value="">{{ __('Select secretary') }}</option>
                                             @foreach ($users as $user)
                                                 @if ($user->isSecretary())
@@ -175,7 +175,7 @@
 
                                                 <div class="mt-4">
                                                     <x-input-label for="type" value="{{ __('Type') }}:" />
-                                                    <select id="type" name="type" class="block mt-1 w-full">
+                                                    <select id="type" name="type" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full">
                                                         @foreach (\App\Models\Question::STATUSES as $status)
                                                             <option value="{{ $status }}" {{ $question->type == $status ? 'selected' : '' }}>{{ $status }}</option>
                                                         @endforeach
@@ -184,7 +184,7 @@
 
                                                 <div class="mt-4">
                                                     <x-input-label for="presenter_id" value="{{ __('Presenter') }}:" />
-                                                    <select id="presenter_id" name="presenter_id" class="block mt-1 w-full">
+                                                    <select id="presenter_id" name="presenter_id" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full">
                                                         @foreach ($users as $user)
                                                             <option value="{{ $user->user_id }}" {{ $question->presenter_id == $user->user_id ? 'selected' : '' }}>{{ $user->pedagogical_name }} {{ $user->name }}</option>
                                                         @endforeach
