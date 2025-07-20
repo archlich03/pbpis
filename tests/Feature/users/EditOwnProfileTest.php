@@ -11,7 +11,10 @@ beforeEach(function () {
 });
 
 it('allows a user to update their own profile', function () {
-    $user = User::factory()->create();
+    // Create user with IT admin role so they can change roles
+    $user = User::factory()->create([
+        'role' => 'IT administratorius'
+    ]);
     $this->actingAs($user);
 
     $updatedData = [
