@@ -48,7 +48,7 @@
         <!-- Gender -->
         <div class="mt-4">
             <x-input-label for="gender" :value="__('Gender')" />
-            <select id="gender" name="gender" class="block mt-1 w-full">
+            <select id="gender" name="gender" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full">
                 <option value="0" {{ old('gender') == '0' ? 'selected' : '' }}>{{ __('Female') }}</option>
                 <option value="1" {{ old('gender') == '1' ? 'selected' : '' }}>{{ __('Male') }}</option>
             </select>
@@ -58,7 +58,7 @@
         <!-- Role -->
         <div class="mt-4">
             <x-input-label for="role" :value="__('Role')" />
-            <select id="role" name="role" class="block mt-1 w-full">
+            <select id="role" name="role" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full">
                 @if (Auth::user()->role === 'Sekretorius')
                     <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || Auth::user()->role == 'Balsuojantysis' ? 'selected' : '' }}>
                         {{ __('Balsuojantysis') }}

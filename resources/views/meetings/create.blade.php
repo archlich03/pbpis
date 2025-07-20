@@ -13,7 +13,7 @@
 
                     <div class="mt-6">
                         <x-input-label for="secretary_id" value="{{ __('Associated secretary') }}:" />
-                        <select id="secretary_id" name="secretary_id" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <select id="secretary_id" name="secretary_id" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block w-full mt-1">
                             <option value="">{{ __('Select secretary') }}</option>
                             @foreach ($users as $user)
                                 @if ($user->isSecretary())
@@ -29,14 +29,13 @@
                         <x-input-label for="is_evote" value="{{ __('Meeting type') }}:" class="flex items-center" />
                         <div class="mt-1 flex items-center space-x-4">
                             <div class="flex items-center">
-                                <input id="is_evote_0" type="radio" name="is_evote" value="0" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" required />
+                                <input id="is_evote_0" type="radio" name="is_evote" value="0" class="focus:ring-indigo-500 dark:focus:ring-indigo-600 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded" required />
                                 <label for="is_evote_0" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                                     {{ __('Physical') }}
                                 </label>
                             </div>
-                            &nbsp;&nbsp;&nbsp;&nbsp;
                             <div class="flex items-center">
-                                <input id="is_evote_1" type="radio" name="is_evote" value="1" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" required />
+                                <input id="is_evote_1" type="radio" name="is_evote" value="1" class="focus:ring-indigo-500 dark:focus:ring-indigo-600 h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded" required />
                                 <label for="is_evote_1" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                                     {{ __('Electronic') }}
                                 </label>

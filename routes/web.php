@@ -6,6 +6,7 @@ use App\Http\Controllers\BodyController;
 use App\Http\Controllers\VoteController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -69,6 +70,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+
+// Theme routes
+Route::post('/theme/toggle', [ThemeController::class, 'toggle'])->name('theme.toggle');
+Route::post('/theme/set', [ThemeController::class, 'set'])->name('theme.set');
 
 Route::get('/locale', function (Request $request) {
     $locale = $request->query('locale');
