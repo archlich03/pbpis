@@ -1,3 +1,5 @@
+@section('title', __('Edit Body') . ' - ' . config('app.name', 'PBPIS'))
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -69,12 +71,13 @@
                 </form>
 
                 @if (Auth::user()->isAdmin())
-                    <div x-data="{ confirmingBodyDeletion: false }"
-                        class="relative">
-                        <x-danger-button
-                            x-on:click.prevent="confirmingBodyDeletion = true">
-                            {{ __('Delete Body') }}
-                        </x-danger-button>
+                    <div class="p-6 border-t border-gray-200 dark:border-gray-700">
+                        <div x-data="{ confirmingBodyDeletion: false }"
+                            class="relative">
+                            <x-danger-button
+                                x-on:click.prevent="confirmingBodyDeletion = true">
+                                {{ __('Delete Body') }}
+                            </x-danger-button>
 
                         <div
                             x-show="confirmingBodyDeletion"

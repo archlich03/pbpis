@@ -1,3 +1,5 @@
+@section('title', __('Edit User') . ' - ' . config('app.name', 'PBPIS'))
+
 <x-app-layout>
     @if (Auth::user()->isPrivileged())
         <x-slot name="header">

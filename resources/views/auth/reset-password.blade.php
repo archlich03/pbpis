@@ -1,3 +1,5 @@
+@section('title', __('Reset Password') . ' - ' . config('app.name', 'PBPIS'))
+
 <x-guest-layout>
     <form method="POST" action="{{ route('password.store') }}">
         @csrf

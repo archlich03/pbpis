@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Body;
+use App\Services\RoleAuthorizationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class UserController extends Controller
      */
     public function index(): View
     {
-        if (!Auth::user()->isPrivileged()) {
+        if (!RoleAuthorizationService::canAccessUserManagement(Auth::user())) {
             abort(403);
         }
         $perPage = in_array((int) request('perPage'), [10, 20, 50, 100]) ? (int) request('perPage') : 20;
@@ -51,8 +52,9 @@ class UserController extends Controller
      */
     public function edit(User $user): View
     {
-
-        if (!Auth::user()->isPrivileged()) {
+        $authenticatedUser = Auth::user();
+        
+        if (!RoleAuthorizationService::canEditUserProfile($authenticatedUser, $user)) {
             abort(403);
         }
 
@@ -71,12 +73,7 @@ class UserController extends Controller
             return redirect()->route('login');
         }
      
-        if (!Auth::user()->isAdmin()) {
-            abort(403);
-        }
-        
-        // You can add admin check here if needed:
-        if ($authenticatedUser->role !== 'IT administratorius') {
+        if (!RoleAuthorizationService::canDeleteUser($authenticatedUser, $user)) {
             abort(403);
         }
         
@@ -104,30 +101,8 @@ class UserController extends Controller
             return redirect()->route('login');
         }
 
-        if (! $authenticatedUser->isPrivileged()) {
+        if (!RoleAuthorizationService::canEditUserProfile($authenticatedUser, $user)) {
             abort(403);
-        }
-
-        $authRole = $authenticatedUser->role;
-        $targetRole = $user->role;
-
-        // Authorization logic:
-        // - Users can update their own profile
-        // - IT administrators can update anyone
-        // - Secretaries can update only voters (Balsuojantysis)
-        // - Voters and Secretaries cannot edit IT administrators
-        // - Everyone else forbidden to update other users
-        if ($authenticatedUser->user_id !== $user->user_id) {
-            // Prevent Voters and Secretaries from editing IT administrators
-            if ($targetRole === 'IT administratorius' && $authRole !== 'IT administratorius') {
-                abort(403);
-            }
-            
-            if ($authRole === 'Sekretorius' && $targetRole !== 'Balsuojantysis') {
-                abort(403);
-            } elseif ($authRole !== 'IT administratorius' && $authRole !== 'Sekretorius') {
-                abort(403);
-            }
         }
 
         // Validation rules depend on authenticated user's role
@@ -136,11 +111,7 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->user_id . ',user_id'],
             'pedagogical_name' => ['nullable', 'string', 'max:255'],
             'gender' => ['integer', 'in:0,1'],
-            'role' => $authRole === 'Sekretorius'
-                ? ['string', 'in:Balsuojantysis,Sekretorius']
-                : ($authRole === 'IT administratorius'
-                    ? ['string', 'in:Balsuojantysis,IT administratorius,Sekretorius']
-                    : ['prohibited']),
+            'role' => RoleAuthorizationService::getRoleValidationRules($authenticatedUser),
         ]);
 
         $user->update([

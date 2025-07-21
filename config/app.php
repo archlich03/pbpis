@@ -94,8 +94,8 @@ return [
     */
 
     'available_locales' => [
-        'en' => 'English',
-        'lt' => 'Lithuanian',
+        'en' => 'EN',
+        'lt' => 'LT',
     ],
 
     /*

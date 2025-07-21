@@ -1,3 +1,4 @@
+<title>{{ __('Meeting Protocol') }}</title>
 <style>
 /*@font-face {
     font-family:'Times';
@@ -121,7 +122,7 @@ p, div, h1, h2, h3 {
                         {{ $question->presenter->pedagogical_name }} {{ $question->presenter->name }}.
                     </span> 
                     <span>
-                        {{ $question->summary? $question->summary : 'Vyko diskusija.' }}
+                        {!! $question->summary? $question->summary : 'Vyko diskusija.' !!}
                     </span><br>
                     @if ($question->type != "Nebalsuoti")
                         @php

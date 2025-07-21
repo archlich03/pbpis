@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('decision')->nullable();
             $table->foreignId('presenter_id')->constrained('users', 'user_id')->nullable();
             $table->string('type')->default('Nebalsuoti');
-            $table->string('summary')->nullable();
+            $table->text('summary')->nullable();
             $table->integer('position')->default(0);
             $table->timestamps();
         });

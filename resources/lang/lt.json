@@ -61,7 +61,7 @@
   "Create Question": "Sukurti klausimą",
   "Create new body": "Kurti naują darinį",
   "Current Password": "Dabartinis slaptažodis",
-  "Dashboard": "Valdymo skydas",
+  "Dashboard": "Pagrindinis puslapis",
   "Date": "Data",
   "Delete": "Ištrinti",
   "Delete Account": "Ištrinti paskyrą",
@@ -177,5 +177,17 @@
   "Questions reordered successfully": "Klausimai sėkmingai pertvarkti",
   "Move Up": "Perkelti aukštyn",
   "Move Down": "Perkelti žemyn",
-  "You cannot modify the role of an IT administrator.": "Jūs negalite keisti IT administratoriaus vaidmens."
+  "You cannot modify the role of an IT administrator.": "Jūs negalite keisti IT administratoriaus vaidmens.",
+  "You can use HTML formatting (e.g., <strong>, <em>, <p>, <br>, <ul>, <li>)": "Galite naudoti HTML formatavimą (pvz., <strong>, <em>, <p>, <br>, <ul>, <li>)",
+  "Enter detailed summary with HTML formatting if needed...": "Iveskite detalų santrauką su HTML formatavimu, jei reikia...",
+  "Edit User": "Redaguoti vartotoją",
+  "Create Body": "Kurti padalinį",
+  "Edit Body": "Redaguoti padalinį",
+  "Body Details": "Padalinio informacija",
+  "Meeting Details": "Posėdžio informacija",
+  "Meeting Protocol": "Posėdžio protokolas",
+  "Login": "Prisijungimas",
+  "Forgot Password": "Pamiršote slaptažodį",
+  "Reset Password": "Atstatyti slaptažodį",
+  "Verify Email": "Patvirtinti el. paštą"
 }
