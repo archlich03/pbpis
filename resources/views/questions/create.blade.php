@@ -1,3 +1,5 @@
+@section('title', __('Create Question') . ' - ' . config('app.name', 'PBPIS'))
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -43,7 +45,8 @@
 
                         <div class="mt-4">
                             <x-input-label for="summary" value="{{ __('Question summary') }}:" />
-                            <textarea id="summary" name="summary" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="3">{{ old('summary') }}</textarea>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ __('You can use HTML formatting (e.g., <strong>, <em>, <p>, <br>, <ul>, <li>)') }}</p>
+                            <textarea id="summary" name="summary" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full" rows="6" placeholder="{{ __('Enter detailed summary with HTML formatting if needed...') }}">{{ old('summary') }}</textarea>
                         </div>
 
                         <div class="flex items-center justify-end mt-4">
