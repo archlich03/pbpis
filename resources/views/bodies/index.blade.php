@@ -72,7 +72,10 @@
                                 <th class="px-4 py-2">{!! sortLink('title', __('Name')) !!}</th>
                                 <th class="px-4 py-2">{{ __('Chairperson') }}</th>
                                 <th class="px-2 py-2 whitespace-nowrap w-[1%]">{{ __('Type') }}</th>
-                                <th class="px-2 py-2 whitespace-nowrap w-[1%]" colspan="{{ Auth::user()->isPrivileged() ? 2 : 1 }}">{{ __('Actions') }}</th>
+                                <th class="px-2 py-2 whitespace-nowrap w-[1%]">{{ __('Actions') }}</th>
+                                @if (Auth::user()->isPrivileged())
+                                    <th class="px-2 py-2 whitespace-nowrap w-[1%]"></th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
