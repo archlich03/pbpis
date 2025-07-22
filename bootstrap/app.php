@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\SetLocale; // Import your custom middleware
+use App\Http\Middleware\SecurityHeaders;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // have done their job, making the session available.
         $middleware->web(append: [
             SetLocale::class,
+            SecurityHeaders::class,
         ]);
 
         // If you had any global middleware or route middleware aliases,

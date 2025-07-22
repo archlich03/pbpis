@@ -156,7 +156,7 @@ class UserController extends Controller
         }
         
         $request->validate([
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(12)->mixedCase()->numbers()->symbols()],
         ]);
 
         if ($request->filled('password')) {

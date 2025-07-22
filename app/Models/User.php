@@ -32,6 +32,7 @@ class User extends Authenticatable
         'gender',
         'role',
         'pedagogical_name',
+        'ms_id',
     ];
 
     /**

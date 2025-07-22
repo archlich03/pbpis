@@ -43,14 +43,14 @@ it('allows a user to update their own profile', function () {
 
 it('allows a user to change their own password', function () {
     $user = User::factory()->create([
-        'password' => Hash::make('old-password'),
+        'password' => Hash::make('OldPassword123!'),
     ]);
     $this->actingAs($user);
 
     $passwordData = [
-        'current_password' => 'old-password',
-        'password' => 'new-password',
-        'password_confirmation' => 'new-password',
+        'current_password' => 'OldPassword123!',
+        'password' => 'NewPassword456@',
+        'password_confirmation' => 'NewPassword456@',
     ];
 
     $response = $this->put(route('password.update'), $passwordData);
@@ -59,7 +59,7 @@ it('allows a user to change their own password', function () {
     $response->assertSessionHas('status', 'password-updated');
 
     $user->refresh();
-    expect(Hash::check('new-password', $user->password))->toBeTrue();
+    expect(Hash::check('NewPassword456@', $user->password))->toBeTrue();
 });
 
 it('allows a user to delete their own profile', function () {

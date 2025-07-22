@@ -87,6 +87,9 @@ class MicrosoftController extends Controller
                     ->with('error', __('Invalid state token. Please try again.'));
             }
             
+            // Clear the state token after successful validation
+            session()->forget('microsoft_auth_state');
+            
             // Check for error response
             if ($request->has('error')) {
                 Log::error('Microsoft OAuth error', [
@@ -137,13 +140,43 @@ class MicrosoftController extends Controller
                     ->with('error', __('Could not retrieve email from Microsoft account.'));
             }
             
+            // Validate and sanitize Microsoft data
+            $email = filter_var($email, FILTER_VALIDATE_EMAIL);
+            if (!$email) {
+                Log::error('Invalid email format from Microsoft', ['email' => $msGraphData['mail'] ?? $msGraphData['userPrincipalName'] ?? 'null']);
+                return redirect()->route('login')
+                    ->with('error', __('Invalid email format from Microsoft account.'));
+            }
+            
+            // Sanitize display name
+            $displayName = isset($msGraphData['displayName']) ? strip_tags(trim($msGraphData['displayName'])) : null;
+            if ($displayName && strlen($displayName) > 255) {
+                $displayName = substr($displayName, 0, 255);
+            }
+            
+            // Validate Microsoft ID
+            $msId = isset($msGraphData['id']) ? preg_replace('/[^a-zA-Z0-9\-]/', '', $msGraphData['id']) : null;
+            if ($msId && strlen($msId) > 255) {
+                $msId = substr($msId, 0, 255);
+            }
+            
             Log::info('Processing Microsoft login for email', ['email' => $email]);
             
-            // Regular login flow
-            $user = $this->processUserLogin($email, $msGraphData, $tokenResponse);
+            // Regular login flow - pass sanitized data
+            $sanitizedData = [
+                'id' => $msId,
+                'displayName' => $displayName,
+                'mail' => $email,
+                'userPrincipalName' => $email
+            ];
+            $user = $this->processUserLogin($email, $sanitizedData, $tokenResponse);
             
             // Log the user in
             Auth::login($user);
+            
+            // Regenerate session to prevent session fixation attacks
+            $request->session()->regenerate();
+            
             Log::info('User logged in successfully', ['user_id' => $user->user_id]);
             
             return redirect()->route('dashboard');
