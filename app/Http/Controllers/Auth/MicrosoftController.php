@@ -10,7 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class MicrosoftController extends Controller
 {
@@ -76,9 +78,21 @@ class MicrosoftController extends Controller
     {
         Log::info('Microsoft OAuth callback received', ['query' => $request->query()]);
         
+        // Apply rate limiting for Microsoft authentication attempts
+        $throttleKey = 'microsoft-auth:' . $request->ip();
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            $minutes = ceil($seconds / 60);
+            return redirect()->route('login')
+                ->with('error', __('Too many Microsoft authentication attempts. Please try again in :minutes minutes.', ['minutes' => $minutes]));
+        }
+        
         try {
             // Verify state token to prevent CSRF attacks
             if ($request->state !== session('microsoft_auth_state')) {
+                // Hit rate limiter for invalid state token (potential attack)
+                RateLimiter::hit($throttleKey, 1800);
+                
                 Log::error('Invalid state token', [
                     'received' => $request->state, 
                     'expected' => session('microsoft_auth_state')
@@ -92,6 +106,9 @@ class MicrosoftController extends Controller
             
             // Check for error response
             if ($request->has('error')) {
+                // Hit rate limiter for OAuth errors
+                RateLimiter::hit($throttleKey, 1800);
+                
                 Log::error('Microsoft OAuth error', [
                     'error' => $request->error, 
                     'description' => $request->error_description
@@ -177,11 +194,17 @@ class MicrosoftController extends Controller
             // Regenerate session to prevent session fixation attacks
             $request->session()->regenerate();
             
+            // Clear rate limiting on successful authentication
+            RateLimiter::clear($throttleKey);
+            
             Log::info('User logged in successfully', ['user_id' => $user->user_id]);
             
             return redirect()->route('dashboard');
             
         } catch (\Exception $e) {
+            // Hit rate limiter on failed authentication attempts
+            RateLimiter::hit($throttleKey, 1800); // 30-minute decay
+            
             Log::error('Error in Microsoft callback', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return redirect()->route('login')
                 ->with('error', __('Authentication failed: :error', ['error' => $e->getMessage()]));

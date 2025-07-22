@@ -189,5 +189,7 @@
   "Login": "Prisijungimas",
   "Forgot Password": "Pamiršote slaptažodį",
   "Reset Password": "Atstatyti slaptažodį",
-  "Verify Email": "Patvirtinti el. paštą"
+  "Verify Email": "Patvirtinti el. paštą",
+  "Too many login attempts. Please try again in :minutes minutes.": "Per daug prisijungimo bandymų. Bandykite dar kartą po :minutes minučių.",
+  "Too many Microsoft authentication attempts. Please try again in :minutes minutes.": "Per daug Microsoft autentifikacijos bandymų. Bandykite dar kartą po :minutes minučių."
 }
