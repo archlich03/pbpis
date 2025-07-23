@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -197,6 +198,15 @@ class MicrosoftController extends Controller
             // Clear rate limiting on successful authentication
             RateLimiter::clear($throttleKey);
             
+            // Log successful Microsoft login
+            AuditLog::log(
+                $user->user_id,
+                'microsoft_login',
+                $request->ip(),
+                $request->userAgent(),
+                ['microsoft_id' => $msId]
+            );
+            
             Log::info('User logged in successfully', ['user_id' => $user->user_id]);
             
             return redirect()->route('dashboard');
@@ -303,6 +313,20 @@ class MicrosoftController extends Controller
             $user->password = Hash::make(Str::random(24)); // Generate a secure random password
             $user->role = 'Balsuojantysis'; // Default role
             $user->gender = User::detectGenderFromLithuanianName($userName); // Auto-detect gender
+            $user->save();
+            
+            // Log account creation
+            AuditLog::log(
+                $user->user_id,
+                'microsoft_account_created',
+                request()->ip(),
+                request()->userAgent() ?? 'Unknown',
+                [
+                    'name' => $userName,
+                    'email' => $email,
+                    'ms_id' => $msGraphData['id'] ?? null
+                ]
+            );
             
             Log::info('New user created', ['email' => $email]);
         }

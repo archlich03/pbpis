@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\AuditLog;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -51,6 +52,32 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+        
+        $user = Auth::user();
+        
+        // Check if user has 2FA enabled
+        if ($user->hasTwoFactorEnabled()) {
+            // Store user ID in session for 2FA verification
+            session([
+                'pending_2fa_user_id' => $user->user_id,
+                'pending_2fa_remember' => $this->boolean('remember'),
+            ]);
+            
+            // Logout temporarily until 2FA is verified
+            Auth::logout();
+            
+            // Redirect to 2FA verification will be handled by the controller
+            return;
+        }
+        
+        // Log successful login for non-2FA users
+        AuditLog::log(
+            $user->user_id,
+            'login',
+            $this->ip(),
+            $this->userAgent(),
+            ['method' => 'password']
+        );
     }
 
     /**

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id('user_id')->autoIncrement()->primary();
+            $table->id('user_id');
             $table->string('ms_id')->nullable();
             $table->string('name');
             $table->string('email')->unique();
@@ -22,6 +22,15 @@ return new class extends Migration
             $table->boolean('isLoggedIn')->default(false);
             $table->boolean('gender');
             $table->dateTime('last_login')->default(now());
+            
+            // 2FA fields
+            $table->text('two_factor_secret')->nullable();
+            $table->text('two_factor_recovery_codes')->nullable();
+            $table->timestamp('two_factor_confirmed_at')->nullable();
+            
+            // Forced password change field
+            $table->boolean('password_change_required')->default(false);
+            
             $table->rememberToken();
             $table->timestamps();
         });

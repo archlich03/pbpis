@@ -21,6 +21,22 @@
                         </div>
                     </div>
 
+                    @if($user->canUseTwoFactor())
+                        <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                            <div class="max-w-xl">
+                                @include('users.partials.two-factor-management')
+                            </div>
+                        </div>
+                    @endif
+
+                    @if(empty($user->ms_id))
+                        <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                            <div class="max-w-xl">
+                                @include('users.partials.password-management')
+                            </div>
+                        </div>
+                    @endif
+
                 @if (Auth::user()->role === 'IT administratorius')
 
                     <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">

@@ -25,6 +25,11 @@
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                             {{ __('Users') }}
                         </x-nav-link>
+                        @if(in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
+                            <x-nav-link :href="route('audit.logs')" :active="request()->routeIs('audit.logs')">
+                                {{ __('Audit Logs') }}
+                            </x-nav-link>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -76,6 +81,10 @@
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
+                        
+                        <x-dropdown-link :href="route('user.history')">
+                            {{ __('History') }}
+                        </x-dropdown-link>
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
@@ -120,6 +129,11 @@
                 <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                     {{ __('Users') }}
                 </x-responsive-nav-link>
+                @if(in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
+                    <x-responsive-nav-link :href="route('audit.logs')" :active="request()->routeIs('audit.logs')">
+                        {{ __('Audit Logs') }}
+                    </x-responsive-nav-link>
+                @endif
             @endif
         </div>
 

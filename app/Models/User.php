@@ -33,6 +33,10 @@ class User extends Authenticatable
         'role',
         'pedagogical_name',
         'ms_id',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
+        'password_change_required',
     ];
 
     /**
@@ -43,6 +47,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**
@@ -54,6 +60,10 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_confirmed_at' => 'datetime',
+            'password_change_required' => 'boolean',
         ];
     }
 
@@ -166,6 +176,52 @@ class User extends Authenticatable
         
         // Default to male if uncertain
         return 1;
+    }
+    
+    /**
+     * Check if user has 2FA enabled.
+     */
+    public function hasTwoFactorEnabled(): bool
+    {
+        return !empty($this->two_factor_secret) && !is_null($this->two_factor_confirmed_at);
+    }
+    
+    /**
+     * Check if user can use 2FA (non-Microsoft accounts only).
+     */
+    public function canUseTwoFactor(): bool
+    {
+        return empty($this->ms_id);
+    }
+    
+    /**
+     * Generate new recovery codes.
+     */
+    public function generateRecoveryCodes(): array
+    {
+        $codes = [];
+        for ($i = 0; $i < 8; $i++) {
+            $codes[] = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 8));
+        }
+        return $codes;
+    }
+    
+    /**
+     * Use a recovery code.
+     */
+    public function useRecoveryCode(string $code): bool
+    {
+        $codes = $this->two_factor_recovery_codes ?? [];
+        $upperCode = strtoupper($code);
+        
+        if (($key = array_search($upperCode, $codes)) !== false) {
+            unset($codes[$key]);
+            $this->two_factor_recovery_codes = array_values($codes);
+            $this->save();
+            return true;
+        }
+        
+        return false;
     }
 }
 

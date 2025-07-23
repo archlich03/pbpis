@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\SetLocale; // Import your custom middleware
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\ForcePasswordChangeMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             SetLocale::class,
             SecurityHeaders::class,
+            ForcePasswordChangeMiddleware::class,
         ]);
 
         // If you had any global middleware or route middleware aliases,
