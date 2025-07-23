@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('votes', function (Blueprint $table) {
-            $table->id('vote_id')->autoIncrement()->primary();
+            $table->id('vote_id');
             $table->foreignId('question_id')->constrained('questions', 'question_id');
             $table->foreignId('user_id')->constrained('users', 'user_id');
             $table->string('choice');

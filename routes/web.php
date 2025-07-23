@@ -7,6 +7,7 @@ use App\Http\Controllers\VoteController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\ThemeController;
+use App\Http\Controllers\TwoFactorController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -23,6 +24,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/users/{user}/credentials', [UserController::class, 'updatePassword'])->name('users.updatePassword');
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    
+    // IT admin/secretary 2FA and password management
+    Route::delete('/users/{user}/two-factor', [UserController::class, 'removeTwoFactor'])->name('users.remove-two-factor');
+    Route::post('/users/{user}/force-password-change', [UserController::class, 'forcePasswordChange'])->name('users.force-password-change');
+    Route::patch('/users/{user}/cancel-password-change', [UserController::class, 'cancelPasswordChange'])->name('users.cancel-password-change');
 });
 
 // Bodies routes
@@ -69,6 +75,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // User history route
+    Route::get('/history', [UserController::class, 'history'])->name('user.history');
+    
+    // Admin audit logs route (only for IT administrators and secretaries)
+    Route::get('/audit-logs', [UserController::class, 'auditLogs'])->name('audit.logs');
 });
 
 
@@ -86,5 +98,31 @@ Route::get('/locale', function (Request $request) {
 
     return redirect()->back();
 })->name('locale.change');
+
+// 2FA routes
+
+Route::middleware(['auth'])->group(function () {
+    // 2FA setup routes
+    Route::get('/two-factor/setup', [TwoFactorController::class, 'setup'])->name('two-factor.setup');
+    Route::post('/two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('two-factor.confirm');
+    Route::delete('/two-factor/disable', [TwoFactorController::class, 'disable'])->name('two-factor.disable');
+    Route::get('/two-factor/recovery-codes', [TwoFactorController::class, 'showRecoveryCodes'])->name('two-factor.recovery-codes');
+    Route::post('/two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('two-factor.recovery-codes.regenerate');
+});
+
+// 2FA verification routes (no auth middleware)
+Route::get('/two-factor/verify', [TwoFactorController::class, 'verify'])->name('two-factor.verify');
+Route::post('/two-factor/verify', [TwoFactorController::class, 'verifyCode'])->name('two-factor.verify.post');
+
+// Force password change route
+Route::middleware(['auth'])->group(function () {
+    Route::get('/force-password-change', function () {
+        $user = auth()->user();
+        if (!$user->password_change_required || !empty($user->ms_id)) {
+            return redirect()->route('dashboard');
+        }
+        return view('auth.force-password-change');
+    })->name('force-password-change');
+});
 
 require __DIR__.'/auth.php';

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\AuditLog;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +43,8 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+            // Hit the rate limiter with 30-minute decay (1800 seconds)
+            RateLimiter::hit($this->throttleKey(), 1800);
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
@@ -50,6 +52,32 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+        
+        $user = Auth::user();
+        
+        // Check if user has 2FA enabled
+        if ($user->hasTwoFactorEnabled()) {
+            // Store user ID in session for 2FA verification
+            session([
+                'pending_2fa_user_id' => $user->user_id,
+                'pending_2fa_remember' => $this->boolean('remember'),
+            ]);
+            
+            // Logout temporarily until 2FA is verified
+            Auth::logout();
+            
+            // Redirect to 2FA verification will be handled by the controller
+            return;
+        }
+        
+        // Log successful login for non-2FA users
+        AuditLog::log(
+            $user->user_id,
+            'login',
+            $this->ip(),
+            $this->userAgent(),
+            ['method' => 'password']
+        );
     }
 
     /**
@@ -59,18 +87,19 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        // Check for 10 attempts within 30 minutes (1800 seconds)
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 10)) {
             return;
         }
 
         event(new Lockout($this));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
+        $minutes = ceil($seconds / 60);
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
+            'email' => __('Too many login attempts. Please try again in :minutes minutes.', [
+                'minutes' => $minutes,
             ]),
         ]);
     }

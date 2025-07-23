@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('questions', function (Blueprint $table) {
-            $table->id('question_id')->autoIncrement()->primary();
+            $table->id('question_id');
             $table->string('meeting_id')->constrained('meetings', 'meeting_id');
             $table->string('title');
             $table->string('decision')->nullable();

@@ -24,13 +24,21 @@ class PasswordController extends Controller
             ], 'updatePassword');
         }
         
-        $validated = $request->validateWithBag('updatePassword', [
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', Password::defaults(), 'confirmed'],
-        ]);
+        // If password change is forced, don't require current password
+        if ($user->password_change_required) {
+            $validated = $request->validateWithBag('updatePassword', [
+                'password' => ['required', 'confirmed', Password::min(12)->mixedCase()->numbers()->symbols()],
+            ]);
+        } else {
+            $validated = $request->validateWithBag('updatePassword', [
+                'current_password' => ['required', 'current_password'],
+                'password' => ['required', 'confirmed', Password::min(12)->mixedCase()->numbers()->symbols()],
+            ]);
+        }
 
         $user->update([
             'password' => Hash::make($validated['password']),
+            'password_change_required' => false, // Clear forced password change flag
         ]);
 
         return back()->with('status', 'password-updated');

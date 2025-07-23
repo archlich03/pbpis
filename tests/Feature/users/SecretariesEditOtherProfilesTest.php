@@ -76,7 +76,7 @@ it('allows secretaries updating other user passwords', function () {
     Session::start();
 
     $targetUser = User::factory()->create([
-        'password' => Hash::make('original-password'),
+        'password' => Hash::make('OriginalPassword123!'),
     ]);
 
     $actingUser = User::factory()->create([
@@ -85,8 +85,8 @@ it('allows secretaries updating other user passwords', function () {
 
     $passwordData = [
         '_token' => csrf_token(),
-        'password' => 'hacked-password',
-        'password_confirmation' => 'hacked-password',
+        'password' => 'HackedPassword456@',
+        'password_confirmation' => 'HackedPassword456@',
     ];
 
     $response = $this
@@ -97,8 +97,8 @@ it('allows secretaries updating other user passwords', function () {
     $response->assertRedirect(route('users.index'));
 
     $targetUser->refresh();
-    expect(Hash::check('original-password', $targetUser->password))->toBeFalse();
-    expect(Hash::check('hacked-password', $targetUser->password))->toBeTrue();
+    expect(Hash::check('OriginalPassword123!', $targetUser->password))->toBeFalse();
+    expect(Hash::check('HackedPassword456@', $targetUser->password))->toBeTrue();
 
     Session::flush();
     Session::invalidate();

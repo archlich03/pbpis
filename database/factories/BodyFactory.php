@@ -29,8 +29,8 @@ class BodyFactory extends Factory
             'body_id' => Str::uuid(),
             'title' => fake()->company(),
             'classification' => 'SPK',
-            'chairman_id' => fake()->numberBetween(1, 3),
-            'members' => [1,2,3],
+            'chairman_id' => \App\Models\User::factory(),
+            'members' => [],
             'is_ba_sp' => fake()->boolean(),
         ];
     }

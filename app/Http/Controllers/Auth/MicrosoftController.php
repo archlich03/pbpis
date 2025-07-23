@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -10,7 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class MicrosoftController extends Controller
 {
@@ -76,9 +79,21 @@ class MicrosoftController extends Controller
     {
         Log::info('Microsoft OAuth callback received', ['query' => $request->query()]);
         
+        // Apply rate limiting for Microsoft authentication attempts
+        $throttleKey = 'microsoft-auth:' . $request->ip();
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            $minutes = ceil($seconds / 60);
+            return redirect()->route('login')
+                ->with('error', __('Too many Microsoft authentication attempts. Please try again in :minutes minutes.', ['minutes' => $minutes]));
+        }
+        
         try {
             // Verify state token to prevent CSRF attacks
             if ($request->state !== session('microsoft_auth_state')) {
+                // Hit rate limiter for invalid state token (potential attack)
+                RateLimiter::hit($throttleKey, 1800);
+                
                 Log::error('Invalid state token', [
                     'received' => $request->state, 
                     'expected' => session('microsoft_auth_state')
@@ -87,8 +102,14 @@ class MicrosoftController extends Controller
                     ->with('error', __('Invalid state token. Please try again.'));
             }
             
+            // Clear the state token after successful validation
+            session()->forget('microsoft_auth_state');
+            
             // Check for error response
             if ($request->has('error')) {
+                // Hit rate limiter for OAuth errors
+                RateLimiter::hit($throttleKey, 1800);
+                
                 Log::error('Microsoft OAuth error', [
                     'error' => $request->error, 
                     'description' => $request->error_description
@@ -137,18 +158,63 @@ class MicrosoftController extends Controller
                     ->with('error', __('Could not retrieve email from Microsoft account.'));
             }
             
+            // Validate and sanitize Microsoft data
+            $email = filter_var($email, FILTER_VALIDATE_EMAIL);
+            if (!$email) {
+                Log::error('Invalid email format from Microsoft', ['email' => $msGraphData['mail'] ?? $msGraphData['userPrincipalName'] ?? 'null']);
+                return redirect()->route('login')
+                    ->with('error', __('Invalid email format from Microsoft account.'));
+            }
+            
+            // Sanitize display name
+            $displayName = isset($msGraphData['displayName']) ? strip_tags(trim($msGraphData['displayName'])) : null;
+            if ($displayName && strlen($displayName) > 255) {
+                $displayName = substr($displayName, 0, 255);
+            }
+            
+            // Validate Microsoft ID
+            $msId = isset($msGraphData['id']) ? preg_replace('/[^a-zA-Z0-9\-]/', '', $msGraphData['id']) : null;
+            if ($msId && strlen($msId) > 255) {
+                $msId = substr($msId, 0, 255);
+            }
+            
             Log::info('Processing Microsoft login for email', ['email' => $email]);
             
-            // Regular login flow
-            $user = $this->processUserLogin($email, $msGraphData, $tokenResponse);
+            // Regular login flow - pass sanitized data
+            $sanitizedData = [
+                'id' => $msId,
+                'displayName' => $displayName,
+                'mail' => $email,
+                'userPrincipalName' => $email
+            ];
+            $user = $this->processUserLogin($email, $sanitizedData, $tokenResponse);
             
             // Log the user in
             Auth::login($user);
+            
+            // Regenerate session to prevent session fixation attacks
+            $request->session()->regenerate();
+            
+            // Clear rate limiting on successful authentication
+            RateLimiter::clear($throttleKey);
+            
+            // Log successful Microsoft login
+            AuditLog::log(
+                $user->user_id,
+                'microsoft_login',
+                $request->ip(),
+                $request->userAgent(),
+                ['microsoft_id' => $msId]
+            );
+            
             Log::info('User logged in successfully', ['user_id' => $user->user_id]);
             
             return redirect()->route('dashboard');
             
         } catch (\Exception $e) {
+            // Hit rate limiter on failed authentication attempts
+            RateLimiter::hit($throttleKey, 1800); // 30-minute decay
+            
             Log::error('Error in Microsoft callback', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return redirect()->route('login')
                 ->with('error', __('Authentication failed: :error', ['error' => $e->getMessage()]));
@@ -247,6 +313,20 @@ class MicrosoftController extends Controller
             $user->password = Hash::make(Str::random(24)); // Generate a secure random password
             $user->role = 'Balsuojantysis'; // Default role
             $user->gender = User::detectGenderFromLithuanianName($userName); // Auto-detect gender
+            $user->save();
+            
+            // Log account creation
+            AuditLog::log(
+                $user->user_id,
+                'microsoft_account_created',
+                request()->ip(),
+                request()->userAgent() ?? 'Unknown',
+                [
+                    'name' => $userName,
+                    'email' => $email,
+                    'ms_id' => $msGraphData['id'] ?? null
+                ]
+            );
             
             Log::info('New user created', ['email' => $email]);
         }
