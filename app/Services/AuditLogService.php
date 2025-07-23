@@ -158,13 +158,13 @@ class AuditLogService
         $color = self::getActionColor($action);
         
         $colorClasses = [
-            'green' => 'bg-green-200 text-green-900 dark:bg-green-600 dark:text-green-50',
-            'blue' => 'bg-blue-200 text-blue-900 dark:bg-blue-600 dark:text-blue-50',
-            'red' => 'bg-red-200 text-red-900 dark:bg-red-600 dark:text-red-50',
-            'purple' => 'bg-purple-200 text-purple-900 dark:bg-purple-600 dark:text-purple-50',
-            'yellow' => 'bg-yellow-200 text-yellow-900 dark:bg-yellow-600 dark:text-yellow-50',
-            'orange' => 'bg-orange-200 text-orange-900 dark:bg-orange-600 dark:text-orange-50',
-            'gray' => 'bg-gray-200 text-gray-900 dark:bg-gray-600 dark:text-gray-50',
+            'green' => 'bg-green-100 text-green-700 dark:bg-green-700 dark:text-green-100',
+            'blue' => 'bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-blue-100',
+            'red' => 'bg-red-100 text-red-700 dark:bg-red-700 dark:text-red-100',
+            'purple' => 'bg-purple-100 text-purple-700 dark:bg-purple-700 dark:text-purple-100',
+            'yellow' => 'bg-yellow-100 text-yellow-700 dark:bg-yellow-700 dark:text-yellow-100',
+            'orange' => 'bg-orange-100 text-orange-700 dark:bg-orange-700 dark:text-orange-100',
+            'gray' => 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-100',
         ];
 
         return $colorClasses[$color] ?? $colorClasses['gray'];

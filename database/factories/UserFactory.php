@@ -33,6 +33,11 @@ class UserFactory extends Factory
             'isLoggedIn' => false,
             'gender' => rand(0, 1),
             'last_login' => now(),
+            'ms_id' => null,
+            'two_factor_secret' => null,
+            'two_factor_recovery_codes' => null,
+            'two_factor_confirmed_at' => null,
+            'password_change_required' => false,
         ];
     }
 

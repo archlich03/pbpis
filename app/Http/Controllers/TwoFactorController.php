@@ -217,7 +217,7 @@ class TwoFactorController extends Controller
     /**
      * Show recovery codes.
      */
-    public function showRecoveryCodes(): View
+    public function showRecoveryCodes(): View|RedirectResponse
     {
         $user = Auth::user();
         
