@@ -35,25 +35,22 @@ beforeEach(function () {
     ]);
 });
 
-describe('Attendance-based voting (Dalyvių dauguma)', function () {
+describe('Member majority voting (Balsuoti dauguma)', function () {
     beforeEach(function () {
         $this->question = Question::factory()->create([
             'meeting_id' => $this->meeting->meeting_id,
-            'title' => 'Attendance-based Question',
-            'type' => 'Dalyvių dauguma',
+            'title' => 'Member Majority Question',
+            'type' => 'Balsuoti dauguma',
             'presenter_id' => $this->chairman->user_id,
         ]);
     });
 
-    it('passes with simple majority of attendees - scenario 1', function () {
-        // 6 attendees, 4 vote for, 2 vote against
-        $attendees = $this->members->take(6);
-        foreach ($attendees as $member) {
-            $this->meeting->attendances()->create(['user_id' => $member->user_id]);
-        }
-
-        // 4 vote for
-        foreach ($attendees->take(4) as $member) {
+    it('passes with simple majority of body members - scenario 1', function () {
+        // Body has 10 members, 6 vote for, 2 vote against
+        $voters = $this->members->take(8);
+        
+        // 6 vote for
+        foreach ($voters->take(6) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
@@ -62,7 +59,7 @@ describe('Attendance-based voting (Dalyvių dauguma)', function () {
         }
 
         // 2 vote against
-        foreach ($attendees->skip(4) as $member) {
+        foreach ($voters->skip(6)->take(2) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
@@ -70,20 +67,17 @@ describe('Attendance-based voting (Dalyvių dauguma)', function () {
             ]);
         }
 
-        // Required: >3 votes (more than half of 6 attendees)
-        // For votes: 4 >= 4 (required) -> PASSES
+        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+        // For votes: 6 >= 6 (required) -> PASSES
         expect($this->meeting->calculateQuestionResult($this->question))->toBeTrue();
     });
 
-    it('fails without simple majority of attendees - scenario 2', function () {
-        // 8 attendees, 3 vote for, 2 vote against, 3 abstain
-        $attendees = $this->members->take(8);
-        foreach ($attendees as $member) {
-            $this->meeting->attendances()->create(['user_id' => $member->user_id]);
-        }
-
-        // 3 vote for
-        foreach ($attendees->take(3) as $member) {
+    it('fails without simple majority of body members - scenario 2', function () {
+        // Body has 10 members, 5 vote for, 2 vote against, 3 abstain
+        $voters = $this->members->take(10);
+        
+        // 5 vote for
+        foreach ($voters->take(5) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
@@ -92,7 +86,7 @@ describe('Attendance-based voting (Dalyvių dauguma)', function () {
         }
 
         // 2 vote against
-        foreach ($attendees->skip(3)->take(2) as $member) {
+        foreach ($voters->skip(5)->take(2) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
@@ -101,28 +95,25 @@ describe('Attendance-based voting (Dalyvių dauguma)', function () {
         }
 
         // 3 abstain
-        foreach ($attendees->skip(5) as $member) {
+        foreach ($voters->skip(7)->take(3) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
-                'choice' => 'Susilaikė',
+                'choice' => 'Susilaiko',
             ]);
         }
 
-        // Required: >4 votes (more than half of 8 attendees)
-        // For votes: 3 < 5 (required) -> FAILS
+        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+        // For votes: 5 < 6 (required) -> FAILS
         expect($this->meeting->calculateQuestionResult($this->question))->toBeFalse();
     });
 
     it('passes with exact minimum required votes - scenario 3', function () {
-        // 7 attendees, 4 vote for, 1 vote against, 2 abstain
-        $attendees = $this->members->take(7);
-        foreach ($attendees as $member) {
-            $this->meeting->attendances()->create(['user_id' => $member->user_id]);
-        }
-
-        // 4 vote for
-        foreach ($attendees->take(4) as $member) {
+        // Body has 10 members, 6 vote for, 1 vote against, 2 abstain
+        $voters = $this->members->take(9);
+        
+        // 6 vote for (exact minimum)
+        foreach ($voters->take(6) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
@@ -133,33 +124,30 @@ describe('Attendance-based voting (Dalyvių dauguma)', function () {
         // 1 vote against
         Vote::factory()->create([
             'question_id' => $this->question->question_id,
-            'user_id' => $attendees->skip(4)->first()->user_id,
+            'user_id' => $voters->skip(6)->first()->user_id,
             'choice' => 'Prieš',
         ]);
 
         // 2 abstain
-        foreach ($attendees->skip(5) as $member) {
+        foreach ($voters->skip(7)->take(2) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
-                'choice' => 'Susilaikė',
+                'choice' => 'Susilaiko',
             ]);
         }
 
-        // Required: >3.5 votes (more than half of 7 attendees) = 4 votes minimum
-        // For votes: 4 >= 4 (required) -> PASSES
+        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+        // For votes: 6 >= 6 (required) -> PASSES
         expect($this->meeting->calculateQuestionResult($this->question))->toBeTrue();
     });
 
-    it('fails with tie votes - scenario 4', function () {
-        // 6 attendees, 3 vote for, 3 vote against
-        $attendees = $this->members->take(6);
-        foreach ($attendees as $member) {
-            $this->meeting->attendances()->create(['user_id' => $member->user_id]);
-        }
-
-        // 3 vote for
-        foreach ($attendees->take(3) as $member) {
+    it('fails with insufficient votes - scenario 4', function () {
+        // Body has 10 members, 5 vote for, 4 vote against, 1 abstain
+        $voters = $this->members->take(10);
+        
+        // 5 vote for
+        foreach ($voters->take(5) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
@@ -167,8 +155,8 @@ describe('Attendance-based voting (Dalyvių dauguma)', function () {
             ]);
         }
 
-        // 3 vote against
-        foreach ($attendees->skip(3) as $member) {
+        // 4 vote against
+        foreach ($voters->skip(5)->take(4) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
@@ -176,23 +164,30 @@ describe('Attendance-based voting (Dalyvių dauguma)', function () {
             ]);
         }
 
-        // Required: >3 votes (more than half of 6 attendees) = 4 votes minimum
-        // For votes: 3 < 4 (required) -> FAILS
+        // 1 abstain
+        Vote::factory()->create([
+            'question_id' => $this->question->question_id,
+            'user_id' => $voters->skip(9)->first()->user_id,
+            'choice' => 'Susilaiko',
+        ]);
+
+        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+        // For votes: 5 < 6 (required) -> FAILS
         expect($this->meeting->calculateQuestionResult($this->question))->toBeFalse();
     });
 
-    it('ignores votes from non-attendees - scenario 5', function () {
-        // 4 attendees, 3 vote for, 1 vote against
-        // 2 non-attendees also vote (should be ignored)
-        $attendees = $this->members->take(4);
-        $nonAttendees = $this->members->skip(4)->take(2);
-
-        foreach ($attendees as $member) {
+    it('counts all body member votes regardless of attendance - scenario 5', function () {
+        // Body has 10 members, 7 vote for, 2 vote against
+        // Some voters are not marked as attending (but votes still count)
+        $voters = $this->members->take(9);
+        
+        // Only mark 4 as attending
+        foreach ($voters->take(4) as $member) {
             $this->meeting->attendances()->create(['user_id' => $member->user_id]);
         }
 
-        // 3 attendees vote for
-        foreach ($attendees->take(3) as $member) {
+        // 7 vote for (including non-attendees)
+        foreach ($voters->take(7) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
@@ -200,24 +195,17 @@ describe('Attendance-based voting (Dalyvių dauguma)', function () {
             ]);
         }
 
-        // 1 attendee votes against
-        Vote::factory()->create([
-            'question_id' => $this->question->question_id,
-            'user_id' => $attendees->skip(3)->first()->user_id,
-            'choice' => 'Prieš',
-        ]);
-
-        // 2 non-attendees vote for (should be ignored)
-        foreach ($nonAttendees as $member) {
+        // 2 vote against
+        foreach ($voters->skip(7)->take(2) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
-                'choice' => 'Už',
+                'choice' => 'Prieš',
             ]);
         }
 
-        // Required: >2 votes (more than half of 4 attendees) = 3 votes minimum
-        // For votes from attendees only: 3 >= 3 (required) -> PASSES
+        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+        // For votes: 7 >= 6 (required) -> PASSES
         expect($this->meeting->calculateQuestionResult($this->question))->toBeTrue();
     });
 });
@@ -233,14 +221,9 @@ describe('All members voting (Balsuoti dauguma)', function () {
     });
 
     it('passes with simple majority of all body members - scenario 1', function () {
-        // Body has 10 members, 6 vote for, 2 vote against, 2 don't vote
+        // Body has 10 members, 6 vote for, 2 vote against, 3 don't vote
         $votingMembers = $this->members->take(8);
         
-        // Mark some as attending (doesn't matter for this vote type)
-        foreach ($votingMembers->take(6) as $member) {
-            $this->meeting->attendances()->create(['user_id' => $member->user_id]);
-        }
-
         // 6 vote for
         foreach ($votingMembers->take(6) as $member) {
             Vote::factory()->create([
@@ -265,16 +248,11 @@ describe('All members voting (Balsuoti dauguma)', function () {
     });
 
     it('fails without simple majority of all body members - scenario 2', function () {
-        // Body has 10 members, 4 vote for, 3 vote against, 3 don't vote
-        $votingMembers = $this->members->take(7);
+        // Body has 10 members, 5 vote for, 3 vote against, 3 don't vote
+        $votingMembers = $this->members->take(8);
         
-        // Mark some as attending
-        foreach ($votingMembers as $member) {
-            $this->meeting->attendances()->create(['user_id' => $member->user_id]);
-        }
-
-        // 4 vote for
-        foreach ($votingMembers->take(4) as $member) {
+        // 5 vote for
+        foreach ($votingMembers->take(5) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
@@ -283,7 +261,7 @@ describe('All members voting (Balsuoti dauguma)', function () {
         }
 
         // 3 vote against
-        foreach ($votingMembers->skip(4) as $member) {
+        foreach ($votingMembers->skip(5) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
@@ -292,14 +270,12 @@ describe('All members voting (Balsuoti dauguma)', function () {
         }
 
         // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        // For votes: 4 < 6 (required) -> FAILS
+        // For votes: 5 < 6 (required) -> FAILS
         expect($this->meeting->calculateQuestionResult($this->question))->toBeFalse();
     });
 
-    it('only counts votes from attendees even for all-members voting - scenario 3', function () {
-        // Body has 10 members, but only 5 are attending
-        // 4 attendees vote for, 1 attendee votes against
-        // 3 non-attendees vote for (should be ignored)
+    it('counts all votes including non-attendees for all-members voting - scenario 3', function () {
+        // Body has 10 members, 7 total vote (4 attendees + 3 non-attendees), 1 against
         $attendees = $this->members->take(5);
         $nonAttendees = $this->members->skip(5)->take(3);
 
@@ -323,7 +299,7 @@ describe('All members voting (Balsuoti dauguma)', function () {
             'choice' => 'Prieš',
         ]);
 
-        // 3 non-attendees vote for (should be ignored)
+        // 3 non-attendees vote for (now counted)
         foreach ($nonAttendees as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
@@ -333,8 +309,8 @@ describe('All members voting (Balsuoti dauguma)', function () {
         }
 
         // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        // For votes from attendees only: 4 < 6 (required) -> FAILS
-        expect($this->meeting->calculateQuestionResult($this->question))->toBeFalse();
+        // For votes: 7 >= 6 (required) -> PASSES
+        expect($this->meeting->calculateQuestionResult($this->question))->toBeTrue();
     });
 });
 
@@ -411,20 +387,11 @@ describe('2/3 majority voting (2/3 dauguma)', function () {
     });
 
     it('passes with exact 2/3 majority - scenario 3', function () {
-        // Body has 9 members, 6 vote for, 1 vote against, 2 abstain
-        // Adjust body to have 9 members for exact 2/3 calculation
-        $this->body->members = $this->members->take(9)->pluck('user_id')->toArray();
-        $this->body->save();
-
-        $votingMembers = $this->members->take(9);
+        // Body has 10 members, 8 vote for, 1 vote against, 2 abstain
+        $votingMembers = $this->members->take(10);
         
-        // Mark all as attending
-        foreach ($votingMembers as $member) {
-            $this->meeting->attendances()->create(['user_id' => $member->user_id]);
-        }
-
-        // 6 vote for
-        foreach ($votingMembers->take(6) as $member) {
+        // 8 vote for (exactly 2/3 of 10 = 6.67, so need 7)
+        foreach ($votingMembers->take(8) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
@@ -435,28 +402,26 @@ describe('2/3 majority voting (2/3 dauguma)', function () {
         // 1 vote against
         Vote::factory()->create([
             'question_id' => $this->question->question_id,
-            'user_id' => $votingMembers->skip(6)->first()->user_id,
+            'user_id' => $votingMembers->skip(8)->first()->user_id,
             'choice' => 'Prieš',
         ]);
 
         // 2 abstain
-        foreach ($votingMembers->skip(7) as $member) {
+        foreach ($votingMembers->skip(9)->take(2) as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
-                'choice' => 'Susilaikė',
+                'choice' => 'Susilaiko',
             ]);
         }
 
-        // Required: >=6 votes (2/3 of 9 body members) = exactly 6 votes
-        // For votes: 6 >= 6 (required) -> PASSES
+        // Required: >=6.67 votes (2/3 of 10 body members) = 7 votes minimum
+        // For votes: 8 >= 7 (required) -> PASSES
         expect($this->meeting->calculateQuestionResult($this->question))->toBeTrue();
     });
 
-    it('only counts votes from attendees for 2/3 majority - scenario 4', function () {
-        // Body has 10 members, 8 are attending
-        // 5 attendees vote for, 1 attendee votes against, 2 attendees abstain
-        // 2 non-attendees vote for (should be ignored)
+    it('counts all votes including non-attendees for 2/3 majority - scenario 4', function () {
+        // Body has 10 members, 7 total vote for (5 attendees + 2 non-attendees), 1 against, 2 abstain
         $attendees = $this->members->take(8);
         $nonAttendees = $this->members->skip(8)->take(2);
 
@@ -485,11 +450,11 @@ describe('2/3 majority voting (2/3 dauguma)', function () {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
                 'user_id' => $member->user_id,
-                'choice' => 'Susilaikė',
+                'choice' => 'Susilaiko',
             ]);
         }
 
-        // 2 non-attendees vote for (should be ignored)
+        // 2 non-attendees vote for (now counted)
         foreach ($nonAttendees as $member) {
             Vote::factory()->create([
                 'question_id' => $this->question->question_id,
@@ -499,8 +464,8 @@ describe('2/3 majority voting (2/3 dauguma)', function () {
         }
 
         // Required: >=6.67 votes (2/3 of 10 body members) = 7 votes minimum
-        // For votes from attendees only: 5 < 7 (required) -> FAILS
-        expect($this->meeting->calculateQuestionResult($this->question))->toBeFalse();
+        // For votes: 7 >= 7 (required) -> PASSES
+        expect($this->meeting->calculateQuestionResult($this->question))->toBeTrue();
     });
 });
 
@@ -572,7 +537,7 @@ describe('Edge cases and quorum requirements', function () {
             Vote::factory()->create([
                 'question_id' => $question->question_id,
                 'user_id' => $member->user_id,
-                'choice' => 'Susilaikė',
+                'choice' => 'Susilaiko',
             ]);
         }
 
