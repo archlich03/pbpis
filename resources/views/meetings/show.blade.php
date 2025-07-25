@@ -11,389 +11,58 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <details class="mb-4">
-                        <summary class="text-xl font-semibold"><span class="cursor-pointer">{{ __('Meeting information') }}</span></summary>
-                        @if (!Auth::user()->isPrivileged())
-                            <ul class="list-disc pl-4">
-                                <li><strong>{{ __('Meeting date') }}:</strong> {{ $meeting->meeting_date->format('Y-m-d') }}</li>
-                                <li><strong>{{ __('Meeting type') }}:</strong> {{ $meeting->is_evote ? __('Electronic') : __('Physical') }}</li>
-                                <li><strong>{{ __('Status') }}:</strong> {{ __($meeting->status) }}</li>
-                                <li><strong>{{ __('Associated secretary') }}:</strong> {{ optional($meeting->secretary)->pedagogical_name ?? '' }} {{ optional($meeting->secretary)->name ?? '' }}</li>
-                                <li><strong>{{ __('Vote start') }}:</strong> {{ $meeting->vote_start->format('Y-m-d H:i') }}</li>
-                                <li><strong>{{ __('Vote end') }}:</strong> {{ $meeting->vote_end->format('Y-m-d H:i') }}</li>
-                            </ul>
-                        @else
-                            <form method="post" action="{{ route('meetings.update', $meeting) }}" class="dark:text-gray-800">
-                                @csrf
-                                @method('PATCH')
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <p class="text-gray-700 dark:text-gray-300"><strong>{{ __('Status') }}:</strong> {{ __($meeting->status) }}</p>
-                                    </div>
-                                    <div>
-                                        <x-input-label for="meeting_date" value="{{ __('Meeting date') }}:" />
-                                        <x-text-input id="meeting_date" name="meeting_date" type="date" class="block w-full" value="{{ $meeting->meeting_date->format('Y-m-d') }}" />
-                                    </div>
-                                    <div>
-                                        <x-input-label for="is_evote" value="{{ __('Meeting type') }}:" />
-                                        <select id="is_evote" name="is_evote" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block w-full">
-                                            <option value="0" {{ $meeting->is_evote === 0 ? 'selected' : '' }}>{{ __('Physical') }}</option>
-                                            <option value="1" {{ $meeting->is_evote === 1 ? 'selected' : '' }}>{{ __('Electronic') }}</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <x-input-label for="secretary_id" value="{{ __('Associated secretary') }}:" />
-                                        <select id="secretary_id" name="secretary_id" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block w-full">
-                                            <option value="">{{ __('Select secretary') }}</option>
-                                            @foreach ($users as $user)
-                                                @if ($user->isSecretary())
-                                                    <option value="{{ $user->user_id }}"
-                                                        @if ($user == $meeting->secretary) selected @endif
-                                                        required>{{ $user->name }}</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <x-input-label for="vote_start" value="{{ __('Vote start') }}:" />
-                                        <x-text-input id="vote_start" name="vote_start" type="datetime-local" class="block w-full" value="{{ $meeting->vote_start->format('Y-m-d\TH:i') }}" />
-                                    </div>
-                                    <div>
-                                        <x-input-label for="vote_end" value="{{ __('Vote end') }}:" />
-                                        <x-text-input id="vote_end" name="vote_end" type="datetime-local" class="block w-full" value="{{ $meeting->vote_end->format('Y-m-d\TH:i') }}" />
-                                    </div>
-                                </div>
-                                <x-primary-button type="submit">
-                                    {{ __('Update') }}
-                                </x-primary-button>
-                            </form>
-                            @if (Auth::user()->isPrivileged())
-                                <x-primary-button>
-                                    <a href="{{ route('meetings.protocol', $meeting) }}" class="w-full" target="_blank">
-                                        {{ __('View HTML Protocol') }}
-                                    </a>
-                                </x-primary-button>
-                                <x-primary-button>
-                                    <a href="{{ route('meetings.pdf', $meeting) }}" class="w-full" target="_blank">
-                                        {{ __('Download PDF Protocol') }}
-                                    </a>
-                                </x-primary-button>
-                                <div x-data="{ confirmingMeetingDeletion: false }"
-                                    class="relative">
-                                    <x-danger-button
-                                        x-on:click.prevent="confirmingMeetingDeletion = true">
-                                        {{ __('Delete Meeting') }}
-                                    </x-danger-button>
-
-                                    <div
-                                        x-show="confirmingMeetingDeletion"
-                                        @click.outside="confirmingMeetingDeletion = false"
-                                        class="fixed z-50 inset-0 bg-gray-900 bg-opacity-50 dark:bg-gray-800 dark:bg-opacity-50 flex items-center justify-center"
-                                        style="backdrop-filter: blur(2px);">
-                                        <div class="bg-gray-800 dark:bg-gray-700 p-6 rounded shadow-md max-w-md mx-auto">
-                                            <h2 class="text-lg font-medium text-gray-300 dark:text-gray-100">
-                                                {{ __('Are you sure you want to delete this meeting?') }}
-                                            </h2>
-
-                                            <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                                                {{ __('This action is irreversible. Please confirm that you want to delete this meeting') }}
-                                            </p>
-
-                                            <form method="post" action="{{ route('meetings.destroy', $meeting) }}">
-                                                @csrf
-                                                @method('delete')
-
-                                                <div class="mt-6 flex justify-end">
-                                                    <x-secondary-button x-on:click="confirmingMeetingDeletion = false">
-                                                        {{ __('Cancel') }}
-                                                    </x-secondary-button>
-
-                                                    <x-danger-button type="submit">
-                                                        {{ __('Delete') }}
-                                                    </x-danger-button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                        @endif
-                    </details>
-
+                    {{-- Meeting Information Section --}}
+                    @include('meetings.partials.meeting-info')
+                    
                     <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
-
-                @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
-                    <details class="mb-4">
-                        <summary class="text-xl font-semibold"><span class="cursor-pointer">{{ __('Questions') }}</span></summary>
-                        <div class="ml-4" x-data="questionReorder()">
-                            @if (Auth::User()->isPrivileged())
-                                <div class="mb-4">
-                                    <div class="flex space-x-2 mb-2">
-                                        <x-primary-button>
-                                            <a href="{{ route('questions.create', $meeting) }}" class="block">
-                                                {{ __('Create New Question') }}
-                                            </a>
-                                        </x-primary-button>
-                                        
-                                        @if($meeting->questions->count() > 1)
-                                            <x-secondary-button @click="reorderMode = !reorderMode">
-                                                <span x-text="reorderMode ? '{{ __('Done Reordering') }}' : '{{ __('Reorder Questions') }}'" class="text-sm"></span>
-                                            </x-secondary-button>
-                                        @endif
-                                    </div>
-                                    
-                                    @if($meeting->questions->count() > 1)
-                                        <div x-show="reorderMode" class="text-sm text-gray-600 dark:text-gray-400">
-                                            {{ __('Drag and drop questions to reorder them. Changes will be saved automatically.') }}
-                                        </div>
-                                    @endif
-                                </div>
-                            @endif
-                            @foreach ($meeting->questions as $question)
-                                <details class="mb-4" data-question-id="{{ $question->question_id }}">
-                                    <summary class="font-semibold cursor-pointer flex items-center justify-between">
-                                        <span>{{ $loop->iteration }}. {{ $question->title }}</span>
-                                        @if (Auth::User()->isPrivileged() && $meeting->questions->count() > 1)
-                                            <div class="flex space-x-1 ml-4" x-show="reorderMode">
-                                                @if (!$loop->first)
-                                                    <button type="button" 
-                                                            onclick="moveQuestion({{ $question->question_id }}, 'up')"
-                                                            class="px-2 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                            title="{{ __('Move Up') }}">
-                                                        ↑
-                                                    </button>
-                                                @endif
-                                                @if (!$loop->last)
-                                                    <button type="button" 
-                                                            onclick="moveQuestion({{ $question->question_id }}, 'down')"
-                                                            class="px-2 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                            title="{{ __('Move Down') }}">
-                                                        ↓
-                                                    </button>
-                                                @endif
-                                            </div>
-                                        @endif
-                                    </summary>
-                                    <div class="ml-4">
-                                        @php
-                                            $statuses = [];
-                                            $minVotes = \App\Models\Question::MINIMUM_VOTES[array_search($question->type, \App\Models\Question::STATUSES)] * $question->meeting->body->members->count();
-                                            foreach (\App\Models\Vote::STATUSES as $status) {
-                                                $count = $question->votes()->where('choice', $status)->count();
-                                                array_push($statuses, [$status, $count]);
-                                            }
-                                        @endphp
-                                        @if ($question->type != 'Nebalsuoti')
-                                            <span><strong>
-                                                {{ ($statuses[0][1] > $minVotes)? __('Klausimas priimtas') : __('Klausimas nepriimtas') }}
-                                            </strong></span><br>
-                                        @endif
-                                        <span>
-                                            @foreach ($statuses as $status)
-                                                <span>
-                                                    {{ __($status[0]) }}: {{ $status[1] }}{{ $loop->last ? '.' : ';' }}
-                                                </span>
-                                            @endforeach
-                                        </span>
-                                        @if (!Auth::User()->isPrivileged())
-                                            <p><strong>{{ __('Presenter') }}:</strong> {{ optional($question->presenter)->pedagogical_name ?? '' }} {{ optional($question->presenter)->name ?? '' }}</p>
-                                            @if (!empty($question->decision))
-                                                <p><strong>{{ __('Question decision') }}:</strong> {{ $question->decision }}</p>
-                                            @endif
-                                            @if (!empty($question->summary))
-                                                <div><strong>{{ __('Question summary') }}:</strong> {!! $question->summary !!}</div>
-                                            @endif
-                                        @else
-                                            <form method="POST" action="{{ route('questions.update', [$meeting, $question]) }}" class="dark:text-gray-800">
-                                                @csrf
-                                                @method('PATCH')
-
-                                                <div class="mt-4">
-                                                    <x-input-label for="title" value="{{ __('Title') }}:" />
-                                                    <x-text-input id="title" name="title" type="text" class="block mt-1 w-full" value="{{ $question->title }}" required />
-                                                </div>
-
-                                                <div class="mt-4">
-                                                    <x-input-label for="type" value="{{ __('Type') }}:" />
-                                                    <select id="type" name="type" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full">
-                                                        @foreach (\App\Models\Question::STATUSES as $status)
-                                                            <option value="{{ $status }}" {{ $question->type == $status ? 'selected' : '' }}>{{ $status }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-
-                                                <div class="mt-4">
-                                                    <x-input-label for="presenter_id" value="{{ __('Presenter') }}:" />
-                                                    <select id="presenter_id" name="presenter_id" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full">
-                                                        @foreach ($users as $user)
-                                                            <option value="{{ $user->user_id }}" {{ $question->presenter_id == $user->user_id ? 'selected' : '' }}>{{ $user->pedagogical_name }} {{ $user->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-
-                                                <div class="mt-4">
-                                                    <x-input-label for="decision" value="{{ __('Question decision') }}:" />
-                                                    <x-text-input id="decision" name="decision" type="text" class="block mt-1 w-full" value="{{ $question->decision }}" />
-                                                </div>
-
-                                                <div class="mt-4">
-                                                    <x-input-label for="summary" value="{{ __('Question summary') }}:" />
-                                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ __('You can use HTML formatting (e.g., <strong>, <em>, <p>, <br>, <ul>, <li>)') }}</p>
-                                                    <textarea id="summary" name="summary" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full" rows="6" placeholder="{{ __('Enter detailed summary with HTML formatting if needed...') }}">{{ $question->summary }}</textarea>
-                                                </div>
-
-                                                <div class="flex items-center justify-end mt-4">
-                                                    <x-primary-button class="ml-4">
-                                                        {{ __('Update Question') }}
-                                                    </x-primary-button>
-                                                </div>
-                                            </form>
-                                            <form method="POST" action="{{ route('questions.destroy', [$meeting, $question]) }}" class="dark:text-gray-800">
-                                                @csrf
-                                                @method('DELETE')
-                                                <x-danger-button class="mt-4">
-                                                    {{ __('Delete Question') }}
-                                                </x-danger-button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </details>
-                            @endforeach
-                        </div>
-                    </details>
-
-                    <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
-
-                    <details class="mb-4" open>
-                        <summary class="text-xl font-semibold"><span class="cursor-pointer">{{ __('Voting process') }}</span></summary>
-                        @if ($meeting->status == "Vyksta" && $meeting->body->members->contains(Auth::user()))
-                            <div class="w-full">
-                                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3">{{ __('Question') }}</th>
-                                            <th class="px-6 py-4" colspan="{{ count(\App\Models\Vote::STATUSES) + 1 }}">
-                                                {{ __('Voting choice') }}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($meeting->questions as $question)
-                                            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                                <td class="px-6 py-4">{{ $loop->iteration }}. {{ $question->title }}</td>
-                                                @if ($question->type == "Nebalsuoti")
-                                                    <td class="px-6 py-4" colspan="{{ count(\App\Models\Vote::STATUSES) }}">
-                                                        <i>{{ __('Casting vote is not needed.') }}</i>
-                                                    </td>
-                                                    @continue
-                                                @endif
-                                                @foreach (\App\Models\Vote::STATUSES as $status)
-                                                    <form method="POST" action="{{ route('votes.store', [$meeting, $question]) }}" class="inline-block">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="choice" value="{{ $status }}">
-                                                        <td class="px-6 py-4">
-                                                            @if ($question->voteByUser(auth::user()) && $question->voteByUser(auth::user())->choice == $status)
-                                                                <x-danger-button type="submit" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest">
-                                                                    {{ __($status) }}
-                                                                </x-danger-button>
-                                                            @else
-                                                                <x-primary-button type="submit" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest">
-                                                                    {{ __($status) }}
-                                                                </x-primary-button>
-                                                            @endif
-                                                        </td>
-                                                    </form>
-                                                @endforeach
-                                                @if (!$question->voteByUser(auth()->user()))
-                                                    <form method="POST" action="{{ route('votes.store', [$meeting, $question]) }}" class="inline-block">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="choice" value="Nebalsuota">
-                                                        <td class="px-6 py-4">
-                                                            <x-danger-button type="submit" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest">
-                                                                {{ __('Nebalsuota') }}
-                                                            </x-danger-button>
-                                                        </td>
-                                                    </form>
-                                                @else
-                                                    <form method="POST" action="{{ route('votes.destroy', [$meeting, $question]) }}" class="inline-block">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <td class="px-6 py-4">
-                                                            <x-primary-button type="submit" class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest">
-                                                                {{ __('Nebalsuota') }}
-                                                            </x-primary-button>
-                                                        </td>
-                                                    </form>
-                                                
-                                                @endif
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <div class="w-full">
-                                <p class="text-gray-500 dark:text-gray-400">{{ __('Voting process is not available.') }}</p>
-                            </div>
-                            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3">{{ __('Question') }}</th>
-                                        <th class="px-6 py-4" colspan="{{ count(\App\Models\Vote::STATUSES) + 1 }}">
-                                            {{ __('Voting choice') }}
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($meeting->questions as $question)
-                                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                            <td class="px-6 py-4">{{ $loop->iteration }}. {{ $question->title }}</td>
-                                            @if ($question->type == "Nebalsuoti")
-                                                <td class="px-6 py-4" colspan="{{ count(\App\Models\Vote::STATUSES) }}">
-                                                    <i>{{ __('Casting vote is not needed.') }}</i>
-                                                </td>
-                                                @continue
-                                            @endif
-                                            @foreach (\App\Models\Vote::STATUSES as $status)
-                                                <td class="px-6 py-4">
-                                                    @if ($question->voteByUser(auth()->user()) && $question->voteByUser(auth()->user())->choice == $status)
-                                                        <span class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md font-semibold text-xs uppercase tracking-widest">
-                                                            {{ __($status) }}
-                                                        </span>
-                                                    @else
-                                                        <span class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-md font-semibold text-xs uppercase tracking-widest">
-                                                            {{ __($status) }}
-                                                        </span>
-                                                    @endif
-                                                </td>
-                                            @endforeach
-                                            <td class="px-6 py-4">
-                                                @if ($question->voteByUser(auth()->user()))
-                                                    <span class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-md font-semibold text-xs uppercase tracking-widest">
-                                                        {{ __('Nebalsuota') }}
-                                                    </span>
-                                                @else
-                                                    <span class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md font-semibold text-xs uppercase tracking-widest">
-                                                        {{ __('Nebalsuota') }}
-                                                    </span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-
-                        @endif
-                    </details>
-                @endif
+                    
+                    {{-- Attendance Management Section --}}
+                    @include('meetings.partials.attendance-management')
+                    
+                    @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
+                        <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
+                    @endif
+                    
+                    {{-- Questions Section --}}
+                    @include('meetings.partials.questions-section')
+                    
+                    @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
+                        <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
+                    @endif
+                    
+                    {{-- Voting Process Section --}}
+                    @include('meetings.partials.voting-process')
+                    
+                    @if (Auth::user()->isPrivileged() || Auth::user()->isSecretary())
+                        <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
+                    @endif
+                    
+                    {{-- Proxy Voting Section --}}
+                    @include('meetings.partials.proxy-voting')
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Persist details element state
+        document.addEventListener('DOMContentLoaded', function() {
+            const details = document.querySelectorAll('details');
+            
+            details.forEach(function(detail, index) {
+                const key = `meeting-{{ $meeting->meeting_id }}-details-${index}`;
+                const isOpen = localStorage.getItem(key) === 'true';
+                
+                if (isOpen) {
+                    detail.open = true;
+                }
+                
+                detail.addEventListener('toggle', function() {
+                    localStorage.setItem(key, detail.open);
+                });
+            });
+        });
+        
         function questionReorder() {
             return {
                 reorderMode: false
@@ -405,80 +74,32 @@
             const questionsContainer = document.querySelector('[x-data="questionReorder()"]');
             const questionElements = Array.from(questionsContainer.querySelectorAll('details[data-question-id]'));
             
-            // Find the current question element
-            const currentElement = questionElements.find(el => el.dataset.questionId == questionId);
-            if (!currentElement) return;
-            
+            const currentElement = questionsContainer.querySelector(`details[data-question-id="${questionId}"]`);
             const currentIndex = questionElements.indexOf(currentElement);
-            let newIndex;
             
             if (direction === 'up' && currentIndex > 0) {
-                newIndex = currentIndex - 1;
+                const previousElement = questionElements[currentIndex - 1];
+                questionsContainer.insertBefore(currentElement, previousElement);
             } else if (direction === 'down' && currentIndex < questionElements.length - 1) {
-                newIndex = currentIndex + 1;
-            } else {
-                return; // Can't move further
+                const nextElement = questionElements[currentIndex + 1];
+                questionsContainer.insertBefore(nextElement, currentElement);
             }
             
-            // Swap elements in DOM
-            const targetElement = questionElements[newIndex];
-            if (direction === 'up') {
-                targetElement.parentNode.insertBefore(currentElement, targetElement);
-            } else {
-                targetElement.parentNode.insertBefore(currentElement, targetElement.nextSibling);
-            }
+            // Send AJAX request to update order
+            const newOrder = Array.from(questionsContainer.querySelectorAll('details[data-question-id]'))
+                .map(el => el.getAttribute('data-question-id'));
             
-            // Get new order of question IDs
-            const newQuestionIds = [];
-            questionsContainer.querySelectorAll('details[data-question-id]').forEach(element => {
-                newQuestionIds.push(parseInt(element.dataset.questionId));
-            });
-            
-            // Save new order
-            saveQuestionOrder(newQuestionIds);
-        }
-        
-        // Function to save the new question order
-        function saveQuestionOrder(questionIds) {
-            fetch(`{{ route('questions.reorder', $meeting) }}`, {
+            fetch('{{ route("questions.reorder", $meeting) }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({
-                    questions: questionIds
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('{{ __('Questions reordered successfully') }}');
-                    // Update question numbers in the UI
-                    updateQuestionNumbers();
-                } else {
-                    console.error('Failed to reorder questions');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-        
-        // Function to update question numbers after reordering
-        function updateQuestionNumbers() {
-            const questionsContainer = document.querySelector('[x-data="questionReorder()"]');
-            const questionElements = questionsContainer.querySelectorAll('details[data-question-id]');
-            
-            questionElements.forEach((element, index) => {
-                const summarySpan = element.querySelector('summary span');
-                if (summarySpan) {
-                    const titleText = summarySpan.textContent.replace(/^\d+\.\s*/, '');
-                    summarySpan.textContent = `${index + 1}. ${titleText}`;
-                }
+                body: JSON.stringify({ questions: newOrder })
+            }).catch(error => {
+                console.error('Error updating question order:', error);
+                // Optionally revert the UI change on error
             });
         }
     </script>
 </x-app-layout>
-
-

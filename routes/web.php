@@ -55,6 +55,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/meetings/{meeting}/protocolPDF', [MeetingController::class, 'protocolPDF'])->name('meetings.pdf');
 });
 
+// Attendance routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/meetings/{meeting}/attendance/toggle', [App\Http\Controllers\AttendanceController::class, 'toggle'])->name('attendance.toggle');
+    Route::post('/meetings/{meeting}/attendance/mark-all', [App\Http\Controllers\AttendanceController::class, 'markAllPresent'])->name('attendance.mark-all');
+    Route::post('/meetings/{meeting}/attendance/auto-mark', [App\Http\Controllers\AttendanceController::class, 'autoMarkFromVotes'])->name('attendance.auto-mark');
+    Route::post('/meetings/{meeting}/attendance/mark-non-voters-absent', [App\Http\Controllers\AttendanceController::class, 'markNonVotersAbsent'])->name('attendance.mark-non-voters-absent');
+});
+
 // Questions routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/meetings/{meeting}/questions', [QuestionController::class, 'create'])->name('questions.create');
@@ -69,6 +77,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/meetings/{meeting}/questions/{question}/votes', [VoteController::class, 'store'])->name('votes.store');
     Route::delete('/meetings/{meeting}/questions/{question}/votes', [VoteController::class, 'destroy'])->name('votes.destroy');
+    
+    // Proxy voting routes (for secretaries and IT admins)
+    Route::put('/meetings/{meeting}/questions/{question}/proxy-votes', [VoteController::class, 'storeProxy'])->name('votes.proxy');
+    Route::delete('/meetings/{meeting}/questions/{question}/proxy-votes', [VoteController::class, 'destroyProxy'])->name('votes.proxy-destroy');
 });
 
 Route::middleware('auth')->group(function () {

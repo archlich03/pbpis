@@ -34,15 +34,21 @@ beforeEach(function () {
         'meeting_date' => now()->toDateString(),
         'vote_start' => now()->subHour()->toDateTimeString(),
         'vote_end' => now()->addHour()->toDateTimeString(),
-        'status' => 'Suplanuotas',
+        'status' => 'Vyksta',
     ]);
+
+    // Create attendances to ensure quorum
+    $this->meeting->attendances()->create(['user_id' => $this->chairman->user_id]);
+    foreach ($this->members as $member) {
+        $this->meeting->attendances()->create(['user_id' => $member->user_id]);
+    }
 
     $this->question = Question::factory()->create([
         'meeting_id' => $this->meeting->meeting_id,
         'title' => 'Test Question',
         'decision' => '',
         'presenter_id' => $this->members->first()->user_id,
-        'type' => 'Nebalsuoti',
+        'type' => 'Dalyvių dauguma',
         'summary' => 'Test summary',
     ]);
 });
@@ -52,7 +58,7 @@ it('allows a body member to vote', function () {
 
     $response = put(route('votes.store', ['meeting' => $this->meeting->meeting_id, 'question' => $this->question->question_id]), [
         '_token' => csrf_token(),
-        'choice' => 'yes',
+        'choice' => 'Už',
     ]);
 
     $response->assertRedirect(route('meetings.show', $this->meeting));
@@ -60,7 +66,7 @@ it('allows a body member to vote', function () {
     $this->assertDatabaseHas('votes', [
         'question_id' => $this->question->question_id,
         'user_id' => $this->members->first()->user_id,
-        'choice' => 'yes',
+        'choice' => 'Už',
     ]);
 });
 
@@ -71,18 +77,18 @@ it('updates existing vote if already voted', function () {
     Vote::factory()->create([
         'question_id' => $this->question->question_id,
         'user_id' => $this->members->first()->user_id,
-        'choice' => 'no',
+        'choice' => 'Prieš',
     ]);
 
     put(route('votes.store', ['meeting' => $this->meeting->meeting_id, 'question' => $this->question->question_id]), [
         '_token' => csrf_token(),
-        'choice' => 'yes',
+        'choice' => 'Už',
     ])->assertRedirect(route('meetings.show', $this->meeting));
 
     $this->assertDatabaseHas('votes', [
         'question_id' => $this->question->question_id,
         'user_id' => $this->members->first()->user_id,
-        'choice' => 'yes',
+        'choice' => 'Už',
     ]);
 });
 
@@ -91,7 +97,7 @@ it('forbids voting for users who are not body members', function () {
 
     put(route('votes.store', ['meeting' => $this->meeting->meeting_id, 'question' => $this->question->question_id]), [
         '_token' => csrf_token(),
-        'choice' => 'yes',
+        'choice' => 'Už',
     ])->assertForbidden();
 
     $this->assertDatabaseMissing('votes', [
@@ -121,7 +127,7 @@ it('does not save vote if current time is outside voting period', function () {
 
     put(route('votes.store', ['meeting' => $this->meeting->meeting_id, 'question' => $this->question->question_id]), [
         '_token' => csrf_token(),
-        'choice' => 'yes',
+        'choice' => 'Už',
     ])->assertRedirect(route('meetings.show', $this->meeting));
 
     $this->assertDatabaseMissing('votes', [
@@ -133,6 +139,6 @@ it('does not save vote if current time is outside voting period', function () {
 it('redirects guest to login when trying to vote', function () {
     put(route('votes.store', ['meeting' => $this->meeting->meeting_id, 'question' => $this->question->question_id]), [
         '_token' => csrf_token(),
-        'choice' => 'yes',
+        'choice' => 'Už',
     ])->assertRedirect(route('login'));
 });
