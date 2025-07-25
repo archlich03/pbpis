@@ -13,11 +13,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (!$meeting->hasQuorum())
-                            <div class="text-orange-600 dark:text-orange-400">
-                                <i>{{ __('Warning: Quorum has not been reached. Votes cast will not be counted towards question approval.') }}</i>
-                            </div>
-                        @endif
+
                         @foreach ($meeting->questions as $question)
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                 <td class="px-6 py-4">{{ $loop->iteration }}. {{ $question->title }}</td>
@@ -28,14 +24,7 @@
                                     @continue
                                 @endif
                                 
-                                @if (!$meeting->isUserAttending(Auth::user()))
-                                    <td class="px-6 py-4" colspan="{{ count(\App\Models\Vote::STATUSES) }}">
-                                        <div class="text-orange-600 dark:text-orange-400">
-                                            <i>{{ __('Only attending members can vote.') }}</i>
-                                        </div>
-                                    </td>
-                                    @continue
-                                @endif
+
                                 @foreach (\App\Models\Vote::STATUSES as $status)
                                     <form method="POST" action="{{ route('votes.store', [$meeting, $question]) }}" class="inline-block">
                                         @csrf

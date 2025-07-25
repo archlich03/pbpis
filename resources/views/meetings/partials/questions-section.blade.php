@@ -29,16 +29,12 @@
                             <span>{{ $loop->iteration }}. {{ $question->title }}</span>
                             @if ($question->type != 'Nebalsuoti')
                                 @php
-                                    $questionPassed = $meeting->questionPassesWithChairmanVote($question);
-                                    $hasQuorum = $meeting->hasQuorum();
+                                    $voteCounts = $meeting->getVoteCounts($question);
+                                    $questionPassed = $meeting->calculateQuestionResult($question);
                                 @endphp
-                                @if (!$hasQuorum)
-                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300">
-                                        {{ __('No Quorum') }}
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $questionPassed ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
-                                        {{ $questionPassed ? __('Passed') : __('Failed') }}
+                                @if ($voteCounts['Už'] > 0)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $questionPassed ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
+                                        {{ $questionPassed ? __('Passed') : __('Not Passed') }}
                                     </span>
                                 @endif
                             @endif
@@ -60,52 +56,48 @@
                     </summary>
                     <div class="ml-4">
                         @php
-                            $statuses = [];
-                            
-                            // Calculate voting results using simple vote calculation
+                            $voteCounts = $meeting->getVoteCounts($question);
+                            $hasChairmanVoted = $meeting->hasChairmanVoted($question);
+                            $requiredVotes = $meeting->getRequiredVotesForQuestion($question, $hasChairmanVoted);
+                            $requiredWithoutChairman = $meeting->getRequiredVotesForQuestion($question, false);
+                            $requiredWithChairman = $meeting->getRequiredVotesForQuestion($question, true);
                             $questionPassed = $meeting->calculateQuestionResult($question);
-                            
-                            // Calculate minimum votes and eligible voters based on voting type
-                            $minVotes = $meeting->getRequiredVotesForQuestion($question);
-                            
-                            if ($question->isAttendanceBasedVoting()) {
-                                // For attendance-based voting (Dalyvių dauguma), use attendees count
-                                $totalEligibleVoters = $question->meeting->getAttendeesCount();
-                            } else {
-                                // For all members voting (Balsuoti dauguma, 2/3 dauguma), use all body members
-                                $totalEligibleVoters = $meeting->body->members->count();
-                            }
-                            
-                            // Get attendee IDs for filtering votes
-                            $attendeeIds = $meeting->attendances->pluck('user_id')->toArray();
-                            
-                            foreach (\App\Models\Vote::STATUSES as $status) {
-                                // Only count votes from attendees
-                                $count = $question->votes()->whereIn('user_id', $attendeeIds)->where('choice', $status)->count();
-                                array_push($statuses, [$status, $count]);
-                            }
                         @endphp
+
                         @if ($question->type != 'Nebalsuoti')
-                            <div class="mb-2">
-                                @if (!$meeting->hasQuorum())
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300">
-                                        {{ __('Klausimas nepriimtas') }} - {{ __('Quorum not reached') }}
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $questionPassed ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
-                                        {{ $questionPassed ? __('Passed') : __('Failed') }}
-                                    </span>
-                                @endif
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                <strong>{{ __('Vote counts') }}:</strong> 
+                                {{ __('Už') }}: {{ $voteCounts['Už'] }}, 
+                                {{ __('Prieš') }}: {{ $voteCounts['Prieš'] }}, 
+                                {{ __('Susilaikė') }}: {{ $voteCounts['Susilaikė'] }}
                             </div>
                             
                             <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                <strong>{{ __('Eligible Voters') }}:</strong> {{ $totalEligibleVoters }} ({{ __('Attendees only') }})<br>
-                                <strong>{{ __('Required for approval') }}:</strong> {{ ceil($minVotes) }} {{ __('votes') }}<br>
-                                <strong>{{ __('Vote counts') }}:</strong> 
-                                @foreach ($statuses as $status)
-                                    {{ __($status[0]) }}: {{ $status[1] }}{{ !$loop->last ? ', ' : '' }}
-                                @endforeach
+                                <strong>{{ __('Required to pass') }}:</strong> 
+                                @if ($question->type === '2/3 dauguma')
+                                    @if ($hasChairmanVoted)
+                                        {{ $requiredWithChairman }} {{ __('votes') }}
+                                    @else
+                                        {{ $requiredWithoutChairman }} {{ __('votes') }}
+                                    @endif
+                                @else
+                                    @php
+                                        $chairman = $meeting->body->chairman;
+                                        $chairmanVotedFor = false;
+                                        if ($chairman && $hasChairmanVoted) {
+                                            $chairmanVote = $question->votes()->where('user_id', $chairman->user_id)->first();
+                                            $chairmanVotedFor = $chairmanVote && $chairmanVote->choice === 'Už';
+                                        }
+                                    @endphp
+                                    {{ $requiredWithoutChairman }} {{ __('votes') }}
+                                    @if ($hasChairmanVoted && $chairmanVotedFor)
+                                        {{ __('(or tie with chairman voting for)') }}
+                                    @elseif (!$hasChairmanVoted && $chairman)
+                                        {{ __('(or tie if chairman votes for)') }}
+                                    @endif
+                                @endif
                             </div>
+
                         @endif
 
                         @if (!Auth::User()->isPrivileged())

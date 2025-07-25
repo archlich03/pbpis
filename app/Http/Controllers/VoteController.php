@@ -24,10 +24,7 @@ class VoteController extends Controller
             abort(403);
         }
         
-        // Check if quorum is reached
-        if (!$meeting->hasQuorum()) {
-            return redirect()->back()->with('error', __('Quorum has not been reached. Voting is not allowed.'));
-        }
+
         
         // Auto-attendance marking will happen after vote is saved
         

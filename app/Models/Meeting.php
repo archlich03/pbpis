@@ -139,50 +139,116 @@ class Meeting extends Model
         return $attendees >= ($totalMembers / 2);
     }
 
-
+    /**
+     * Calculate the required votes for a question to pass
+     *
+     * @param Question $question
+     * @param bool $withChairmanVote Whether chairman's vote is included
+     * @return int
+     */
+    public function getRequiredVotesForQuestion(Question $question, bool $withChairmanVote = false): int
+    {
+        $totalMembers = $this->body->members->count();
+        
+        if ($question->type === 'Nebalsuoti') {
+            return 0;
+        }
+        
+        if ($question->type === '2/3 dauguma') {
+            // 2/3 majority
+            $required = ceil($totalMembers * 2 / 3);
+        } else {
+            // Member majority: more than half (same regardless of chairman vote)
+            $required = ceil($totalMembers / 2);
+        }
+        
+        return $required;
+    }
 
     /**
-     * Calculate if question passes based on voting type
+     * Check if chairman has voted on a question
+     *
+     * @param Question $question
+     * @return bool
+     */
+    public function hasChairmanVoted(Question $question): bool
+    {
+        $chairman = $this->body->chairman;
+        if (!$chairman) {
+            return false;
+        }
+        
+        return $question->votes()->where('user_id', $chairman->user_id)->exists();
+    }
+
+    /**
+     * Get current vote counts for a question
+     *
+     * @param Question $question
+     * @return array
+     */
+    public function getVoteCounts(Question $question): array
+    {
+        $votes = $question->votes;
+        
+        return [
+            'Už' => $votes->where('choice', 'Už')->count(),
+            'Prieš' => $votes->where('choice', 'Prieš')->count(),
+            'Susilaikė' => $votes->where('choice', 'Susilaiko')->count(),
+        ];
+    }
+
+    /**
+     * Calculate if question would pass with current votes
      *
      * @param Question $question
      * @return bool
      */
     public function calculateQuestionResult(Question $question): bool
     {
-        // Only count votes from attendees
-        $attendeeIds = $this->attendances->pluck('user_id')->toArray();
-        $votes = $question->votes->whereIn('user_id', $attendeeIds);
-        
-        $forVotes = $votes->where('choice', 'Už')->count();
-        $requiredVotes = $this->getRequiredVotesForQuestion($question);
-        
-        // Question passes if "For" votes meet or exceed the required threshold
-        return $forVotes >= $requiredVotes;
-    }
+        $totalMembers = $this->body->members->count();
+        $attendeesCount = $this->getAttendeesCount();
+        $voteCounts = $this->getVoteCounts($question);
+        $forVotes = $voteCounts['Už'];
 
-    /**
-     * Get the required number of "For" votes for a question to pass
-     *
-     * @param Question $question
-     * @return float
-     */
-    public function getRequiredVotesForQuestion(Question $question): float
-    {
-        if ($question->isAttendanceBasedVoting()) {
-            // For attendance-based voting, need more than half of attendees
-            $attendees = $this->getAttendeesCount();
-            return ($attendees / 2) + 0.1; // More than half
+        $againstVotes = $attendeesCount - $forVotes;
+
+        if ($question->type === 'Nebalsuoti') {
+            return true;
         } else {
-            // For all members voting, need more than half of all body members
-            $allMembers = $this->body->members->count();
-            
-            if ($question->type === '2/3 dauguma') {
-                return ($allMembers * 2 / 3); // 2/3 of all members
-            } else {
-                return ($allMembers / 2) + 0.1; // More than half of all members
+            $requiredVotes = 0;
+            if ($question->type === '2/3 dauguma')
+                $requiredVotes = $totalMembers * 2 / 3;
+            else if ($question->type === 'Balsuoti dauguma')
+                $requiredVotes = $totalMembers / 2;
+
+            // Check if it passes with standard majority
+            if ($forVotes > $requiredVotes) {
+                return true;
             }
+
+            // Chairman tiebreaker: only applies when exactly half vote for and half against
+            // This only makes sense for even-numbered bodies
+            $chairman = $this->body->chairman;
+            if (
+                $chairman &&
+                $totalMembers % 2 == 0 &&
+                $forVotes == $againstVotes &&
+                $forVotes + $againstVotes > $requiredVotes
+            ) {
+                $chairmanVote = $question->votes()->where('user_id', $chairman->user_id)->first();
+                if ($chairmanVote && $chairmanVote->choice === 'Už') {
+                    // True 50-50 split: chairman breaks tie
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            return false;
         }
     }
+
 
     /**
      * The "booted" method of the model.

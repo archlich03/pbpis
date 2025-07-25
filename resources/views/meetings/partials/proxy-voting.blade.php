@@ -7,7 +7,24 @@
             </p>
             
             @if ($meeting->status == "Vyksta" && $meeting->questions->count() > 0)
-                <div class="flex gap-6" x-data="{ selectedQuestion: {{ $meeting->questions->where('type', '!=', 'Nebalsuoti')->first()?->question_id ?? 'null' }} }">
+                <div class="flex gap-6" x-data="{
+                    selectedQuestion: null,
+                    init() {
+                        // Try to get saved question from localStorage
+                        const saved = localStorage.getItem('proxyVoting_selectedQuestion_{{ $meeting->meeting_id }}');
+                        if (saved && saved !== 'null') {
+                            this.selectedQuestion = parseInt(saved);
+                        } else {
+                            // Default to first votable question
+                            this.selectedQuestion = {{ $meeting->questions->where('type', '!=', 'Nebalsuoti')->first()?->question_id ?? 'null' }};
+                        }
+                        
+                        // Watch for changes and save to localStorage
+                        this.$watch('selectedQuestion', (value) => {
+                            localStorage.setItem('proxyVoting_selectedQuestion_{{ $meeting->meeting_id }}', value);
+                        });
+                    }
+                }">
                     <!-- Left side: Question list -->
                     <div class="w-1/3">
                         <h4 class="font-semibold mb-3">{{ __('Select Question') }}</h4>

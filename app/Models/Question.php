@@ -41,27 +41,17 @@ class Question extends Model
      */
     public const STATUSES = [
         'Nebalsuoti',
-        'Dalyvių dauguma',  // New attendance-based voting (default)
-        'Balsuoti dauguma', // All body members majority
-        '2/3 dauguma'       // 2/3 majority of all body members
+        'Balsuoti dauguma', // Member majority
+        '2/3 dauguma'       // 2/3 majority
     ];
 
     public const MINIMUM_VOTES = [
         0,      // No voting needed
-        (1/2),  // Attendance-based majority (>50% of attendees)
-        (1/2),  // All members majority (>50% of all body members)
+        (1/2),  // Member majority (>50% of all body members)
         (2/3),  // 2/3 majority of all body members
     ];
 
-    /**
-     * Check if this question uses attendance-based voting
-     *
-     * @return bool
-     */
-    public function isAttendanceBasedVoting(): bool
-    {
-        return $this->type === 'Dalyvių dauguma';
-    }
+
 
     /**
      * Get the meeting that owns the Question
