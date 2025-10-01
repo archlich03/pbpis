@@ -12,7 +12,7 @@ export default defineConfig({
     server: {
         host: '0.0.0.0', // <--- IMPORTANT: Listen on all interfaces
         hmr: {
-            host: 'localhost', // Browser connects to localhost for HMR
+            host: process.env.VITE_HMR_HOST || 'localhost', // Browser connects to this host for HMR
         },
         watch: {
             usePolling: true, // Recommended for Docker volumes on some OS/filesystems
