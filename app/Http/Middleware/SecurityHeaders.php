@@ -18,9 +18,8 @@ class SecurityHeaders
         $response = $next($request);
 
         // Content Security Policy - restrict resource loading
-        // Temporarily allow Vite dev server in production for debugging
-        $viteHosts = " http://localhost:5173 http://127.0.0.1:5173 http://pbpis.teso.fyi:5173 https://pbpis.teso.fyi:5173";
-        $viteWs = " ws://localhost:5173 ws://127.0.0.1:5173 ws://pbpis.teso.fyi:5173 wss://pbpis.teso.fyi:5173";
+        $viteHosts = app()->environment('local') ? " http://localhost:5173 http://127.0.0.1:5173 http://pbpis.teso.fyi:5173 https://pbpis.teso.fyi:5173" : "";
+        $viteWs = app()->environment('local') ? " ws://localhost:5173 ws://127.0.0.1:5173 ws://pbpis.teso.fyi:5173 wss://pbpis.teso.fyi:5173" : "";
         
         $csp = "default-src 'self'; ";
         $csp .= "script-src 'self' 'unsafe-inline' 'unsafe-eval'" . $viteHosts . "; ";
