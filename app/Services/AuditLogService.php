@@ -41,12 +41,7 @@ class AuditLogService
         ],
         '2fa_disabled' => [
             'name' => '2FA Disabled',
-            'description' => 'Two-factor authentication disabled',
-            'color' => 'red',
-        ],
-        '2fa_removed' => [
-            'name' => '2FA Removed',
-            'description' => 'Two-factor authentication removed by admin',
+            'description' => 'Two-factor authentication disabled (by self or admin)',
             'color' => 'red',
         ],
         
