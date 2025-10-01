@@ -115,12 +115,14 @@ p, div, h1, h2, h3 {
             @foreach ($meeting->questions as $question)
                 <li>
                     <span>SVARSTYTA. {{ $question->title }}.</span><br>
-                    <span>
-                        {{ $question->presenter->gender? 'Pranešėjas' : 'Pranešėja' }} 
-                        {{ ($question->presenter->user_id == $meeting->body->chairman->user_id && $meeting->body->chairman->gender == 1) ? 'SPK pirmininkas ' : '' }}
-                        {{ ($question->presenter->user_id == $meeting->body->chairman->user_id && $meeting->body->chairman->gender == 0) ? 'SPK pirmininkė ' : '' }}
-                        {{ $question->presenter->pedagogical_name }} {{ $question->presenter->name }}.
-                    </span> 
+                    @if($question->presenter)
+                        <span>
+                            {{ $question->presenter->gender? 'Pranešėjas' : 'Pranešėja' }} 
+                            {{ ($question->presenter->user_id == $meeting->body->chairman->user_id && $meeting->body->chairman->gender == 1) ? 'SPK pirmininkas ' : '' }}
+                            {{ ($question->presenter->user_id == $meeting->body->chairman->user_id && $meeting->body->chairman->gender == 0) ? 'SPK pirmininkė ' : '' }}
+                            {{ $question->presenter->pedagogical_name }} {{ $question->presenter->name }}.
+                        </span> 
+                    @endif
                     <span>
                         {!! $question->summary? $question->summary : 'Vyko diskusija.' !!}
                     </span><br>

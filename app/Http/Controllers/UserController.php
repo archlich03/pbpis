@@ -87,9 +87,54 @@ class UserController extends Controller
             ]);
         }
         
+        // Check if user is a chairman of any body
+        $chairmanBodies = Body::where('chairman_id', $user->user_id)->get();
+        if ($chairmanBodies->count() > 0) {
+            return redirect()->route('users.edit', $user)
+                ->withErrors([
+                    'delete' => __('Cannot delete this user because they are the chairman of :count body/bodies: :bodies', [
+                        'count' => $chairmanBodies->count(),
+                        'bodies' => $chairmanBodies->pluck('title')->join(', ')
+                    ])
+                ], 'userDeletion');
+        }
+        
+        // Check if user is a secretary of any meeting
+        $secretaryMeetings = \App\Models\Meeting::where('secretary_id', $user->user_id)->get();
+        if ($secretaryMeetings->count() > 0) {
+            return redirect()->route('users.edit', $user)
+                ->withErrors([
+                    'delete' => __('Cannot delete this user because they are the secretary of :count meeting(s). Please reassign or delete those meetings first.', [
+                        'count' => $secretaryMeetings->count()
+                    ])
+                ], 'userDeletion');
+        }
+        
+        // Store user info in audit logs before deletion (for historical records)
+        \Illuminate\Support\Facades\DB::table('audit_logs')
+            ->where('user_id', $user->user_id)
+            ->update([
+                'deleted_user_name' => $user->name,
+                'deleted_user_email' => $user->email,
+            ]);
+        
+        // Remove user from body members JSON arrays
+        $bodies = Body::all();
+        foreach ($bodies as $body) {
+            // Get raw member IDs from database
+            $memberIds = json_decode($body->getRawOriginal('members') ?? '[]', true);
+            
+            if (in_array($user->user_id, $memberIds)) {
+                $memberIds = array_values(array_filter($memberIds, fn($id) => $id != $user->user_id));
+                // Update with array - the cast will handle JSON encoding
+                $body->update(['members' => $memberIds]);
+            }
+        }
+        
         $user->delete();
 
-        return redirect()->route('users.index');
+        return redirect()->route('users.index')
+            ->with('status', 'user-deleted');
     }
 
     
