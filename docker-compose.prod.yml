@@ -17,7 +17,7 @@ services:
         condition: service_healthy
     networks:
       - pbpis-network
-      - nginx_shared_network
+      - shared_network
 
   mysql:
     image: mysql:9.0
@@ -48,5 +48,5 @@ volumes:
 networks:
   pbpis-network:
     driver: bridge
-  nginx_shared_network:
+  shared_network:
     external: true
