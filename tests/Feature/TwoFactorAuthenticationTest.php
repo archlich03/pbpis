@@ -258,7 +258,7 @@ it('allows user to disable 2fa', function () {
     // Verify audit log was created
     $this->assertDatabaseHas('audit_logs', [
         'user_id' => $this->user->user_id,
-        'action' => '2fa_removed',
+        'action' => '2fa_disabled',
     ]);
 });
 
@@ -318,7 +318,7 @@ it('allows it admin to remove user 2fa', function () {
     // Verify audit log was created
     $this->assertDatabaseHas('audit_logs', [
         'user_id' => $this->user->user_id,
-        'action' => '2fa_removed',
+        'action' => '2fa_disabled',
     ]);
 });
 
