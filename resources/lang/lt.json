@@ -229,6 +229,8 @@
   "(Deleted User)": "(Ištrintas vartotojas)",
   "Cannot delete this user because they are the chairman of :count body/bodies: :bodies": "Negalima ištrinti šio vartotojo, nes jis yra :count darinio(-ių) pirmininkas: :bodies",
   "Cannot delete this user because they are the secretary of :count meeting(s). Please reassign or delete those meetings first.": "Negalima ištrinti šio vartotojo, nes jis yra :count posėdžio(-ių) sekretorius. Pirmiausia priskirkite kitus sekretorius arba ištrinkite tuos posėdžius.",
+  "Cannot delete your account because you are the chairman of :count body/bodies: :bodies": "Negalima ištrinti jūsų paskyros, nes esate :count darinio(-ių) pirmininkas: :bodies",
+  "Cannot delete your account because you are the secretary of :count meeting(s). Please contact an administrator.": "Negalima ištrinti jūsų paskyros, nes esate :count posėdžio(-ių) sekretorius. Susisiekite su administratoriumi.",
   "No details": "Nėra detalių",
   "Verify": "Patvirtinti",
   "Authentication code or recovery code": "Autentifikacijos kodas arba atkūrimo kodas",

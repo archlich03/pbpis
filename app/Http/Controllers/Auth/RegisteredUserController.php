@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -55,6 +56,23 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
+
+        // Log the user creation
+        $createdBy = Auth::user();
+        AuditLog::log(
+            $user->user_id,
+            'user_created',
+            $request->ip(),
+            $request->userAgent(),
+            [
+                'created_by' => $createdBy->user_id,
+                'created_by_name' => $createdBy->name,
+                'created_by_role' => $createdBy->role,
+                'user_name' => $user->name,
+                'user_email' => $user->email,
+                'user_role' => $user->role,
+            ]
+        );
 
         return redirect(route('users.index', absolute: false));
     }
