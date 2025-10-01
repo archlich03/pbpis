@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -40,6 +41,18 @@ class PasswordController extends Controller
             'password' => Hash::make($validated['password']),
             'password_change_required' => false, // Clear forced password change flag
         ]);
+
+        // Log the password change
+        AuditLog::log(
+            $user->user_id,
+            'password_changed',
+            $request->ip(),
+            $request->userAgent(),
+            [
+                'self_changed' => true,
+                'was_forced' => $user->password_change_required,
+            ]
+        );
 
         return back()->with('status', 'password-updated');
     }

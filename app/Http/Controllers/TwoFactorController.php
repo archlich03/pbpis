@@ -202,13 +202,13 @@ class TwoFactorController extends Controller
             'two_factor_confirmed_at' => null,
         ]);
         
-        // Log the removal
+        // Log the removal (user disabling their own 2FA)
         AuditLog::log(
             $user->user_id,
-            '2fa_removed',
+            '2fa_disabled',
             $request->ip(),
             $request->userAgent(),
-            ['removed_by' => 'self']
+            ['disabled_by' => 'self']
         );
         
         return redirect()->route('profile.edit')->with('status', '2fa-disabled');

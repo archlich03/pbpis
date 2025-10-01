@@ -175,6 +175,12 @@
                                                     <div class="font-medium">{{ $log->user->name }}</div>
                                                     <div class="text-gray-500 dark:text-gray-400">{{ $log->user->email }}</div>
                                                 </div>
+                                            @elseif($log->deleted_user_name)
+                                                <div>
+                                                    <div class="font-medium text-red-600 dark:text-red-400">{{ $log->deleted_user_name }}</div>
+                                                    <div class="text-gray-500 dark:text-gray-400">{{ $log->deleted_user_email }}</div>
+                                                    <div class="text-xs text-red-500 dark:text-red-400 italic">{{ __('(Deleted User)') }}</div>
+                                                </div>
                                             @else
                                                 <span class="text-gray-400 dark:text-gray-500">{{ __('Unknown User') }}</span>
                                             @endif

@@ -87,9 +87,70 @@ class UserController extends Controller
             ]);
         }
         
+        // Check if user is a chairman of any body
+        $chairmanBodies = Body::where('chairman_id', $user->user_id)->get();
+        if ($chairmanBodies->count() > 0) {
+            return redirect()->route('users.edit', $user)
+                ->withErrors([
+                    'delete' => __('Cannot delete this user because they are the chairman of :count body/bodies: :bodies', [
+                        'count' => $chairmanBodies->count(),
+                        'bodies' => $chairmanBodies->pluck('title')->join(', ')
+                    ])
+                ], 'userDeletion');
+        }
+        
+        // Check if user is a secretary of any meeting
+        $secretaryMeetings = \App\Models\Meeting::where('secretary_id', $user->user_id)->get();
+        if ($secretaryMeetings->count() > 0) {
+            return redirect()->route('users.edit', $user)
+                ->withErrors([
+                    'delete' => __('Cannot delete this user because they are the secretary of :count meeting(s). Please reassign or delete those meetings first.', [
+                        'count' => $secretaryMeetings->count()
+                    ])
+                ], 'userDeletion');
+        }
+        
+        // Store user info in audit logs before deletion (for historical records)
+        \Illuminate\Support\Facades\DB::table('audit_logs')
+            ->where('user_id', $user->user_id)
+            ->update([
+                'deleted_user_name' => $user->name,
+                'deleted_user_email' => $user->email,
+            ]);
+        
+        // Remove user from body members JSON arrays
+        $bodies = Body::all();
+        foreach ($bodies as $body) {
+            // Get raw member IDs from database
+            $memberIds = json_decode($body->getRawOriginal('members') ?? '[]', true);
+            
+            if (in_array($user->user_id, $memberIds)) {
+                $memberIds = array_values(array_filter($memberIds, fn($id) => $id != $user->user_id));
+                // Update with array - the cast will handle JSON encoding
+                $body->update(['members' => $memberIds]);
+            }
+        }
+        
+        // Log the deletion before actually deleting
+        AuditLog::log(
+            $user->user_id,
+            'user_deleted',
+            $request->ip(),
+            $request->userAgent(),
+            [
+                'deleted_by' => $authenticatedUser->user_id,
+                'deleted_by_name' => $authenticatedUser->name,
+                'deleted_by_role' => $authenticatedUser->role,
+                'deleted_user_name' => $user->name,
+                'deleted_user_email' => $user->email,
+                'deleted_user_role' => $user->role,
+            ]
+        );
+        
         $user->delete();
 
-        return redirect()->route('users.index');
+        return redirect()->route('users.index')
+            ->with('status', 'user-deleted');
     }
 
     
@@ -126,6 +187,20 @@ class UserController extends Controller
             'gender' => $request->input('gender'),
             'role' => $request->input('role'),
         ]);
+
+        // Log the profile update
+        $action = ($authenticatedUser->user_id === $user->user_id) ? 'profile_updated' : 'user_updated';
+        AuditLog::log(
+            $user->user_id,
+            $action,
+            $request->ip(),
+            $request->userAgent(),
+            [
+                'updated_by' => $authenticatedUser->user_id,
+                'updated_by_name' => $authenticatedUser->name,
+                'updated_by_role' => $authenticatedUser->role,
+            ]
+        );
 
         return redirect()->route('users.index');
     }
@@ -167,6 +242,19 @@ class UserController extends Controller
                 'password' => bcrypt($request->input('password')),
                 'password_change_required' => false, // Clear forced password change flag
             ]);
+            
+            // Log the password change
+            AuditLog::log(
+                $user->user_id,
+                'password_changed',
+                $request->ip(),
+                $request->userAgent(),
+                [
+                    'changed_by' => $authenticatedUser->user_id,
+                    'changed_by_name' => $authenticatedUser->name,
+                    'changed_by_role' => $authenticatedUser->role,
+                ]
+            );
         }
 
         return redirect()->route('users.index');
@@ -217,16 +305,16 @@ class UserController extends Controller
             'two_factor_confirmed_at' => null,
         ]);
         
-        // Log the removal
+        // Log the removal (use 2fa_disabled when admin removes it)
         AuditLog::log(
             $user->user_id,
-            '2fa_removed',
+            '2fa_disabled',
             $request->ip(),
             $request->userAgent(),
             [
-                'removed_by' => $authenticatedUser->user_id,
-                'removed_by_name' => $authenticatedUser->name,
-                'removed_by_role' => $authenticatedUser->role,
+                'disabled_by' => $authenticatedUser->user_id,
+                'disabled_by_name' => $authenticatedUser->name,
+                'disabled_by_role' => $authenticatedUser->role,
             ]
         );
         
