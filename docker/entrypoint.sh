@@ -14,7 +14,13 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-npm run dev &
+# Only run Vite dev server in local development
+if [ "$APP_ENV" = "local" ]; then
+    echo "Starting Vite dev server..."
+    npm run dev &
+else
+    echo "Production mode - using built assets"
+fi
 
 # Start PHP-FPM
 exec php-fpm
