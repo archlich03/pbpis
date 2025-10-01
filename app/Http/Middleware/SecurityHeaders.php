@@ -17,19 +17,9 @@ class SecurityHeaders
     {
         $response = $next($request);
 
-        // Content Security Policy - restrict resource loading
-        $viteHosts = app()->environment('local') ? " http://localhost:5173 http://127.0.0.1:5173 http://pbpis.teso.fyi:5173 https://pbpis.teso.fyi:5173" : "";
-        $viteWs = app()->environment('local') ? " ws://localhost:5173 ws://127.0.0.1:5173 ws://pbpis.teso.fyi:5173 wss://pbpis.teso.fyi:5173" : "";
-        
-        $csp = "default-src 'self'; ";
-        $csp .= "script-src 'self' 'unsafe-inline' 'unsafe-eval'" . $viteHosts . "; ";
-        $csp .= "style-src 'self' 'unsafe-inline' fonts.bunny.net" . $viteHosts . "; ";
-        $csp .= "img-src 'self' data: https:; ";
-        $csp .= "font-src 'self' fonts.bunny.net; ";
-        $csp .= "connect-src 'self'" . $viteHosts . $viteWs . "; ";
-        $csp .= "frame-ancestors 'none';";
-        
-        $response->headers->set('Content-Security-Policy', $csp);
+        // Content Security Policy - DISABLED for debugging
+        // TODO: Re-enable CSP after fixing Vite asset loading
+        // $response->headers->set('Content-Security-Policy', $csp);
 
         // Prevent MIME type sniffing
         $response->headers->set('X-Content-Type-Options', 'nosniff');
