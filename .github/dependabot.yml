@@ -54,6 +54,13 @@ updates:
         update-types:
           - "major"
           - "minor"
+      tailwind-ecosystem:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+        update-types:
+          - "major"
+          - "minor"
     open-pull-requests-limit: 2
 
   - package-ecosystem: "docker"
