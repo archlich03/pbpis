@@ -52,6 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/meetings/{meeting}', [MeetingController::class, 'update'])->name('meetings.update');
     Route::delete('/meetings/{meeting}', [MeetingController::class, 'destroy'])->name('meetings.destroy');
     Route::get('/meetings/{meeting}/protocolHTML', [MeetingController::class, 'protocol'])->name('meetings.protocol');
+    Route::get('/meetings/{meeting}/protocolDOCX', [MeetingController::class, 'protocolDOCX'])->name('meetings.docx');
     Route::get('/meetings/{meeting}/protocolPDF', [MeetingController::class, 'protocolPDF'])->name('meetings.pdf');
 });
 
