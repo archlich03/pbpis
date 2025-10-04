@@ -68,13 +68,12 @@ p, div, h1, h2, h3 {
         <span>
             VILNIAUS UNIVERSITETO<br>KAUNO FAKULTETO
         </span><br>
-        <br>
         <span>
             {{ $meeting->body->is_ba_sp? 'PIRMOSIOS' : 'ANTROSIOS' }} PAKOPOS STUDIJŲ PROGRAMOS
         </span><br>
 
         <span>
-            „{{ mb_strtoupper($meeting->body->title, 'UTF-8') }}“ KOMITETAS<br>
+            „{{ \Illuminate\Support\Str::upper($meeting->body->title) }}“ KOMITETAS<br>
         </span><br>
         
         <span>
