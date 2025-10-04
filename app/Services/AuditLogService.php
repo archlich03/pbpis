@@ -90,6 +90,28 @@ class AuditLogService
             'description' => 'User account deleted by admin',
             'color' => 'red',
         ],
+        
+        // Voting actions
+        'vote_cast' => [
+            'name' => 'Vote Cast',
+            'description' => 'User cast a vote on a question',
+            'color' => 'blue',
+        ],
+        'vote_removed' => [
+            'name' => 'Vote Removed',
+            'description' => 'User removed their vote',
+            'color' => 'yellow',
+        ],
+        'proxy_vote_cast' => [
+            'name' => 'Proxy Vote Cast',
+            'description' => 'Admin/Secretary cast a vote on behalf of another user',
+            'color' => 'purple',
+        ],
+        'proxy_vote_removed' => [
+            'name' => 'Proxy Vote Removed',
+            'description' => 'Admin/Secretary removed a vote on behalf of another user',
+            'color' => 'orange',
+        ],
     ];
 
     /**

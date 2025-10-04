@@ -139,47 +139,6 @@ class Meeting extends Model
         return $attendees >= ($totalMembers / 2);
     }
 
-    /**
-     * Calculate the required votes for a question to pass
-     *
-     * @param Question $question
-     * @param bool $withChairmanVote Whether chairman's vote is included
-     * @return int
-     */
-    public function getRequiredVotesForQuestion(Question $question, bool $withChairmanVote = false): int
-    {
-        $totalMembers = $this->body->members->count();
-        
-        if ($question->type === 'Nebalsuoti') {
-            return 0;
-        }
-        
-        if ($question->type === '2/3 dauguma') {
-            // 2/3 majority
-            $required = ceil($totalMembers * 2 / 3);
-        } else {
-            // Member majority: more than half (same regardless of chairman vote)
-            $required = ceil($totalMembers / 2);
-        }
-        
-        return $required;
-    }
-
-    /**
-     * Check if chairman has voted on a question
-     *
-     * @param Question $question
-     * @return bool
-     */
-    public function hasChairmanVoted(Question $question): bool
-    {
-        $chairman = $this->body->chairman;
-        if (!$chairman) {
-            return false;
-        }
-        
-        return $question->votes()->where('user_id', $chairman->user_id)->exists();
-    }
 
     /**
      * Get current vote counts for a question
@@ -200,53 +159,56 @@ class Meeting extends Model
 
     /**
      * Calculate if question would pass with current votes
+     * Supports multiple voting types with different thresholds
+     * 
+     * Note: Voting is allowed without quorum. The quorum check is for display purposes only.
      *
      * @param Question $question
      * @return bool
      */
     public function calculateQuestionResult(Question $question): bool
     {
-        $totalMembers = $this->body->members->count();
-        $attendeesCount = $this->getAttendeesCount();
-        $voteCounts = $this->getVoteCounts($question);
-        $forVotes = $voteCounts['Už'];
-
-        $againstVotes = $attendeesCount - $forVotes;
-
         if ($question->type === 'Nebalsuoti') {
             return true;
+        }
+
+        $voteCounts = $this->getVoteCounts($question);
+        $votesFor = $voteCounts['Už'];
+        $votesAgainst = $voteCounts['Prieš'];
+        
+        // Determine threshold based on voting type
+        if ($question->type === '2/3 dauguma') {
+            // 2/3 majority: need >= 2/3 of all body members
+            $totalMembers = $this->body->members->count();
+            $majorityThreshold = ($totalMembers * 2 / 3) - 0.01; // Use -0.01 to make >= work with >
+        } elseif ($question->type === 'Dalyvių dauguma') {
+            // Attendee majority: need > 50% of attendees
+            $attendees = $this->getAttendeesCount();
+            $majorityThreshold = $attendees / 2;
         } else {
-            $requiredVotes = 0;
-            if ($question->type === '2/3 dauguma')
-                $requiredVotes = $totalMembers * 2 / 3;
-            else if ($question->type === 'Balsuoti dauguma')
-                $requiredVotes = $totalMembers / 2;
+            // Simple majority (Balsuoti dauguma): need > 50% of all body members
+            $totalMembers = $this->body->members->count();
+            $majorityThreshold = $totalMembers / 2;
+        }
 
-            // Check if it passes with standard majority
-            if ($forVotes > $requiredVotes) {
-                return true;
-            }
-
-            // Chairman tiebreaker: only applies when exactly half vote for and half against
-            // This only makes sense for even-numbered bodies
+        // Decision is adopted only if votes_for > majority_threshold
+        if ($votesFor > $majorityThreshold) {
+            return true; // Decision adopted
+        }
+        
+        // Check for exact tie between "for" and "against"
+        if ($votesFor == $votesAgainst) {
+            // Chairman breaks the tie
             $chairman = $this->body->chairman;
-            if (
-                $chairman &&
-                $totalMembers % 2 == 0 &&
-                $forVotes == $againstVotes &&
-                $forVotes + $againstVotes > $requiredVotes
-            ) {
+            if ($chairman) {
                 $chairmanVote = $question->votes()->where('user_id', $chairman->user_id)->first();
                 if ($chairmanVote && $chairmanVote->choice === 'Už') {
-                    // True 50-50 split: chairman breaks tie
-                    return true;
-                } else {
-                    return false;
+                    return true; // Chairman voted "for" - decision adopted
                 }
             }
-
-            return false;
         }
+        
+        return false; // Decision rejected
     }
 
 

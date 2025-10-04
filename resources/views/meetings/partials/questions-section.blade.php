@@ -23,19 +23,39 @@
                 </div>
             @endif
             @foreach ($meeting->questions as $question)
-                <details class="mb-4" data-question-id="{{ $question->question_id }}">
+                <details class="mb-4" data-question-id="{{ $question->question_id }}" id="question-{{ $question->question_id }}">
                     <summary class="font-semibold cursor-pointer flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                             <span>{{ $loop->iteration }}. {{ $question->title }}</span>
                             @if ($question->type != 'Nebalsuoti')
                                 @php
-                                    $voteCounts = $meeting->getVoteCounts($question);
-                                    $questionPassed = $meeting->calculateQuestionResult($question);
+                                    $totalVotes = $question->votes()->count();
+                                    $totalMembers = $meeting->body->members->count();
                                 @endphp
-                                @if ($voteCounts['Už'] > 0)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $questionPassed ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
-                                        {{ $questionPassed ? __('Passed') : __('Not Passed') }}
-                                    </span>
+                                @if ($meeting->status == 'Vyksta')
+                                    {{-- Show vote count during voting period --}}
+                                    @if ($totalVotes > 0)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                            {{ $totalVotes }}/{{ $totalMembers }} {{ __('voted') }}
+                                        </span>
+                                    @endif
+                                @else
+                                    {{-- Show pass/fail status after voting ends --}}
+                                    @php
+                                        $voteCounts = $meeting->getVoteCounts($question);
+                                        $questionPassed = $meeting->calculateQuestionResult($question);
+                                    @endphp
+                                    @if ($voteCounts['Už'] > 0 || $voteCounts['Prieš'] > 0 || $voteCounts['Susilaikė'] > 0)
+                                        @if ($questionPassed)
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                                {{ __('Passed') }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                                                {{ __('Not Passed') }}
+                                            </span>
+                                        @endif
+                                    @endif
                                 @endif
                             @endif
                         </div>
@@ -57,46 +77,34 @@
                     <div class="ml-4">
                         @php
                             $voteCounts = $meeting->getVoteCounts($question);
-                            $hasChairmanVoted = $meeting->hasChairmanVoted($question);
-                            $requiredVotes = $meeting->getRequiredVotesForQuestion($question, $hasChairmanVoted);
-                            $requiredWithoutChairman = $meeting->getRequiredVotesForQuestion($question, false);
-                            $requiredWithChairman = $meeting->getRequiredVotesForQuestion($question, true);
                             $questionPassed = $meeting->calculateQuestionResult($question);
                         @endphp
 
                         @if ($question->type != 'Nebalsuoti')
-                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                <strong>{{ __('Vote counts') }}:</strong> 
-                                {{ __('Už') }}: {{ $voteCounts['Už'] }}, 
-                                {{ __('Prieš') }}: {{ $voteCounts['Prieš'] }}, 
-                                {{ __('Susilaikė') }}: {{ $voteCounts['Susilaikė'] }}
-                            </div>
-                            
-                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                <strong>{{ __('Required to pass') }}:</strong> 
-                                @if ($question->type === '2/3 dauguma')
-                                    @if ($hasChairmanVoted)
-                                        {{ $requiredWithChairman }} {{ __('votes') }}
+                            @if ($meeting->status == 'Vyksta')
+                                {{-- During voting period, show only member count --}}
+                                <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                    <strong>{{ __('Voting status') }}:</strong> 
+                                    {{ $question->votes()->count() }}/{{ $meeting->body->members->count() }} {{ __('members have voted') }}
+                                </div>
+                            @else
+                                {{-- After voting ends, show detailed results --}}
+                                <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                    <strong>{{ __('Vote counts') }}:</strong> 
+                                    {{ __('Už') }}: {{ $voteCounts['Už'] }}, 
+                                    {{ __('Prieš') }}: {{ $voteCounts['Prieš'] }}, 
+                                    {{ __('Susilaikė') }}: {{ $voteCounts['Susilaikė'] }}
+                                </div>
+                                
+                                <div class="text-sm mb-2">
+                                    <strong>{{ __('Decision') }}:</strong>
+                                    @if ($questionPassed)
+                                        <span class="text-green-600 dark:text-green-400 font-semibold">{{ __('Passed') }}</span>
                                     @else
-                                        {{ $requiredWithoutChairman }} {{ __('votes') }}
+                                        <span class="text-red-600 dark:text-red-400 font-semibold">{{ __('Not Passed') }}</span>
                                     @endif
-                                @else
-                                    @php
-                                        $chairman = $meeting->body->chairman;
-                                        $chairmanVotedFor = false;
-                                        if ($chairman && $hasChairmanVoted) {
-                                            $chairmanVote = $question->votes()->where('user_id', $chairman->user_id)->first();
-                                            $chairmanVotedFor = $chairmanVote && $chairmanVote->choice === 'Už';
-                                        }
-                                    @endphp
-                                    {{ $requiredWithoutChairman }} {{ __('votes') }}
-                                    @if ($hasChairmanVoted && $chairmanVotedFor)
-                                        {{ __('(or tie with chairman voting for)') }}
-                                    @elseif (!$hasChairmanVoted && $chairman)
-                                        {{ __('(or tie if chairman votes for)') }}
-                                    @endif
-                                @endif
-                            </div>
+                                </div>
+                            @endif
 
                         @endif
 

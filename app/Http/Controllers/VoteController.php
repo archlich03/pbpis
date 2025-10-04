@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\Meeting;
 use App\Models\User;
 use App\Models\Question;
@@ -43,6 +44,21 @@ class VoteController extends Controller
         if (now() <= $meeting->vote_end && now() >= $meeting->vote_start) {            
             $vote->save();
             
+            // Log audit event
+            AuditLog::log(
+                Auth::user()->user_id,
+                'vote_cast',
+                $request->ip(),
+                $request->userAgent(),
+                [
+                    'meeting_id' => $meeting->meeting_id,
+                    'meeting_date' => $meeting->meeting_date->format('Y-m-d'),
+                    'body' => $meeting->body->title,
+                    'question' => $question->title,
+                    'choice' => $request->input('choice'),
+                ]
+            );
+            
             // Auto-mark user as attending when they vote
             if (!$meeting->isUserAttending(Auth::user())) {
                 $meeting->attendances()->create([
@@ -60,7 +76,7 @@ class VoteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Meeting $meeting, Question $question)
+    public function destroy(Request $request, Meeting $meeting, Question $question)
     {
         $vote = $question->voteByUser(Auth::user());
         if (!$meeting->body->members->contains(Auth::user())) {
@@ -72,7 +88,25 @@ class VoteController extends Controller
             return redirect()->back()->with('error', __('No vote found to delete.'));
         }
 
+        // Store vote details before deletion for audit log
+        $voteChoice = $vote->choice;
+        
         $vote->delete();
+        
+        // Log audit event
+        AuditLog::log(
+            Auth::user()->user_id,
+            'vote_removed',
+            $request->ip(),
+            $request->userAgent(),
+            [
+                'meeting_id' => $meeting->meeting_id,
+                'meeting_date' => $meeting->meeting_date->format('Y-m-d'),
+                'body' => $meeting->body->title,
+                'question' => $question->title,
+                'previous_choice' => $voteChoice,
+            ]
+        );
         
         // Check if user has any votes left in this meeting
         $userHasVotes = $meeting->questions()->whereHas('votes', function($query) {
@@ -117,6 +151,23 @@ class VoteController extends Controller
             'user_id' => $targetUser->user_id,
             'choice' => $request->choice,
         ]);
+        
+        // Log audit event (logged under the admin/secretary who cast the vote)
+        AuditLog::log(
+            Auth::user()->user_id,
+            'proxy_vote_cast',
+            $request->ip(),
+            $request->userAgent(),
+            [
+                'meeting_id' => $meeting->meeting_id,
+                'meeting_date' => $meeting->meeting_date->format('Y-m-d'),
+                'body' => $meeting->body->title,
+                'question' => $question->title,
+                'target_user' => $targetUser->name,
+                'target_user_id' => $targetUser->user_id,
+                'choice' => $request->choice,
+            ]
+        );
 
         // Auto-mark target user as attending when vote is cast on their behalf
         if (!$meeting->isUserAttending($targetUser)) {
@@ -150,8 +201,29 @@ class VoteController extends Controller
             abort(403, 'User is not a member of this body.');
         }
 
+        // Get vote details before deletion for audit log
+        $existingVote = $question->votes()->where('user_id', $targetUser->user_id)->first();
+        $previousChoice = $existingVote ? $existingVote->choice : null;
+        
         // Delete the vote
         $question->votes()->where('user_id', $targetUser->user_id)->delete();
+        
+        // Log audit event (logged under the admin/secretary who removed the vote)
+        AuditLog::log(
+            Auth::user()->user_id,
+            'proxy_vote_removed',
+            $request->ip(),
+            $request->userAgent(),
+            [
+                'meeting_id' => $meeting->meeting_id,
+                'meeting_date' => $meeting->meeting_date->format('Y-m-d'),
+                'body' => $meeting->body->title,
+                'question' => $question->title,
+                'target_user' => $targetUser->name,
+                'target_user_id' => $targetUser->user_id,
+                'previous_choice' => $previousChoice,
+            ]
+        );
         
         // Check if target user has any votes left in this meeting
         $userHasVotes = $meeting->questions()->whereHas('votes', function($query) use ($targetUser) {
