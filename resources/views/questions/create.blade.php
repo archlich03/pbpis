@@ -45,8 +45,8 @@
 
                         <div class="mt-4">
                             <x-input-label for="summary" value="{{ __('Question summary') }}:" />
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ __('You can use HTML formatting (e.g., <strong>, <em>, <p>, <br>, <ul>, <li>)') }}</p>
-                            <textarea id="summary" name="summary" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full" rows="6" placeholder="{{ __('Enter detailed summary with HTML formatting if needed...') }}">{{ old('summary') }}</textarea>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 mb-2">{{ __('Use the rich text editor to format your summary') }}</p>
+                            <x-tiptap-editor name="summary" :value="old('summary', '')" id="summary" />
                         </div>
 
                         <div class="flex items-center justify-end mt-4">

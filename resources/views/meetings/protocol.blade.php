@@ -50,7 +50,7 @@
     font-style:italic;
 }
 body {
-    font-family: 'Times New Roman', 'FreeSerif', 'Times', 'DejaVu Sans', serif;
+    font-family: 'Times New Roman', Times, serif;
     font-size: 16px;
     margin: 0;
     padding: 0;
@@ -68,13 +68,12 @@ p, div, h1, h2, h3 {
         <span>
             VILNIAUS UNIVERSITETO<br>KAUNO FAKULTETO
         </span><br>
-        <br>
         <span>
             {{ $meeting->body->is_ba_sp? 'PIRMOSIOS' : 'ANTROSIOS' }} PAKOPOS STUDIJŲ PROGRAMOS
         </span><br>
 
         <span>
-            „{{ strtoupper($meeting->body->title) }}“ KOMITETAS<br>
+            „{{ \Illuminate\Support\Str::upper($meeting->body->title) }}“ KOMITETAS<br>
         </span><br>
         
         <span>
@@ -123,9 +122,9 @@ p, div, h1, h2, h3 {
                             {{ $question->presenter->pedagogical_name }} {{ $question->presenter->name }}.
                         </span> 
                     @endif
-                    <span>
+                    <div class="prose prose-sm max-w-none inline">
                         {!! $question->summary? $question->summary : 'Vyko diskusija.' !!}
-                    </span><br>
+                    </div>
                     @if ($question->type != "Nebalsuoti")
                         @php
                             $statuses = [];

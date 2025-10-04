@@ -10,17 +10,12 @@ chmod -R 777 /var/www/storage /var/www/bootstrap/cache
 composer install
 npm install
 
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Only run Vite dev server in local development
-if [ "$APP_ENV" = "local" ]; then
-    echo "Starting Vite dev server..."
-    npm run dev &
-else
-    echo "Production mode - using built assets"
-fi
+echo "Development mode (APP_ENV=${APP_ENV:-not set}) - clearing caches..."
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+echo "Starting Vite dev server..."
+npm run dev &
 
 # Start PHP-FPM
 exec php-fpm

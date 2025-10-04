@@ -106,7 +106,12 @@
                                 <p><strong>{{ __('Decision') }}:</strong> {{ $question->decision }}</p>
                             @endif
                             @if (!empty($question->summary))
-                                <p><strong>{{ __('Summary') }}:</strong> {!! $question->summary !!}</p>
+                                <div class="mt-2">
+                                    <strong>{{ __('Summary') }}:</strong>
+                                    <div class="prose prose-sm dark:prose-invert max-w-none mt-1">
+                                        {!! $question->summary !!}
+                                    </div>
+                                </div>
                             @endif
                         @else
                             <form method="POST" action="{{ route('questions.update', [$meeting, $question]) }}" class="dark:text-gray-800">
@@ -144,12 +149,7 @@
 
                                 <div class="mt-4">
                                     <x-input-label for="summary-{{ $question->question_id }}" value="{{ __('Question summary') }}:" />
-                                    <textarea 
-                                        id="summary-{{ $question->question_id }}" 
-                                        name="summary" 
-                                        rows="4" 
-                                        class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full"
-                                        placeholder="{{ __('Enter detailed summary...') }}">{{ $question->summary }}</textarea>
+                                    <x-tiptap-editor name="summary" :value="$question->summary ?? ''" :id="'summary-' . $question->question_id" />
                                 </div>
 
                                 <div class="flex items-center justify-end mt-4">

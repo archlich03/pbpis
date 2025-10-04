@@ -14,13 +14,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'IT admin',
-            'role' => 'IT administratorius',
-            'email' => env('DEFAULT_EMAIL', 'admin@knf.vu.lt'),
-            'password' => Hash::make(env('DEFAULT_PASSWORD', 'admin123')),
-            'gender' => 1,
-        ]);
+        // Use firstOrCreate to avoid duplicate key errors
+        User::firstOrCreate(
+            ['email' => env('DEFAULT_EMAIL', 'admin@knf.vu.lt')],
+            [
+                'name' => 'IT admin',
+                'role' => 'IT administratorius',
+                'password' => Hash::make(env('DEFAULT_PASSWORD', 'admin123')),
+                'gender' => 1,
+            ]
+        );
     }
 }
 
