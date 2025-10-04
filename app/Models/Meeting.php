@@ -159,8 +159,7 @@ class Meeting extends Model
 
     /**
      * Calculate if question would pass with current votes
-     * Based on SPK voting rules: strict majority of present members
-     * Abstentions count toward the threshold (raise the bar)
+     * Based on simple majority of total body members
      * 
      * Note: Voting is allowed without quorum. The quorum check is for display purposes only.
      *
@@ -173,21 +172,14 @@ class Meeting extends Model
             return true;
         }
 
+        $totalMembers = $this->body->members->count();
         $voteCounts = $this->getVoteCounts($question);
         $votesFor = $voteCounts['Už'];
         $votesAgainst = $voteCounts['Prieš'];
-        $votesAbstain = $voteCounts['Susilaikė'];
         
-        // Calculate total votes cast (for + against + abstain)
-        $totalVotesCast = $votesFor + $votesAgainst + $votesAbstain;
-        
-        // If no votes cast, decision fails
-        if ($totalVotesCast == 0) {
-            return false;
-        }
-        
-        // Calculate majority threshold based on votes cast (abstentions count toward total)
-        $majorityThreshold = $totalVotesCast / 2;
+        // Calculate majority threshold based on total body members
+        // Required: more than half of all body members
+        $majorityThreshold = $totalMembers / 2;
 
         // Decision is adopted only if votes_for > majority_threshold
         if ($votesFor > $majorityThreshold) {
