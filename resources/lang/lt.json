@@ -359,10 +359,16 @@
   "Decision": "Nutarta",
   "Summary": "Santrauka",
   "Vote counts": "Balsų skaičius",
+  "voted": "balsavo",
+  "Voting status": "Balsavimo būsena",
+  "members have voted": "nariai balsavo",
   "No vote found to delete.": "Nerasta balso, kurį būtų galima ištrinti.",
   "Keyboard shortcuts": "Spartieji klavišai",
   "bold": "paryškintas",
   "italic": "pasvirasis",
   "bullet list": "sąrašas su ženkleliais",
-  "numbered list": "numeruotas sąrašas"
+  "numbered list": "numeruotas sąrašas",
+  "Question title": "Klausimo pavadinimas",
+  "Voting type": "Balsavimo tipas",
+  "Update Meeting": "Atnaujinti posėdį"
 }

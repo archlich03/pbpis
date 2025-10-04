@@ -49,8 +49,17 @@
         document.addEventListener('DOMContentLoaded', function() {
             const details = document.querySelectorAll('details');
             
-            details.forEach(function(detail, index) {
-                const key = `meeting-{{ $meeting->meeting_id }}-details-${index}`;
+            details.forEach(function(detail) {
+                // Use ID if available (for questions), otherwise use a generic key
+                let key;
+                if (detail.id) {
+                    key = `meeting-{{ $meeting->meeting_id }}-${detail.id}`;
+                } else {
+                    // For sections without IDs, use the summary text as identifier
+                    const summaryText = detail.querySelector('summary')?.textContent.trim().substring(0, 30);
+                    key = `meeting-{{ $meeting->meeting_id }}-${summaryText}`;
+                }
+                
                 const isOpen = localStorage.getItem(key) === 'true';
                 
                 if (isOpen) {

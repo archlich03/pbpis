@@ -96,20 +96,18 @@
                     @foreach ($meeting->questions as $question)
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                             <td class="px-6 py-4">{{ $loop->iteration }}. {{ $question->title }}</td>
-                            @foreach (\App\Models\Vote::STATUSES as $status)
-                                <td class="px-6 py-4">{{ $question->votes()->where('choice', $status)->count() }}</td>
-                            @endforeach
-                            <td class="px-6 py-4">
-                                @if ($question->voteByUser(auth()->user()))
-                                    <span class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-md font-semibold text-xs uppercase tracking-widest">
-                                        {{ __('Nebalsuota') }}
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md font-semibold text-xs uppercase tracking-widest">
-                                        {{ __('Nebalsuota') }}
-                                    </span>
-                                @endif
-                            </td>
+                            @if ($question->type == "Nebalsuoti")
+                                <td class="px-6 py-4" colspan="{{ count(\App\Models\Vote::STATUSES) + 1 }}">
+                                    <i>{{ __('Casting vote is not needed.') }}</i>
+                                </td>
+                            @else
+                                @foreach (\App\Models\Vote::STATUSES as $status)
+                                    <td class="px-6 py-4">{{ $question->votes()->where('choice', $status)->count() }}</td>
+                                @endforeach
+                                <td class="px-6 py-4">
+                                    {{ $meeting->body->members->count() - $question->votes()->count() }}
+                                </td>
+                            @endif
                         </tr>
                     @endforeach
                 </tbody>
