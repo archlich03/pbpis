@@ -50,7 +50,7 @@
     font-style:italic;
 }
 body {
-    font-family: 'Times New Roman', 'FreeSerif', 'Times', 'DejaVu Sans', serif;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 16px;
     margin: 0;
     padding: 0;
@@ -123,9 +123,9 @@ p, div, h1, h2, h3 {
                             {{ $question->presenter->pedagogical_name }} {{ $question->presenter->name }}.
                         </span> 
                     @endif
-                    <span>
+                    <div class="prose prose-sm max-w-none inline">
                         {!! $question->summary? $question->summary : 'Vyko diskusija.' !!}
-                    </span><br>
+                    </div>
                     @if ($question->type != "Nebalsuoti")
                         @php
                             $statuses = [];

@@ -139,7 +139,7 @@
   "Status": "Statusas",
   "Suplanuotas": "Suplanuotas",
   "Susilaiko": "Susilaiko",
-  "The Voting and Protocol Management Information System (PBPIS) is designed for the administration of electronic meetings of Study Program Committees at Vilnius University Kaunas Faculty. It assists members in participating in meetings, casting their votes and generating minutes in a convenient, unified platform.": "<strong>Balsavimo ir protokolavimo informacinė sistema (PBPIS)</strong> skirta Vilniaus universiteto Kauno fakulteto studijų programų komitetų elektroniniams posėdžiams administruoti. Ji padeda nariams dalyvauti posėdžiuose, balsuoti patogioje, vieningoje platformoje.",
+  "The Voting and Protocol Management Information System (PBPIS) is designed for the administration of electronic meetings of Study Program Committees at Vilnius University Kaunas Faculty. It assists members in participating in meetings, casting their votes and generating minutes in a convenient, unified platform.": "<strong>Posėdžių balsavimo ir protokolavimo informacinė sistema (PBPIS)</strong> skirta Vilniaus universiteto Kauno fakulteto studijų programų komitetų elektroniniams posėdžiams administruoti. Ji padeda nariams dalyvauti posėdžiuose, balsuoti patogioje, vieningoje platformoje.",
   "This action is irreversible and will delete all related meeting, question and vote information. Please confirm that you want to delete this body.": "Šis veiksmas negrįžtamas bei ištrins visą susijusią posėdžių, klausimų bei balsų informaciją. Patvirtinkite, kad norite ištrinti šį darinį.",
   "to": "iki",
   "Title": "Pavadinimas",
@@ -358,5 +358,10 @@
   "Decision": "Nutarta",
   "Summary": "Santrauka",
   "Vote counts": "Balsų skaičius",
-  "No vote found to delete.": "Nerasta balso, kurį būtų galima ištrinti."
+  "No vote found to delete.": "Nerasta balso, kurį būtų galima ištrinti.",
+  "Keyboard shortcuts": "Spartieji klavišai",
+  "bold": "paryškintas",
+  "italic": "pasvirasis",
+  "bullet list": "sąrašas su ženkleliais",
+  "numbered list": "numeruotas sąrašas"
 }
