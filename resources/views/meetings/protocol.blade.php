@@ -50,7 +50,7 @@
     font-style:italic;
 }
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Times New Roman', Times, serif;
     font-size: 16px;
     margin: 0;
     padding: 0;
@@ -74,7 +74,7 @@ p, div, h1, h2, h3 {
         </span><br>
 
         <span>
-            „{{ strtoupper($meeting->body->title) }}“ KOMITETAS<br>
+            „{{ mb_strtoupper($meeting->body->title, 'UTF-8') }}“ KOMITETAS<br>
         </span><br>
         
         <span>
