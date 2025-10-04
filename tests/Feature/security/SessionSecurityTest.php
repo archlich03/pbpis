@@ -45,16 +45,6 @@ it('invalidates session on logout', function () {
     $this->assertGuest();
 });
 
-it('protects against csrf attacks', function () {
-    $user = User::factory()->create();
-    
-    // Try to make a request without CSRF token
-    $response = $this->actingAs($user)->post(route('logout'));
-    
-    // Should fail due to missing CSRF token
-    $response->assertStatus(419); // CSRF token mismatch
-})->skip('CSRF protection behavior differs in testing environment');
-
 it('allows requests with valid csrf token', function () {
     $user = User::factory()->create();
     

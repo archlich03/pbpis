@@ -277,8 +277,8 @@ it('stores question with empty summary', function () {
         ->first();
     
     expect($question)->not->toBeNull();
-    // Empty string or null are both acceptable
-    expect($question->summary === '' || $question->summary === null)->toBeTrue();
+    // Empty string is converted to null by ConvertEmptyStringsToNull middleware
+    expect($question->summary)->toBeNull();
 });
 
 it('updates question to have empty summary', function () {
@@ -302,8 +302,8 @@ it('updates question to have empty summary', function () {
         ->assertRedirect(route('meetings.show', $this->meeting));
 
     $question->refresh();
-    // Empty string or null are both acceptable
-    expect($question->summary === '' || $question->summary === null)->toBeTrue();
+    // Empty string is converted to null by ConvertEmptyStringsToNull middleware
+    expect($question->summary)->toBeNull();
 });
 
 // Test display of rich text content

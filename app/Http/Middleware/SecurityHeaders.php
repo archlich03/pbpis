@@ -20,20 +20,15 @@ class SecurityHeaders
         // Content Security Policy
         $cspDirectives = [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Allow inline scripts for Alpine.js and Vite
-            "style-src 'self' 'unsafe-inline'", // Allow inline styles for Tailwind
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'" . (app()->environment('local') ? ' http://localhost:5173' : ''), // Allow inline scripts for Alpine.js and Vite
+            "style-src 'self' 'unsafe-inline' https://fonts.bunny.net" . (app()->environment('local') ? ' http://localhost:5173' : ''), // Allow inline styles for Tailwind and external fonts
             "img-src 'self' data: https:",
-            "font-src 'self' data:",
-            "connect-src 'self' ws: wss:", // Allow WebSocket for Vite HMR
+            "font-src 'self' data: https://fonts.bunny.net",
+            "connect-src 'self' ws: wss:" . (app()->environment('local') ? ' ws://localhost:* wss://localhost:* http://localhost:*' : ''), // Allow WebSocket for Vite HMR
             "frame-ancestors 'none'",
             "base-uri 'self'",
             "form-action 'self'",
         ];
-        
-        // In development, allow Vite dev server
-        if (app()->environment('local')) {
-            $cspDirectives[] = "connect-src 'self' ws://localhost:* wss://localhost:* http://localhost:*";
-        }
         
         $csp = implode('; ', $cspDirectives);
         $response->headers->set('Content-Security-Policy', $csp);
