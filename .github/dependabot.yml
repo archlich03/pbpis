@@ -1,7 +1,5 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# Dependabot configuration optimized for infrequent production deployments
+# Focus on security updates and major releases only
 
 version: 2
 updates:
@@ -9,13 +7,53 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Vilnius"
+    # Only security and major Laravel updates
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+    groups:
+      security:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      laravel-major:
+        patterns:
+          - "laravel/*"
+        update-types:
+          - "major"
+          - "minor"
+    open-pull-requests-limit: 3
 
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "monthly"
+      day: "tuesday"
+      time: "09:00"
+      timezone: "Europe/Vilnius"
+    # Only security updates for frontend
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch", "version-update:semver-minor"]
+    groups:
+      security:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 2
 
   - package-ecosystem: "docker"
     directory: "/docker/"
     schedule:
-      interval: "quarterly"
+      interval: "monthly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Vilnius"
+    open-pull-requests-limit: 1
