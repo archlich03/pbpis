@@ -45,10 +45,20 @@
                                         $voteCounts = $meeting->getVoteCounts($question);
                                         $questionPassed = $meeting->calculateQuestionResult($question);
                                     @endphp
-                                    @if ($voteCounts['Už'] > 0)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $questionPassed ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
-                                            {{ $questionPassed ? __('Passed') : __('Not Passed') }}
-                                        </span>
+                                    @if ($voteCounts['Už'] > 0 || $voteCounts['Prieš'] > 0 || $voteCounts['Susilaikė'] > 0)
+                                        @if ($questionPassed === null)
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+                                                {{ __('Meeting not valid') }}
+                                            </span>
+                                        @elseif ($questionPassed)
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                                {{ __('Passed') }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                                                {{ __('Not Passed') }}
+                                            </span>
+                                        @endif
                                     @endif
                                 @endif
                             @endif
@@ -71,10 +81,6 @@
                     <div class="ml-4">
                         @php
                             $voteCounts = $meeting->getVoteCounts($question);
-                            $hasChairmanVoted = $meeting->hasChairmanVoted($question);
-                            $requiredVotes = $meeting->getRequiredVotesForQuestion($question, $hasChairmanVoted);
-                            $requiredWithoutChairman = $meeting->getRequiredVotesForQuestion($question, false);
-                            $requiredWithChairman = $meeting->getRequiredVotesForQuestion($question, true);
                             $questionPassed = $meeting->calculateQuestionResult($question);
                         @endphp
 
@@ -96,7 +102,9 @@
                                 
                                 <div class="text-sm mb-2">
                                     <strong>{{ __('Decision') }}:</strong>
-                                    @if ($questionPassed)
+                                    @if ($questionPassed === null)
+                                        <span class="text-yellow-600 dark:text-yellow-400 font-semibold">{{ __('Meeting not valid') }}</span>
+                                    @elseif ($questionPassed)
                                         <span class="text-green-600 dark:text-green-400 font-semibold">{{ __('Passed') }}</span>
                                     @else
                                         <span class="text-red-600 dark:text-red-400 font-semibold">{{ __('Not Passed') }}</span>
