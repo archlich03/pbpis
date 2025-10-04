@@ -102,8 +102,20 @@
                                                                         @method('PUT')
                                                                         <input type="hidden" name="user_id" value="{{ $member->user_id }}">
                                                                         <input type="hidden" name="choice" value="{{ $status }}">
+                                                                        @php
+                                                                            if ($existingVote && $existingVote->choice == $status) {
+                                                                                $btnClass = match($status) {
+                                                                                    'Už' => 'bg-green-500 text-white hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500',
+                                                                                    'Prieš' => 'bg-red-500 text-white hover:bg-red-400 dark:bg-red-600 dark:hover:bg-red-500',
+                                                                                    'Susilaiko' => 'bg-yellow-500 text-white hover:bg-yellow-400 dark:bg-yellow-600 dark:hover:bg-yellow-500',
+                                                                                    default => 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                                                                };
+                                                                            } else {
+                                                                                $btnClass = 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500';
+                                                                            }
+                                                                        @endphp
                                                                         <button type="submit" 
-                                                                                class="px-2 py-1 text-xs rounded {{ $existingVote && $existingVote->choice == $status ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500' }}"
+                                                                                class="px-2 py-1 text-xs rounded {{ $btnClass }}"
                                                                                 title="{{ __($status) }}">
                                                                             {{ __($status) }}
                                                                         </button>
@@ -116,7 +128,7 @@
                                                                         @method('DELETE')
                                                                         <input type="hidden" name="user_id" value="{{ $member->user_id }}">
                                                                         <button type="submit" 
-                                                                                class="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                                                                                class="px-2 py-1 text-xs bg-gray-300 text-gray-700 dark:bg-gray-600 dark:text-gray-300 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
                                                                                 title="{{ __('Remove vote') }}">
                                                                             ✕
                                                                         </button>

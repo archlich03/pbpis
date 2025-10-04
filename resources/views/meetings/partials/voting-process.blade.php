@@ -32,11 +32,20 @@
                                         <input type="hidden" name="choice" value="{{ $status }}">
                                         <td class="px-6 py-4">
                                             @if ($question->voteByUser(auth::user()) && $question->voteByUser(auth::user())->choice == $status)
-                                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md font-semibold text-xs uppercase tracking-widest hover:bg-green-400 focus:bg-green-400 active:bg-green-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                @php
+                                                    $buttonClass = match($status) {
+                                                        'Už' => 'bg-green-500 hover:bg-green-400 focus:bg-green-400 active:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500',
+                                                        'Prieš' => 'bg-red-500 hover:bg-red-400 focus:bg-red-400 active:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500',
+                                                        'Susilaiko' => 'bg-yellow-500 hover:bg-yellow-400 focus:bg-yellow-400 active:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-500',
+                                                        default => 'bg-gray-300 hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-600'
+                                                    };
+                                                    $textClass = 'text-white';
+                                                @endphp
+                                                <button type="submit" class="inline-flex items-center px-4 py-2 {{ $buttonClass }} {{ $textClass }} rounded-md font-semibold text-xs uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                                     {{ __($status) }}
                                                 </button>
                                             @else
-                                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-md font-semibold text-xs uppercase tracking-widest hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 dark:bg-gray-600 dark:text-gray-300 rounded-md font-semibold text-xs uppercase tracking-widest hover:bg-gray-400 dark:hover:bg-gray-500 focus:bg-gray-400 active:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                                     {{ __($status) }}
                                                 </button>
                                             @endif
@@ -48,7 +57,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <td class="px-6 py-4">
-                                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md font-semibold text-xs uppercase tracking-widest hover:bg-red-400 focus:bg-red-400 active:bg-red-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 dark:bg-gray-600 dark:text-gray-300 rounded-md font-semibold text-xs uppercase tracking-widest hover:bg-gray-400 dark:hover:bg-gray-500 focus:bg-gray-400 active:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                                 {{ __('Remove vote') }}
                                             </button>
                                         </td>
@@ -58,7 +67,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <td class="px-6 py-4">
-                                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 rounded-md font-semibold text-xs uppercase tracking-widest">
+                                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-700 dark:bg-gray-600 dark:text-gray-300 rounded-md font-semibold text-xs uppercase tracking-widest">
                                                 {{ __('Remove vote') }}
                                             </button>
                                         </td>
