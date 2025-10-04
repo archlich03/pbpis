@@ -17,9 +17,26 @@ class SecurityHeaders
     {
         $response = $next($request);
 
-        // Content Security Policy - DISABLED for debugging
-        // TODO: Re-enable CSP after fixing Vite asset loading
-        // $response->headers->set('Content-Security-Policy', $csp);
+        // Content Security Policy
+        $cspDirectives = [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Allow inline scripts for Alpine.js and Vite
+            "style-src 'self' 'unsafe-inline'", // Allow inline styles for Tailwind
+            "img-src 'self' data: https:",
+            "font-src 'self' data:",
+            "connect-src 'self' ws: wss:", // Allow WebSocket for Vite HMR
+            "frame-ancestors 'none'",
+            "base-uri 'self'",
+            "form-action 'self'",
+        ];
+        
+        // In development, allow Vite dev server
+        if (app()->environment('local')) {
+            $cspDirectives[] = "connect-src 'self' ws://localhost:* wss://localhost:* http://localhost:*";
+        }
+        
+        $csp = implode('; ', $cspDirectives);
+        $response->headers->set('Content-Security-Policy', $csp);
 
         // Prevent MIME type sniffing
         $response->headers->set('X-Content-Type-Options', 'nosniff');
