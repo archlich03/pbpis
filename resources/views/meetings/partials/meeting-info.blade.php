@@ -65,6 +65,11 @@
                     </a>
                 </x-primary-button>
                 <x-primary-button>
+                    <a href="{{ route('meetings.docx', $meeting) }}" class="w-full">
+                        {{ __('Download DOCX Protocol') }}
+                    </a>
+                </x-primary-button>
+                <x-primary-button>
                     <a href="{{ route('meetings.pdf', $meeting) }}" class="w-full" target="_blank">
                         {{ __('Download PDF Protocol') }}
                     </a>

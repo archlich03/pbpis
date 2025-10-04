@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\Shared\Html;
 
 class MeetingController extends Controller
 {
@@ -237,5 +240,196 @@ class MeetingController extends Controller
         $pdf = PDF::loadView('meetings.protocol', ['meeting' => $meeting]);
         $name = $meeting->body->title . ' ' . ($meeting->body->is_ba_sp ? 'BA' : 'MA') . ' ' . $meeting->meeting_date->format('Y-m-d') . ' protokolas.pdf';
         return $pdf->download($name); 
+    }
+
+    public function protocolDOCX(Meeting $meeting)
+    {
+        if (!Auth::user()->isPrivileged() && !$meeting->body->members->contains(Auth::user())) {
+            abort(403);
+        }
+
+        $phpWord = new PhpWord();
+        
+        // Define numbered list styles - separate for agenda and questions
+        $phpWord->addNumberingStyle(
+            'agendaNumbering',
+            [
+                'type' => 'multilevel',
+                'levels' => [
+                    [
+                        'format' => 'decimal',
+                        'text' => '%1.',
+                        'left' => 360,
+                        'hanging' => 360,
+                        'tabPos' => 360,
+                    ],
+                ],
+            ]
+        );
+        
+        $phpWord->addNumberingStyle(
+            'questionsNumbering',
+            [
+                'type' => 'multilevel',
+                'levels' => [
+                    [
+                        'format' => 'decimal',
+                        'text' => '%1.',
+                        'left' => 360,
+                        'hanging' => 360,
+                        'tabPos' => 360,
+                    ],
+                ],
+            ]
+        );
+        
+        // Set default font for HTML content
+        $phpWord->setDefaultFontName('Times New Roman');
+        $phpWord->setDefaultFontSize(12);
+        
+        $section = $phpWord->addSection([
+            'marginLeft' => 1134,
+            'marginRight' => 1134,
+            'marginTop' => 1134,
+            'marginBottom' => 1134,
+        ]);
+
+        // Title styles
+        $titleStyle = ['name' => 'Times New Roman', 'size' => 12, 'bold' => true];
+        $normalStyle = ['name' => 'Times New Roman', 'size' => 12];
+        $centerAlign = ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER];
+
+        // Title section
+        $section->addText('VILNIAUS UNIVERSITETO', $titleStyle, $centerAlign);
+        $section->addText('KAUNO FAKULTETO', $titleStyle, $centerAlign);
+        $section->addText(
+            ($meeting->body->is_ba_sp ? 'PIRMOSIOS' : 'ANTROSIOS') . ' PAKOPOS STUDIJŲ PROGRAMOS',
+            $titleStyle,
+            $centerAlign
+        );
+        $section->addText(
+            '„' . mb_strtoupper($meeting->body->title) . '" KOMITETAS',
+            $titleStyle,
+            $centerAlign
+        );
+        $section->addText(
+            ($meeting->is_evote ? 'ELEKTRONINIO ' : '') . 'POSĖDŽIO PROTOKOLAS',
+            $titleStyle,
+            $centerAlign
+        );
+        $section->addTextBreak();
+
+        // Meeting details
+        if ($meeting->is_evote) {
+            $section->addText(
+                'Balsavimas el. būdu vyko nuo ' . $meeting->vote_start->format('Y-m-d H:i') . 
+                ' iki ' . $meeting->vote_end->format('Y-m-d H:i') . '.',
+                $normalStyle
+            );
+        } else {
+            $section->addText(
+                'Posėdis vyko ' . $meeting->meeting_date->format('Y-m-d') . '; ' . 
+                $meeting->vote_start->format('H:i') . ' - ' . $meeting->vote_end->format('H:i') . '.',
+                $normalStyle
+            );
+        }
+
+        $section->addText(
+            'Posėdžio ' . ($meeting->body->chairman->gender ? 'pirmininkas' : 'pirmininkė') . ': ' .
+            $meeting->body->chairman->pedagogical_name . ' ' . $meeting->body->chairman->name . '.',
+            $normalStyle
+        );
+
+        $section->addText(
+            'Posėdžio ' . ($meeting->secretary->gender ? 'sekretorius' : 'sekretorė') . ': ' .
+            $meeting->secretary->pedagogical_name . ' ' . $meeting->secretary->name . '.',
+            $normalStyle
+        );
+
+        // Attendees
+        $attendeesText = 'Posėdyje dalyvavo: ';
+        foreach ($meeting->body->members as $index => $member) {
+            $attendeesText .= $member->pedagogical_name . ' ' . $member->name;
+            $attendeesText .= ($index === count($meeting->body->members) - 1) ? '.' : '; ';
+        }
+        $section->addText($attendeesText, $normalStyle);
+        
+        // Add line break before agenda
+        $section->addTextBreak();
+
+        // Agenda
+        $section->addText('DARBOTVARKĖ:', $normalStyle);
+        foreach ($meeting->questions as $index => $question) {
+            $section->addListItem(
+                $question->title . ($index === count($meeting->questions) - 1 ? '.' : ';'),
+                0,
+                $normalStyle,
+                'agendaNumbering'
+            );
+        }
+
+        // Questions details - match HTML format exactly with separate numbering
+        foreach ($meeting->questions as $index => $question) {
+            // Start numbered list item with just "SVARSTYTA. Title."
+            $section->addListItem(
+                'SVARSTYTA. ' . $question->title . '.',
+                0,
+                $normalStyle,
+                'questionsNumbering'
+            );
+            
+            // Add presenter info on new line if exists
+            if ($question->presenter) {
+                $presenterText = ($question->presenter->gender ? 'Pranešėjas' : 'Pranešėja');
+                
+                if ($question->presenter->user_id == $meeting->body->chairman->user_id) {
+                    $presenterText .= ' ' . ($meeting->body->chairman->gender ? 'SPK pirmininkas' : 'SPK pirmininkė');
+                }
+                
+                $presenterText .= ' ' . $question->presenter->pedagogical_name . ' ' . $question->presenter->name . '.';
+                $section->addText($presenterText, $normalStyle);
+            }
+            
+            // Add summary with HTML support
+            if ($question->summary) {
+                Html::addHtml($section, $question->summary, false, false);
+            } else {
+                $section->addText('Vyko diskusija.', $normalStyle);
+            }
+
+            // Voting results
+            if ($question->type != "Nebalsuoti") {
+                $statuses = [];
+                foreach (\App\Models\Vote::STATUSES as $status) {
+                    $count = $question->votes()->where('choice', $status)->count();
+                    $statuses[] = [$status, $count];
+                }
+
+                $forVotes = collect($statuses)->firstWhere(0, 'Už')[1] ?? 0;
+                
+                if ($forVotes >= count($meeting->body->members)) {
+                    $section->addText('Pritarta bendru sutarimu.', $normalStyle);
+                } else {
+                    $votingText = 'Balsuojama: Už: ' . ($statuses[0][1] ?? 0) . '; Prieš: ' . ($statuses[1][1] ?? 0) . '; Susilaiko: ' . ($statuses[2][1] ?? 0) . '.';
+                    $section->addText($votingText, $normalStyle);
+                }
+
+                if ($question->decision != '') {
+                    $section->addText('NUTARTA. ' . $question->decision, $normalStyle);
+                }
+            }
+        }
+
+        // Generate filename
+        $filename = $meeting->body->title . ' ' . 
+                   ($meeting->body->is_ba_sp ? 'BA' : 'MA') . ' ' . 
+                   $meeting->meeting_date->format('Y-m-d') . ' protokolas.docx';
+
+        // Save to temp file and download
+        $tempFile = tempnam(sys_get_temp_dir(), 'protocol');
+        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
+        $objWriter->save($tempFile);
+
+        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
 }
