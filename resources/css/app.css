@@ -1,3 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* Font family */
+  --font-sans: Figtree, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  
+  /* Safelist colors for audit logs - prevent purging */
+  --color-green-100: #dcfce7;
+  --color-green-700: #15803d;
+  --color-blue-100: #dbeafe;
+  --color-blue-700: #1d4ed8;
+  --color-red-100: #fee2e2;
+  --color-red-700: #b91c1c;
+  --color-purple-100: #f3e8ff;
+  --color-purple-700: #7e22ce;
+  --color-yellow-100: #fef9c3;
+  --color-yellow-700: #a16207;
+  --color-orange-100: #ffedd5;
+  --color-orange-700: #c2410c;
+  --color-gray-100: #f3f4f6;
+  --color-gray-700: #374151;
+}
