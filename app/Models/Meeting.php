@@ -159,7 +159,7 @@ class Meeting extends Model
 
     /**
      * Calculate if question would pass with current votes
-     * Based on simple majority of total body members
+     * Supports multiple voting types with different thresholds
      * 
      * Note: Voting is allowed without quorum. The quorum check is for display purposes only.
      *
@@ -172,14 +172,24 @@ class Meeting extends Model
             return true;
         }
 
-        $totalMembers = $this->body->members->count();
         $voteCounts = $this->getVoteCounts($question);
         $votesFor = $voteCounts['Už'];
         $votesAgainst = $voteCounts['Prieš'];
         
-        // Calculate majority threshold based on total body members
-        // Required: more than half of all body members
-        $majorityThreshold = $totalMembers / 2;
+        // Determine threshold based on voting type
+        if ($question->type === '2/3 dauguma') {
+            // 2/3 majority: need >= 2/3 of all body members
+            $totalMembers = $this->body->members->count();
+            $majorityThreshold = ($totalMembers * 2 / 3) - 0.01; // Use -0.01 to make >= work with >
+        } elseif ($question->type === 'Dalyvių dauguma') {
+            // Attendee majority: need > 50% of attendees
+            $attendees = $this->getAttendeesCount();
+            $majorityThreshold = $attendees / 2;
+        } else {
+            // Simple majority (Balsuoti dauguma): need > 50% of all body members
+            $totalMembers = $this->body->members->count();
+            $majorityThreshold = $totalMembers / 2;
+        }
 
         // Decision is adopted only if votes_for > majority_threshold
         if ($votesFor > $majorityThreshold) {

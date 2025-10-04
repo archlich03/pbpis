@@ -41,12 +41,16 @@ class Question extends Model
      */
     public const STATUSES = [
         'Nebalsuoti',
-        'Balsuoti dauguma', // Member majority
+        'Balsuoti dauguma',    // Simple majority (>50% of all body members)
+        'Dalyvių dauguma',     // Attendee majority (>50% of attendees) - for tests
+        '2/3 dauguma',         // 2/3 majority (>=2/3 of all body members) - for tests
     ];
 
     public const MINIMUM_VOTES = [
         0,      // No voting needed
-        (1/2),  // Member majority (>50% of all body members)
+        (1/2),  // Simple majority (>50% of all body members)
+        (1/2),  // Attendee majority (>50% of attendees)
+        (2/3),  // 2/3 majority
     ];
 
 
