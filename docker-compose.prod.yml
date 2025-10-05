@@ -69,5 +69,7 @@ networks:
 volumes:
   mysql_data:
     driver: local
+    name: pbpis_prod_mysql_data
   redis_data:
     driver: local
+    name: pbpis_prod_redis_data

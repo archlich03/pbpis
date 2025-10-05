@@ -33,7 +33,7 @@ services:
       - laravel
 
   mysql:
-    image: mysql:latest
+    image: mysql:8.0
     container_name: mysql
     restart: unless-stopped
     environment:
@@ -45,6 +45,12 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - laravel
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: --default-authentication-plugin=mysql_native_password
 
   redis:
     image: redis:7-alpine
