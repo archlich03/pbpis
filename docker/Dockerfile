@@ -4,7 +4,9 @@ RUN apt-get update && apt-get install -y \
     git zip unzip curl gnupg2 ca-certificates libpng-dev libjpeg-dev \
     libfreetype6-dev libonig-dev libpq-dev libicu-dev libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd bcmath exif intl zip
+    && docker-php-ext-install pdo pdo_mysql gd bcmath exif intl zip \
+    && pecl install redis \
+    && docker-php-ext-enable redis
 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs
