@@ -11,9 +11,11 @@ services:
       - ./storage:/var/www/storage
       - ./.env:/var/www/.env:ro
     ports:
-      - "8000:80"  # Your external nginx will proxy_pass to this port
+      - "127.0.0.1:8000:80"  # Bind to localhost only - accessible from host
     networks:
       - pbpis_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Allow container to reach host
     depends_on:
       mysql:
         condition: service_healthy
