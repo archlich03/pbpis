@@ -43,6 +43,18 @@ services:
     networks:
       - laravel
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - laravel
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
@@ -61,3 +73,4 @@ networks:
 
 volumes:
   mysql_data:
+  redis_data:
