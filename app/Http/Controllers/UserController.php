@@ -467,6 +467,7 @@ class UserController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('action', 'LIKE', "%{$search}%")
                   ->orWhere('ip_address', 'LIKE', "%{$search}%")
+                  ->orWhere('user_agent', 'LIKE', "%{$search}%")
                   ->orWhere('details', 'LIKE', "%{$search}%")
                   ->orWhereHas('user', function($userQuery) use ($search) {
                       $userQuery->where('name', 'LIKE', "%{$search}%")
