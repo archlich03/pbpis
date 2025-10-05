@@ -1,6 +1,8 @@
 name: PBPIS Deployment Test
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -13,10 +15,13 @@ jobs:
     outputs:
       should-deploy: ${{ steps.check.outputs.should-deploy }}
     steps:
-    - name: Check if PR is draft
+    - name: Check if should run tests
       id: check
       run: |
-        if [ "${{ github.event.pull_request.draft }}" = "true" ]; then
+        if [ "${{ github.event_name }}" = "push" ]; then
+          echo "should-deploy=true" >> $GITHUB_OUTPUT
+          echo "✅ Push to main - running deployment tests"
+        elif [ "${{ github.event.pull_request.draft }}" = "true" ]; then
           echo "should-deploy=false" >> $GITHUB_OUTPUT
           echo "⏭️  Skipping deployment tests for draft PR"
         else
