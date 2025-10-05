@@ -23,11 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
             ForcePasswordChangeMiddleware::class,
         ]);
 
-        // If you had any global middleware or route middleware aliases,
-        // they would go here, for example:
-        // $middleware->global([
-        //     // \App\Http\Middleware\TrustProxies::class,
-        // ]);
+        // Trust proxies to get real client IP through Cloudflare and nginx
+        $middleware->trustProxies(at: '*');
         //
         // $middleware->alias([
         //     'auth' => \App\Http\Middleware\Authenticate::class,
