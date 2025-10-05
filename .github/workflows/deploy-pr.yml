@@ -208,11 +208,17 @@ jobs:
         echo "=== PBPIS Container Logs ==="
         docker logs pbpis --tail=50
         echo ""
+        echo "=== Laravel Error Logs ==="
+        docker exec pbpis tail -100 /var/www/storage/logs/laravel.log || echo "Could not read Laravel logs"
+        echo ""
         echo "=== MySQL Container Logs ==="
         docker logs mysql --tail=20
         echo ""
         echo "=== Nginx Container Logs ==="
         docker logs nginx --tail=20
+        echo ""
+        echo "=== Redis Container Logs ==="
+        docker logs redis --tail=20 || echo "Redis container not found"
         
         exit 1
 
