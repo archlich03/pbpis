@@ -92,11 +92,11 @@
                                     <td class="border px-2 py-2 whitespace-nowrap text-sm">
                                         <a href="{{ route('bodies.show', $body) }}"><b>{{ __('View') }}</b></a>
                                     </td>
-                                    <td class="border px-2 py-2 whitespace-nowrap text-sm">
-                                        @if (Auth::user()->isPrivileged())
+                                    @if (Auth::user()->isPrivileged())
+                                        <td class="border px-2 py-2 whitespace-nowrap text-sm">
                                             <a href="{{ route('bodies.edit', $body) }}"><b>{{ __('Edit') }}</b></a>
-                                        @endif
-                                    </td>
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
