@@ -10,12 +10,9 @@ services:
       # Only mount storage and .env - no source code mounting
       - ./storage:/var/www/storage
       - ./.env:/var/www/.env:ro
-    ports:
-      - "127.0.0.1:8000:80"  # Bind to localhost only - accessible from host
     networks:
       - pbpis_network
-    extra_hosts:
-      - "host.docker.internal:host-gateway"  # Allow container to reach host
+      - shared_network
     depends_on:
       mysql:
         condition: service_healthy
@@ -67,6 +64,9 @@ services:
 networks:
   pbpis_network:
     driver: bridge
+  shared_network:
+    name: naudotojas_shared_network
+    external: true
 
 volumes:
   mysql_data:
