@@ -18,6 +18,7 @@ class SecurityHeaders
         $response = $next($request);
 
         // Content Security Policy
+        $appUrl = config('app.url');
         $cspDirectives = [
             "default-src 'self'",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval'" . (app()->environment('local') ? ' http://localhost:5173' : ''), // Allow inline scripts for Alpine.js and Vite
@@ -27,7 +28,7 @@ class SecurityHeaders
             "connect-src 'self' ws: wss:" . (app()->environment('local') ? ' ws://localhost:* wss://localhost:* http://localhost:*' : ''), // Allow WebSocket for Vite HMR
             "frame-ancestors 'none'",
             "base-uri 'self'",
-            "form-action 'self'",
+            "form-action 'self' " . $appUrl, // Allow forms to be submitted to the configured APP_URL
         ];
         
         $csp = implode('; ', $cspDirectives);

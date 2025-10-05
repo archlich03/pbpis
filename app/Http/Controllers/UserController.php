@@ -217,6 +217,7 @@ class UserController extends Controller
             return redirect()->route('login');
         }
         
+        // Only privileged users (IT admins and secretaries) can change passwords
         if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
@@ -228,36 +229,46 @@ class UserController extends Controller
                     'password' => __('Password changes are not allowed for Microsoft-linked accounts.')
                 ], 'updatePassword');
         }
-
-        if ($authenticatedUser->id !== $user->id) {
-            abort(403);
-        }
         
-        $request->validate([
-            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(12)->mixedCase()->numbers()->symbols()],
+        $validated = $request->validateWithBag('updatePassword', [
+            'password' => [
+                'required', 
+                'confirmed', 
+                \Illuminate\Validation\Rules\Password::min(12)
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised()
+            ],
+        ], [
+            'password.min' => __('The password must be at least :min characters.', ['min' => 12]),
+            'password.mixed' => __('The password must contain both uppercase and lowercase letters.'),
+            'password.numbers' => __('The password must contain at least one number.'),
+            'password.symbols' => __('The password must contain at least one special character (including Lithuanian characters: ąčęėįšųūž).'),
+            'password.uncompromised' => __('The password has appeared in a data leak. Please choose a different password.'),
+            'password.confirmed' => __('The password confirmation does not match.'),
         ]);
 
-        if ($request->filled('password')) {
-            $user->update([
-                'password' => bcrypt($request->input('password')),
-                'password_change_required' => false, // Clear forced password change flag
-            ]);
-            
-            // Log the password change
-            AuditLog::log(
-                $user->user_id,
-                'password_changed',
-                $request->ip(),
-                $request->userAgent(),
-                [
-                    'changed_by' => $authenticatedUser->user_id,
-                    'changed_by_name' => $authenticatedUser->name,
-                    'changed_by_role' => $authenticatedUser->role,
-                ]
-            );
-        }
+        $user->update([
+            'password' => bcrypt($validated['password']),
+            'password_change_required' => false, // Clear forced password change flag
+        ]);
+        
+        // Log the password change
+        AuditLog::log(
+            $user->user_id,
+            'password_changed',
+            $request->ip(),
+            $request->userAgent(),
+            [
+                'changed_by' => $authenticatedUser->user_id,
+                'changed_by_name' => $authenticatedUser->name,
+                'changed_by_role' => $authenticatedUser->role,
+            ]
+        );
 
-        return redirect()->route('users.index');
+        return redirect()->route('users.edit', $user)
+            ->with('status', 'password-updated');
     }
 
     public function dashboard(): View
@@ -407,6 +418,7 @@ class UserController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('action', 'LIKE', "%{$search}%")
                   ->orWhere('ip_address', 'LIKE', "%{$search}%")
+                  ->orWhere('user_agent', 'LIKE', "%{$search}%")
                   ->orWhere('details', 'LIKE', "%{$search}%");
             });
         }
@@ -456,6 +468,7 @@ class UserController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('action', 'LIKE', "%{$search}%")
                   ->orWhere('ip_address', 'LIKE', "%{$search}%")
+                  ->orWhere('user_agent', 'LIKE', "%{$search}%")
                   ->orWhere('details', 'LIKE', "%{$search}%")
                   ->orWhereHas('user', function($userQuery) use ($search) {
                       $userQuery->where('name', 'LIKE', "%{$search}%")

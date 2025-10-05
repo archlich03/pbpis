@@ -21,7 +21,7 @@
                                     <x-input-label for="search" :value="__('Search')" />
                                     <x-text-input id="search" name="search" type="text" 
                                                   value="{{ request('search') }}" 
-                                                  placeholder="{{ __('Search by action, IP, user...') }}" 
+                                                  placeholder="{{ __('Search by action, IP, user agent, user...') }}" 
                                                   class="mt-1 block w-full" />
                                 </div>
 
@@ -190,8 +190,17 @@
                                                 {{ $log->action_name }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                            {{ $log->ip_address }}
+                                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                            <div class="flex flex-col">
+                                                <span class="font-medium">{{ $log->ip_address }}</span>
+                                                @if($log->user_agent)
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate max-w-xs cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition-colors" 
+                                                          title="{{ $log->user_agent }} (Double-click to copy)"
+                                                          ondblclick="copyToClipboard(this, '{{ addslashes($log->user_agent) }}')">
+                                                        {{ Str::limit($log->user_agent, 50) }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                             @if($log->details)
@@ -304,5 +313,27 @@
                 }
             });
         });
+        
+        // Copy to clipboard function
+        function copyToClipboard(element, text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Show visual feedback
+                const originalText = element.textContent;
+                const originalTitle = element.title;
+                element.textContent = '✓ Copied!';
+                element.title = 'Copied to clipboard!';
+                element.classList.add('text-green-600', 'dark:text-green-400');
+                
+                // Reset after 1.5 seconds
+                setTimeout(function() {
+                    element.textContent = originalText;
+                    element.title = originalTitle;
+                    element.classList.remove('text-green-600', 'dark:text-green-400');
+                }, 1500);
+            }).catch(function(err) {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
     </script>
 </x-app-layout>

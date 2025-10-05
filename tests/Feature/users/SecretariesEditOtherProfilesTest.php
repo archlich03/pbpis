@@ -94,7 +94,7 @@ it('allows secretaries updating other user passwords', function () {
         ->withSession(['_token' => csrf_token()])
         ->patch(route('users.updatePassword', $targetUser), $passwordData);
 
-    $response->assertRedirect(route('users.index'));
+    $response->assertRedirect(route('users.edit', $targetUser));
 
     $targetUser->refresh();
     expect(Hash::check('OriginalPassword123!', $targetUser->password))->toBeFalse();
