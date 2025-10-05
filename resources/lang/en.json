@@ -119,5 +119,12 @@
     "Confirm Password": "Confirm Password",
     "Verify Email": "Verify Email",
     "You can use HTML formatting (e.g., <strong>, <em>, <p>, <br>, <ul>, <li>)": "You can use HTML formatting (e.g., <strong>, <em>, <p>, <br>, <ul>, <li>)",
-    "Enter detailed summary with HTML formatting if needed...": "Enter detailed summary with HTML formatting if needed..."
+    "Enter detailed summary with HTML formatting if needed...": "Enter detailed summary with HTML formatting if needed...",
+    "The password must be at least :min characters.": "The password must be at least :min characters long.",
+    "The password must contain both uppercase and lowercase letters.": "The password must contain both uppercase and lowercase letters.",
+    "The password must contain at least one number.": "The password must contain at least one number.",
+    "The password must contain at least one special character (including Lithuanian characters: ąčęėįšųūž).": "The password must contain at least one special character.",
+    "The password has appeared in a data leak. Please choose a different password.": "This password has appeared in a data leak. Please choose a different password.",
+    "The password confirmation does not match.": "The password confirmation does not match.",
+    "The current password is incorrect.": "The current password is incorrect."
 }

@@ -42,16 +42,24 @@
             @csrf
             @method('patch')
 
+            @if ($errors->updatePassword->any())
+                <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-red-900/20 dark:text-red-400" role="alert">
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach ($errors->updatePassword->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div>
                 <x-input-label for="update_password_password" :value="__('New Password')" />
                 <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-                <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
             </div>
 
             <div>
                 <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
                 <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-                <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
             </div>
 
             <div class="flex items-center gap-4">

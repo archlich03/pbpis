@@ -34,7 +34,18 @@ class NewPasswordController extends Controller
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email'],
-            'password' => ['required', 'confirmed', Rules\Password::min(12)->mixedCase()->numbers()->symbols()],
+            'password' => [
+                'required', 
+                'confirmed', 
+                Rules\Password::min(12)->mixedCase()->numbers()->symbols()->uncompromised()
+            ],
+        ], [
+            'password.min' => __('The password must be at least :min characters.', ['min' => 12]),
+            'password.mixed' => __('The password must contain both uppercase and lowercase letters.'),
+            'password.numbers' => __('The password must contain at least one number.'),
+            'password.symbols' => __('The password must contain at least one special character (including Lithuanian characters: ąčęėįšųūž).'),
+            'password.uncompromised' => __('The password has appeared in a data leak. Please choose a different password.'),
+            'password.confirmed' => __('The password confirmation does not match.'),
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we

@@ -25,16 +25,35 @@ class PasswordController extends Controller
             ], 'updatePassword');
         }
         
+        // Custom error messages for password validation
+        $messages = [
+            'current_password.current_password' => __('The current password is incorrect.'),
+            'password.min' => __('The password must be at least :min characters.', ['min' => 12]),
+            'password.mixed' => __('The password must contain both uppercase and lowercase letters.'),
+            'password.numbers' => __('The password must contain at least one number.'),
+            'password.symbols' => __('The password must contain at least one special character (including Lithuanian characters: ąčęėįšųūž).'),
+            'password.uncompromised' => __('The password has appeared in a data leak. Please choose a different password.'),
+            'password.confirmed' => __('The password confirmation does not match.'),
+        ];
+        
         // If password change is forced, don't require current password
         if ($user->password_change_required) {
             $validated = $request->validateWithBag('updatePassword', [
-                'password' => ['required', 'confirmed', Password::min(12)->mixedCase()->numbers()->symbols()],
-            ]);
+                'password' => [
+                    'required', 
+                    'confirmed', 
+                    Password::min(12)->mixedCase()->numbers()->symbols()->uncompromised()
+                ],
+            ], $messages);
         } else {
             $validated = $request->validateWithBag('updatePassword', [
                 'current_password' => ['required', 'current_password'],
-                'password' => ['required', 'confirmed', Password::min(12)->mixedCase()->numbers()->symbols()],
-            ]);
+                'password' => [
+                    'required', 
+                    'confirmed', 
+                    Password::min(12)->mixedCase()->numbers()->symbols()->uncompromised()
+                ],
+            ], $messages);
         }
 
         $user->update([
