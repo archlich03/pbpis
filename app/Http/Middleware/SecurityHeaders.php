@@ -28,7 +28,7 @@ class SecurityHeaders
             "connect-src 'self' ws: wss:" . (app()->environment('local') ? ' ws://localhost:* wss://localhost:* http://localhost:*' : ''), // Allow WebSocket for Vite HMR
             "frame-ancestors 'none'",
             "base-uri 'self'",
-            "form-action 'self'", // Allow forms to be submitted to same origin
+            "form-action 'self' {$appUrl}", // Allow forms to be submitted to same origin and APP_URL
         ];
         
         $csp = implode('; ', $cspDirectives);
