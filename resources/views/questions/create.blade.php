@@ -45,7 +45,6 @@
 
                         <div class="mt-4">
                             <x-input-label for="summary" value="{{ __('Question summary') }}:" />
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 mb-2">{{ __('Use the rich text editor to format your summary') }}</p>
                             <x-tiptap-editor name="summary" :value="old('summary', '')" id="summary" />
                         </div>
 

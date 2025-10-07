@@ -34,10 +34,18 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::min(12)->mixedCase()->numbers()->symbols()],
+            'password' => ['required', 'confirmed', Rules\Password::min(12)->mixedCase()->numbers()->symbols()->uncompromised()],
             'gender' => ['required', 'boolean'],
             'role' => ['required', 'string', 'max:32'],
             'pedagogical_name' => ['nullable', 'string', 'max:32'],
+        ], [
+            'email.unique' => __('A user with this email address already exists.'),
+            'password.min' => __('The password must be at least :min characters.', ['min' => 12]),
+            'password.mixed' => __('The password must contain both uppercase and lowercase letters.'),
+            'password.numbers' => __('The password must contain at least one number.'),
+            'password.symbols' => __('The password must contain at least one special character (including Lithuanian characters: ąčęėįšųūž).'),
+            'password.uncompromised' => __('The password has appeared in a data leak. Please choose a different password.'),
+            'password.confirmed' => __('The password confirmation does not match.'),
         ]);
 
         // Auto-detect gender if not provided or use provided value

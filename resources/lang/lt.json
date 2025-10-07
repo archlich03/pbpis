@@ -188,6 +188,7 @@
   "The password has appeared in a data leak. Please choose a different password.": "Šis slaptažodis buvo aptiktas duomenų nutekėjime. Pasirinkite kitą slaptažodį.",
   "The password confirmation does not match.": "Slaptažodžio patvirtinimas nesutampa.",
   "The current password is incorrect.": "Dabartinis slaptažodis neteisingas.",
+  "A user with this email address already exists.": "Vartotojas su šiuo el. pašto adresu jau egzistuoja.",
   "Edit User": "Redaguoti vartotoją",
   "Create Body": "Kurti padalinį",
   "Edit Body": "Redaguoti padalinį",
