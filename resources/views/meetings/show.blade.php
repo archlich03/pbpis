@@ -10,13 +10,13 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div x-data="{ activeTab: localStorage.getItem('meeting-{{ $meeting->meeting_id }}-tab') || 'info' }" 
+                <div x-data="{ activeTab: localStorage.getItem('meeting-{{ $meeting->meeting_id }}-tab') || 'voting' }" 
                      x-init="$watch('activeTab', value => localStorage.setItem('meeting-{{ $meeting->meeting_id }}-tab', value))"
                      class="text-gray-900 dark:text-gray-100">
                     
                     {{-- Tab Navigation --}}
-                    <div class="border-b border-gray-200 dark:border-gray-700">
-                        <nav class="flex flex-wrap -mb-px overflow-x-auto" aria-label="{{ __('Meeting sections') }}" role="tablist">
+                    <div class="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+                        <nav class="flex -mb-px min-w-max sm:min-w-0" aria-label="{{ __('Meeting sections') }}" role="tablist">
                             {{-- Info Tab --}}
                             <button @click="activeTab = 'info'" 
                                     :class="activeTab === 'info' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
