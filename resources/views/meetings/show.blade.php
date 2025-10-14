@@ -17,18 +17,20 @@
                     {{-- Tab Navigation --}}
                     <div class="border-b border-gray-200 dark:border-gray-700 overflow-x-auto scrollbar-hide" style="overflow-y: hidden;">
                         <nav class="flex -mb-px min-w-max sm:min-w-0 sm:flex-wrap" aria-label="{{ __('Meeting sections') }}" role="tablist">
-                            {{-- Info Tab --}}
-                            <button @click="activeTab = 'info'" 
-                                    :class="activeTab === 'info' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                                    class="whitespace-nowrap py-4 px-4 sm:px-6 border-b-2 font-medium text-sm transition-colors"
-                                    role="tab"
-                                    :aria-selected="activeTab === 'info'"
-                                    :tabindex="activeTab === 'info' ? 0 : -1">
-                                {{ __('Meeting information') }}
-                            </button>
+                            {{-- Info Tab - Hidden from regular voters --}}
+                            @if (Auth::User()->isPrivileged())
+                                <button @click="activeTab = 'info'" 
+                                        :class="activeTab === 'info' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                                        class="whitespace-nowrap py-4 px-4 sm:px-6 border-b-2 font-medium text-sm transition-colors"
+                                        role="tab"
+                                        :aria-selected="activeTab === 'info'"
+                                        :tabindex="activeTab === 'info' ? 0 : -1">
+                                    {{ __('Meeting information') }}
+                                </button>
+                            @endif
                             
-                            {{-- Attendance Tab - Only show when meeting is in progress --}}
-                            @if ($meeting->status == 'Vyksta')
+                            {{-- Attendance Tab - Only show to privileged users when meeting is in progress --}}
+                            @if (Auth::User()->isPrivileged() && $meeting->status == 'Vyksta')
                                 <button @click="activeTab = 'attendance'" 
                                         :class="activeTab === 'attendance' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
                                         class="whitespace-nowrap py-4 px-4 sm:px-6 border-b-2 font-medium text-sm transition-colors"
@@ -39,8 +41,8 @@
                                 </button>
                             @endif
                             
-                            {{-- Questions Tab --}}
-                            @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
+                            {{-- Questions Tab - Hidden from regular voters --}}
+                            @if (Auth::User()->isPrivileged())
                                 <button @click="activeTab = 'questions'" 
                                         :class="activeTab === 'questions' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
                                         class="whitespace-nowrap py-4 px-4 sm:px-6 border-b-2 font-medium text-sm transition-colors"
@@ -79,28 +81,32 @@
                     
                     {{-- Tab Panels --}}
                     <div class="p-6">
-                        {{-- Meeting Information Panel --}}
-                        <div x-show="activeTab === 'info'" 
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0"
-                             x-transition:enter-end="opacity-100"
-                             role="tabpanel"
-                             :aria-hidden="activeTab !== 'info'">
-                            @include('meetings.partials.meeting-info')
-                        </div>
+                        {{-- Meeting Information Panel - Hidden from regular voters --}}
+                        @if (Auth::User()->isPrivileged())
+                            <div x-show="activeTab === 'info'" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 role="tabpanel"
+                                 :aria-hidden="activeTab !== 'info'">
+                                @include('meetings.partials.meeting-info')
+                            </div>
+                        @endif
                         
-                        {{-- Attendance Management Panel --}}
-                        <div x-show="activeTab === 'attendance'" 
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0"
-                             x-transition:enter-end="opacity-100"
-                             role="tabpanel"
-                             :aria-hidden="activeTab !== 'attendance'">
-                            @include('meetings.partials.attendance-management')
-                        </div>
+                        {{-- Attendance Management Panel - Hidden from regular voters --}}
+                        @if (Auth::User()->isPrivileged())
+                            <div x-show="activeTab === 'attendance'" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 role="tabpanel"
+                                 :aria-hidden="activeTab !== 'attendance'">
+                                @include('meetings.partials.attendance-management')
+                            </div>
+                        @endif
                         
-                        {{-- Questions Panel --}}
-                        @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
+                        {{-- Questions Panel - Hidden from regular voters --}}
+                        @if (Auth::User()->isPrivileged())
                             <div x-show="activeTab === 'questions'" 
                                  x-transition:enter="transition ease-out duration-200"
                                  x-transition:enter-start="opacity-0"

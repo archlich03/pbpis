@@ -19,7 +19,7 @@
                         </x-secondary-button>
 
                         <form method="GET" class="flex flex-1 items-center gap-2">
-                            @foreach(request()->except('search', 'page') as $key => $value)
+                            @foreach(request()->except('search', 'page', 'show_deleted') as $key => $value)
                                 <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                             @endforeach
 
@@ -42,6 +42,30 @@
                             @endif
                         </form>
                     </div>
+
+                    @if(Auth::user()->role === 'IT administratorius')
+                        <div class="mb-4">
+                            <form method="GET" class="flex items-center gap-2">
+                                @foreach(request()->except('show_deleted', 'page') as $key => $value)
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endforeach
+                                
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input 
+                                        type="checkbox" 
+                                        name="show_deleted" 
+                                        value="1"
+                                        {{ $showDeleted ? 'checked' : '' }}
+                                        onchange="this.form.submit()"
+                                        class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:bg-gray-700"
+                                    />
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">
+                                        {{ __('Show deleted users') }}
+                                    </span>
+                                </label>
+                            </form>
+                        </div>
+                    @endif
                     @if (Auth::user()->isPrivileged())
                         @php
                         if (!function_exists('sortLink')) {
@@ -79,8 +103,13 @@
                             <tbody>
                                 @foreach ($users as $user)
                                     @if (Auth::user()->isPrivileged())
-                                        <tr>
-                                            <td class="border px-4 py-2">{{ $user->pedagogical_name }} {{ $user->name }}</td>
+                                        <tr class="{{ $user->trashed() ? 'bg-red-50 dark:bg-red-900/20' : '' }}">
+                                            <td class="border px-4 py-2">
+                                                {{ $user->pedagogical_name }} {{ $user->name }}
+                                                @if($user->trashed())
+                                                    <span class="ml-2 text-xs text-red-600 dark:text-red-400 font-semibold">({{ __('Deleted') }})</span>
+                                                @endif
+                                            </td>
                                             <td class="border px-4 py-2 break-words">{{ $user->email }}</td>
                                             @if (Auth::user()->isAdmin())
                                                 <td class="border px-2 py-2 whitespace-nowrap text-sm">{{ __($user->role) }}</td>
@@ -96,7 +125,18 @@
                                                 @endif
                                             </td>
                                             <td class="border px-2 py-2 whitespace-nowrap text-sm">
-                                                <a href="{{ route('users.edit', $user) }}" class="hover:underline font-semibold">{{ __('Edit') }}</a>
+                                                @if($user->trashed())
+                                                    @if(Auth::user()->role === 'IT administratorius')
+                                                        <form method="POST" action="{{ route('users.restore', $user->user_id) }}" class="inline">
+                                                            @csrf
+                                                            <button type="submit" class="text-green-600 dark:text-green-400 hover:underline font-semibold">
+                                                                {{ __('Restore') }}
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                @else
+                                                    <a href="{{ route('users.edit', $user) }}" class="hover:underline font-semibold">{{ __('Edit') }}</a>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endif

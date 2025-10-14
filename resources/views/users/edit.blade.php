@@ -39,7 +39,7 @@
 
                 @if (Auth::user()->role === 'IT administratorius')
 
-                    <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                    <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg relative z-10">
                         <div class="max-w-xl">
                             @include('users.partials.delete-user-form')
                         </div>

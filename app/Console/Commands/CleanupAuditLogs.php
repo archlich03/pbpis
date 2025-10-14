@@ -13,21 +13,21 @@ class CleanupAuditLogs extends Command
      *
      * @var string
      */
-    protected $signature = 'audit:cleanup {--days=30 : Number of days to keep audit logs}';
+    protected $signature = 'audit:cleanup';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Clean up audit logs older than specified days (default: 30 days)';
+    protected $description = 'Clean up audit logs older than configured retention period';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $days = $this->option('days');
+        $days = config('app.audit_log_retention_days', 90);
         $cutoffDate = Carbon::now()->subDays($days);
         
         $this->info("Cleaning up audit logs older than {$days} days (before {$cutoffDate->format('Y-m-d H:i:s')})...");

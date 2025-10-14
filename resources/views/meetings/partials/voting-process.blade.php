@@ -22,6 +22,14 @@
                                             <span class="font-semibold">{{ __('Proposal') }}:</span> {{ $question->decision }}
                                         </div>
                                     @endif
+                                    @if (!empty($question->summary))
+                                        <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                            <span class="font-semibold">{{ __('Summary') }}:</span>
+                                            <div class="prose prose-sm dark:prose-invert max-w-none mt-1">
+                                                {!! $question->summary !!}
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </td>
                             @if ($question->type == "Nebalsuoti")
@@ -99,6 +107,14 @@
                             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                                 <span class="font-semibold">{{ __('Proposal') }}:</span> {{ $question->decision }}
                             </p>
+                        @endif
+                        @if (!empty($question->summary))
+                            <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                <span class="font-semibold">{{ __('Summary') }}:</span>
+                                <div class="prose prose-sm dark:prose-invert max-w-none mt-1">
+                                    {!! $question->summary !!}
+                                </div>
+                            </div>
                         @endif
                     </div>
                     
