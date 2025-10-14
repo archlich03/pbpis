@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Schedule audit log cleanup to run daily at 2 AM
 Schedule::command('audit:cleanup')->dailyAt('02:00');
+
+// Schedule old data cleanup to run daily at 3 AM
+Schedule::command('cleanup:old-data')->dailyAt('03:00');

@@ -104,7 +104,7 @@ it('allows IT admins updating other user passwords', function () {
 });
 
 
-it('allows IT admins deleting other users', function () {
+it('allows IT admins deleting other users (soft delete)', function () {
     Session::start();
 
     $targetUser = User::factory()->create();
@@ -124,9 +124,15 @@ it('allows IT admins deleting other users', function () {
 
     $response->assertRedirect(route('users.index'));
 
-    $this->assertDatabaseMissing('users', [
+    // User should still exist in database but be soft deleted
+    $this->assertDatabaseHas('users', [
         'user_id' => $targetUser->user_id,
     ]);
+    
+    // Check that deleted_at is set
+    $targetUser->refresh();
+    expect($targetUser->trashed())->toBeTrue();
+    
     Session::flush();
     Session::invalidate();
 });

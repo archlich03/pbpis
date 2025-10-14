@@ -27,8 +27,14 @@ class UserController extends Controller
         $sort = request('sort', 'name');
         $direction = request('direction', 'asc');
         $search = request('search');
+        $showDeleted = request('show_deleted', false);
 
         $query = User::query();
+
+        // Include soft-deleted users if checkbox is checked
+        if ($showDeleted) {
+            $query->withTrashed();
+        }
 
         // Apply search if present
         if ($search) {
@@ -46,7 +52,7 @@ class UserController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        return view('users.index', compact('users'));
+        return view('users.index', compact('users', 'showDeleted'));
     }
 
     
@@ -131,10 +137,10 @@ class UserController extends Controller
             }
         }
         
-        // Log the deletion before actually deleting
+        // Log the soft deletion
         AuditLog::log(
             $user->user_id,
-            'user_deleted',
+            'user_soft_deleted',
             $request->ip(),
             $request->userAgent(),
             [
@@ -144,15 +150,58 @@ class UserController extends Controller
                 'deleted_user_name' => $user->name,
                 'deleted_user_email' => $user->email,
                 'deleted_user_role' => $user->role,
+                'retention_days' => config('app.data_retention_days', 455),
             ]
         );
         
+        // Soft delete the user (marks deleted_at timestamp)
         $user->delete();
 
         return redirect()->route('users.index')
             ->with('status', 'user-deleted');
     }
 
+    /**
+     * Restore a soft-deleted user.
+     */
+    public function restore($id): RedirectResponse
+    {
+        $authenticatedUser = Auth::user();
+        
+        // Only IT admins can restore users
+        if ($authenticatedUser->role !== 'IT administratorius') {
+            abort(403);
+        }
+        
+        $user = User::withTrashed()->findOrFail($id);
+        
+        if (!$user->trashed()) {
+            return redirect()->route('users.index')
+                ->withErrors(['restore' => 'User is not deleted.']);
+        }
+        
+        // Restore the user
+        $user->restore();
+        
+        // Log the restoration
+        AuditLog::log(
+            $user->user_id,
+            'user_restored',
+            request()->ip(),
+            request()->userAgent(),
+            [
+                'restored_by' => $authenticatedUser->user_id,
+                'restored_by_name' => $authenticatedUser->name,
+                'restored_by_role' => $authenticatedUser->role,
+                'restored_user_name' => $user->name,
+                'restored_user_email' => $user->email,
+                'restored_user_role' => $user->role,
+            ]
+        );
+        
+        return redirect()->route('users.index', ['show_deleted' => true])
+            ->with('status', 'user-restored');
+    }
     
     /**
      * Update the specified user's profile in storage.

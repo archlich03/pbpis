@@ -24,6 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/users/{user}/credentials', [UserController::class, 'updatePassword'])->name('users.updatePassword');
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
     
     // IT admin/secretary 2FA and password management
     Route::delete('/users/{user}/two-factor', [UserController::class, 'removeTwoFactor'])->name('users.remove-two-factor');

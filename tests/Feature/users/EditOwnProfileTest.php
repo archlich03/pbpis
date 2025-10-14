@@ -62,19 +62,20 @@ it('allows a user to change their own password', function () {
     expect(Hash::check('NewPassword456@', $user->password))->toBeTrue();
 });
 
-it('allows a user to delete their own profile', function () {
+it('prevents users from deleting their own profile', function () {
     $user = User::factory()->create([
         'password' => bcrypt('123456789'),
     ]);
 
     $this->actingAs($user)
-         ->startSession()  // Just add this line
+         ->startSession()
          ->delete(route('profile.destroy'), [
              'password' => '123456789',
          ])
-         ->assertRedirect('/');
+         ->assertForbidden();
 
-    $this->assertDatabaseMissing('users', [
+    // User should still exist
+    $this->assertDatabaseHas('users', [
         'user_id' => $user->user_id,
     ]);
 });

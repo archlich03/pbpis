@@ -17,6 +17,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Data Retention Period
+    |--------------------------------------------------------------------------
+    |
+    | Number of days to retain soft-deleted users and old meetings before
+    | permanent deletion. Soft-deleted users and meetings that finished
+    | voting will be permanently deleted after this period.
+    |
+    */
+
+    'data_retention_days' => env('DATA_RETENTION_DAYS', 455),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |
