@@ -5,8 +5,6 @@
     @endphp
     
     @if ($canEditAttendance)
-        <details class="mb-4" open>
-            <summary class="text-xl font-semibold"><span class="cursor-pointer">{{ __('Meeting Attendance') }}</span></summary>
             <div class="ml-4">
                 @if (Auth::user()->isPrivileged())
                     <div class="mb-4 space-x-2">
@@ -110,6 +108,5 @@
                     </div>
                 </div>
             </div>
-        </details>
     @endif
 @endif
