@@ -54,6 +54,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/meetings/{meeting}/protocolHTML', [MeetingController::class, 'protocol'])->name('meetings.protocol');
     Route::get('/meetings/{meeting}/protocolDOCX', [MeetingController::class, 'protocolDOCX'])->name('meetings.docx');
     Route::get('/meetings/{meeting}/protocolPDF', [MeetingController::class, 'protocolPDF'])->name('meetings.pdf');
+    Route::get('/meetings/{meeting}/voting-report', [MeetingController::class, 'votingReport'])->name('meetings.voting-report');
 });
 
 // Attendance routes

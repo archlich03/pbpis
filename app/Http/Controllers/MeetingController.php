@@ -224,7 +224,7 @@ class MeetingController extends Controller
     
     public function protocol(Meeting $meeting)
     {
-        if (!Auth::user()->isPrivileged() && !$meeting->body->members->contains(Auth::user())) {
+        if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
 
@@ -233,7 +233,7 @@ class MeetingController extends Controller
 
     public function protocolPDF(Meeting $meeting)
     {
-        if (!Auth::user()->isPrivileged() && !$meeting->body->members->contains(Auth::user())) {
+        if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
 
@@ -244,7 +244,7 @@ class MeetingController extends Controller
 
     public function protocolDOCX(Meeting $meeting)
     {
-        if (!Auth::user()->isPrivileged() && !$meeting->body->members->contains(Auth::user())) {
+        if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
 
@@ -431,5 +431,34 @@ class MeetingController extends Controller
         $objWriter->save($tempFile);
 
         return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Display voting report for the meeting
+     *
+     * @param Meeting $meeting
+     * @return \Illuminate\Http\Response
+     */
+    public function votingReport(Meeting $meeting)
+    {
+        // Only allow access to IT admins and secretaries
+        if (!Auth::user()->isPrivileged()) {
+            abort(403);
+        }
+
+        // Get all present members (those with attendance records), sorted alphabetically
+        $attendanceRecords = $meeting->attendances()->pluck('user_id');
+        $presentMembers = $meeting->body->members
+            ->filter(function ($member) use ($attendanceRecords) {
+                return $attendanceRecords->contains($member->user_id);
+            })
+            ->sortBy('name');
+
+        // Get all questions with votes
+        $questions = $meeting->questions()->with(['votes' => function ($query) {
+            $query->orderBy('created_at', 'asc');
+        }])->get();
+
+        return view('meetings.voting-report', compact('meeting', 'presentMembers', 'questions'));
     }
 }

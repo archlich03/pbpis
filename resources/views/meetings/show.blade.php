@@ -9,42 +9,169 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    {{-- Meeting Information Section --}}
-                    @include('meetings.partials.meeting-info')
+            <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg" style="overflow: visible;">
+                <div x-data="{ activeTab: localStorage.getItem('meeting-{{ $meeting->meeting_id }}-tab') || 'voting' }" 
+                     x-init="$watch('activeTab', value => localStorage.setItem('meeting-{{ $meeting->meeting_id }}-tab', value))"
+                     class="text-gray-900 dark:text-gray-100">
                     
-                    <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
+                    {{-- Tab Navigation --}}
+                    <div class="border-b border-gray-200 dark:border-gray-700 overflow-x-auto scrollbar-hide" style="overflow-y: hidden;">
+                        <nav class="flex -mb-px min-w-max sm:min-w-0 sm:flex-wrap" aria-label="{{ __('Meeting sections') }}" role="tablist">
+                            {{-- Info Tab --}}
+                            <button @click="activeTab = 'info'" 
+                                    :class="activeTab === 'info' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                                    class="whitespace-nowrap py-4 px-4 sm:px-6 border-b-2 font-medium text-sm transition-colors"
+                                    role="tab"
+                                    :aria-selected="activeTab === 'info'"
+                                    :tabindex="activeTab === 'info' ? 0 : -1">
+                                {{ __('Meeting information') }}
+                            </button>
+                            
+                            {{-- Attendance Tab - Only show when meeting is in progress --}}
+                            @if ($meeting->status == 'Vyksta')
+                                <button @click="activeTab = 'attendance'" 
+                                        :class="activeTab === 'attendance' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                                        class="whitespace-nowrap py-4 px-4 sm:px-6 border-b-2 font-medium text-sm transition-colors"
+                                        role="tab"
+                                        :aria-selected="activeTab === 'attendance'"
+                                        :tabindex="activeTab === 'attendance' ? 0 : -1">
+                                    {{ __('Attendance') }}
+                                </button>
+                            @endif
+                            
+                            {{-- Questions Tab --}}
+                            @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
+                                <button @click="activeTab = 'questions'" 
+                                        :class="activeTab === 'questions' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                                        class="whitespace-nowrap py-4 px-4 sm:px-6 border-b-2 font-medium text-sm transition-colors"
+                                        role="tab"
+                                        :aria-selected="activeTab === 'questions'"
+                                        :tabindex="activeTab === 'questions' ? 0 : -1">
+                                    {{ __('Questions') }}
+                                </button>
+                            @endif
+                            
+                            {{-- Voting Tab --}}
+                            @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
+                                <button @click="activeTab = 'voting'" 
+                                        :class="activeTab === 'voting' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                                        class="whitespace-nowrap py-4 px-4 sm:px-6 border-b-2 font-medium text-sm transition-colors"
+                                        role="tab"
+                                        :aria-selected="activeTab === 'voting'"
+                                        :tabindex="activeTab === 'voting' ? 0 : -1">
+                                    {{ __('Voting') }}
+                                </button>
+                            @endif
+                            
+                            {{-- Proxy Voting Tab - Only show when meeting is in progress --}}
+                            @if ((Auth::user()->isPrivileged() || Auth::user()->isSecretary()) && $meeting->status == 'Vyksta')
+                                <button @click="activeTab = 'proxy'" 
+                                        :class="activeTab === 'proxy' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                                        class="whitespace-nowrap py-4 px-4 sm:px-6 border-b-2 font-medium text-sm transition-colors"
+                                        role="tab"
+                                        :aria-selected="activeTab === 'proxy'"
+                                        :tabindex="activeTab === 'proxy' ? 0 : -1">
+                                    {{ __('Proxy Voting') }}
+                                </button>
+                            @endif
+                        </nav>
+                    </div>
                     
-                    {{-- Attendance Management Section --}}
-                    @include('meetings.partials.attendance-management')
-                    
-                    @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
-                        <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
-                    @endif
-                    
-                    {{-- Questions Section --}}
-                    @include('meetings.partials.questions-section')
-                    
-                    @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
-                        <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
-                    @endif
-                    
-                    {{-- Voting Process Section --}}
-                    @include('meetings.partials.voting-process')
-                    
-                    @if (Auth::user()->isPrivileged() || Auth::user()->isSecretary())
-                        <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
-                    @endif
-                    
-                    {{-- Proxy Voting Section --}}
-                    @include('meetings.partials.proxy-voting')
+                    {{-- Tab Panels --}}
+                    <div class="p-6">
+                        {{-- Meeting Information Panel --}}
+                        <div x-show="activeTab === 'info'" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0"
+                             x-transition:enter-end="opacity-100"
+                             role="tabpanel"
+                             :aria-hidden="activeTab !== 'info'">
+                            @include('meetings.partials.meeting-info')
+                        </div>
+                        
+                        {{-- Attendance Management Panel --}}
+                        <div x-show="activeTab === 'attendance'" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0"
+                             x-transition:enter-end="opacity-100"
+                             role="tabpanel"
+                             :aria-hidden="activeTab !== 'attendance'">
+                            @include('meetings.partials.attendance-management')
+                        </div>
+                        
+                        {{-- Questions Panel --}}
+                        @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
+                            <div x-show="activeTab === 'questions'" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 role="tabpanel"
+                                 :aria-hidden="activeTab !== 'questions'">
+                                @include('meetings.partials.questions-section')
+                            </div>
+                        @endif
+                        
+                        {{-- Voting Process Panel --}}
+                        @if ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged())
+                            <div x-show="activeTab === 'voting'" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 role="tabpanel"
+                                 :aria-hidden="activeTab !== 'voting'">
+                                @include('meetings.partials.voting-process')
+                            </div>
+                        @endif
+                        
+                        {{-- Proxy Voting Panel --}}
+                        @if (Auth::user()->isPrivileged() || Auth::user()->isSecretary())
+                            <div x-show="activeTab === 'proxy'" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 role="tabpanel"
+                                 :aria-hidden="activeTab !== 'proxy'">
+                                @include('meetings.partials.proxy-voting')
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Keyboard navigation for tabs (accessibility)
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('[role="tab"]');
+            
+            tabButtons.forEach((tab, index) => {
+                tab.addEventListener('keydown', function(e) {
+                    let newIndex;
+                    
+                    // Arrow key navigation
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        newIndex = (index + 1) % tabButtons.length;
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        newIndex = (index - 1 + tabButtons.length) % tabButtons.length;
+                    } else if (e.key === 'Home') {
+                        e.preventDefault();
+                        newIndex = 0;
+                    } else if (e.key === 'End') {
+                        e.preventDefault();
+                        newIndex = tabButtons.length - 1;
+                    }
+                    
+                    if (newIndex !== undefined) {
+                        tabButtons[newIndex].click();
+                        tabButtons[newIndex].focus();
+                    }
+                });
+            });
+        });
+        
         // Persist details element state
         document.addEventListener('DOMContentLoaded', function() {
             const details = document.querySelectorAll('details');

@@ -189,6 +189,18 @@
   "The password confirmation does not match.": "Slaptažodžio patvirtinimas nesutampa.",
   "The current password is incorrect.": "Dabartinis slaptažodis neteisingas.",
   "A user with this email address already exists.": "Vartotojas su šiuo el. pašto adresu jau egzistuoja.",
+  "Attendance": "Dalyvavimas",
+  "Voting": "Balsavimas",
+  "Meeting sections": "Posėdžio skyriai",
+  "Generate Protocol": "Generuoti protokolą",
+  "View HTML": "Peržiūrėti HTML",
+  "Download PDF": "Atsisiųsti PDF",
+  "Download DOCX": "Atsisiųsti DOCX",
+  "Voting results": "Balsavimo rezultatai",
+  "Individual votes": "Individualūs balsai",
+  "Did not vote": "Nebalsuota",
+  "None": "Nėra",
+  "Voting Report": "Balsavimo ataskaita",
   "Edit User": "Redaguoti vartotoją",
   "Create Body": "Kurti padalinį",
   "Edit Body": "Redaguoti padalinį",
@@ -335,7 +347,7 @@
   "Quorum not reached": "Kvorumas nepasiektas",
   "Voting is allowed": "Balsavimas leidžiamas",
 
-  "Required": "Reikalinga",
+  "Required": "Reikalingi",
   "attendees": "dalyviai",
   "No Quorum": "Nėra kvorumo",
   "Required to pass": "Reikia priėmimui",
@@ -383,5 +395,6 @@
   "numbered list": "numeruotas sąrašas",
   "Question title": "Klausimo pavadinimas",
   "Voting type": "Balsavimo tipas",
-  "Update Meeting": "Atnaujinti posėdį"
+  "Update Meeting": "Atnaujinti posėdį",
+  "Proposal": "Siūloma"
 }

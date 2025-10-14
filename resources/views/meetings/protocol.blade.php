@@ -1,30 +1,5 @@
 <title>{{ __('Meeting Protocol') }}</title>
 <style>
-/*@font-face {
-    font-family:'Times';
-    src:url("{{ storage_path('fonts/LiberationSerif-Regular.ttf') }}") format("truetype");
-    font-weight:normal;
-    font-style:normal;
-}
-@font-face {
-    font-family:'Times';
-    src:url("{{ storage_path('fonts/LiberationSerif-Bold.ttf') }}") format("truetype");
-    font-weight:bold;
-    font-style:normal;
-}
-@font-face {
-    font-family:'Times';
-    src:url("{{ storage_path('fonts/LiberationSerif-Italic.ttf') }}") format("truetype");
-    font-weight:normal;
-    font-style:italic;
-}
-@font-face {
-    font-family:'Times';
-    src:url("{{ storage_path('fonts/LiberationSerif-BoldItalic.ttf') }}") format("truetype");
-    font-weight:bold;
-    font-style:italic;
-}*/
-
 @font-face {
     font-family:'FreeSerif';
     src:url("{{ storage_path('fonts/FreeSerif-Regular.ttf') }}") format("truetype");

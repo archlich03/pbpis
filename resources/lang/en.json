@@ -127,5 +127,18 @@
     "The password has appeared in a data leak. Please choose a different password.": "This password has appeared in a data leak. Please choose a different password.",
     "The password confirmation does not match.": "The password confirmation does not match.",
     "The current password is incorrect.": "The current password is incorrect.",
-    "A user with this email address already exists.": "A user with this email address already exists."
+    "A user with this email address already exists.": "A user with this email address already exists.",
+    "Attendance": "Attendance",
+    "Questions": "Questions",
+    "Voting": "Voting",
+    "Meeting sections": "Meeting sections",
+    "Generate Protocol": "Generate Protocol",
+    "View HTML": "View HTML",
+    "Download PDF": "Download PDF",
+    "Download DOCX": "Download DOCX",
+    "Voting results": "Voting results",
+    "Individual votes": "Individual votes",
+    "Did not vote": "Did not vote",
+    "None": "None",
+    "Voting Report": "Voting Report"
 }
