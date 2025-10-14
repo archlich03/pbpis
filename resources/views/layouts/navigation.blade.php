@@ -15,14 +15,14 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('bodies.index')" :active="request()->routeIs('bodies.create')">
+                    <x-nav-link :href="route('bodies.index')" :active="request()->routeIs('bodies.*')">
                         {{ __('Bodies') }}
                     </x-nav-link>
                     @if (Auth::user()->isPrivileged())
-                        <x-nav-link :href="route('meetings.index')" :active="request()->routeIs('meetings.index')">
+                        <x-nav-link :href="route('meetings.index')" :active="request()->routeIs('meetings.*')">
                             {{ __('Meetings') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*') || request()->routeIs('register')">
                             {{ __('Users') }}
                         </x-nav-link>
                         @if(in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
@@ -118,15 +118,15 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('bodies.index')" :active="request()->routeIs('bodies.index')">
+            <x-responsive-nav-link :href="route('bodies.index')" :active="request()->routeIs('bodies.*')">
                 {{ __('Bodies') }}
             </x-responsive-nav-link>
             
             @if (Auth::user()->isPrivileged())
-                <x-responsive-nav-link :href="route('meetings.index')" :active="request()->routeIs('meetings.index')">
+                <x-responsive-nav-link :href="route('meetings.index')" :active="request()->routeIs('meetings.*')">
                     {{ __('Meetings') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*') || request()->routeIs('register')">
                     {{ __('Users') }}
                 </x-responsive-nav-link>
                 @if(in_array(Auth::user()->role, ['IT administratorius', 'Sekretorius']))
@@ -177,6 +177,10 @@
                 
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
+                </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('user.history')">
+                    {{ __('History') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
