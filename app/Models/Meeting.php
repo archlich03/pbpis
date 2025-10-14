@@ -153,7 +153,7 @@ class Meeting extends Model
         return [
             'Už' => $votes->where('choice', 'Už')->count(),
             'Prieš' => $votes->where('choice', 'Prieš')->count(),
-            'Susilaikė' => $votes->where('choice', 'Susilaiko')->count(),
+            'Susilaiko' => $votes->where('choice', 'Susilaiko')->count(),
         ];
     }
 

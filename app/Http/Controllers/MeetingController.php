@@ -432,4 +432,33 @@ class MeetingController extends Controller
 
         return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
+
+    /**
+     * Display voting report for the meeting
+     *
+     * @param Meeting $meeting
+     * @return \Illuminate\Http\Response
+     */
+    public function votingReport(Meeting $meeting)
+    {
+        // Only allow access to body members and privileged users
+        if (!$meeting->body->members->contains(Auth::user()) && !Auth::user()->isPrivileged()) {
+            abort(403);
+        }
+
+        // Get all present members (those with attendance records), sorted alphabetically
+        $attendanceRecords = $meeting->attendances()->pluck('user_id');
+        $presentMembers = $meeting->body->members
+            ->filter(function ($member) use ($attendanceRecords) {
+                return $attendanceRecords->contains($member->user_id);
+            })
+            ->sortBy('name');
+
+        // Get all questions with votes
+        $questions = $meeting->questions()->with(['votes' => function ($query) {
+            $query->orderBy('created_at', 'asc');
+        }])->get();
+
+        return view('meetings.voting-report', compact('meeting', 'presentMembers', 'questions'));
+    }
 }
