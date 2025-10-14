@@ -224,7 +224,7 @@ class MeetingController extends Controller
     
     public function protocol(Meeting $meeting)
     {
-        if (!Auth::user()->isPrivileged() && !$meeting->body->members->contains(Auth::user())) {
+        if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
 
@@ -233,7 +233,7 @@ class MeetingController extends Controller
 
     public function protocolPDF(Meeting $meeting)
     {
-        if (!Auth::user()->isPrivileged() && !$meeting->body->members->contains(Auth::user())) {
+        if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
 
@@ -244,7 +244,7 @@ class MeetingController extends Controller
 
     public function protocolDOCX(Meeting $meeting)
     {
-        if (!Auth::user()->isPrivileged() && !$meeting->body->members->contains(Auth::user())) {
+        if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
 
@@ -441,8 +441,8 @@ class MeetingController extends Controller
      */
     public function votingReport(Meeting $meeting)
     {
-        // Only allow access to body members and privileged users
-        if (!$meeting->body->members->contains(Auth::user()) && !Auth::user()->isPrivileged()) {
+        // Only allow access to IT admins and secretaries
+        if (!Auth::user()->isPrivileged()) {
             abort(403);
         }
 

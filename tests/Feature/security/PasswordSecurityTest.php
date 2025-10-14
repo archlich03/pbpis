@@ -101,13 +101,16 @@ it('rejects passwords without symbols', function () {
 it('accepts strong passwords', function () {
     $admin = User::factory()->create(['role' => 'IT administratorius']);
     
+    // Use a unique strong password that won't be in breach databases
+    $uniquePassword = 'Xk9#mP2$vL8@qW5!rT3^yN7&';
+    
     $response = $this->actingAs($admin)
         ->withSession(['_token' => csrf_token()])
         ->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'password' => 'StrongPassword123!',
-            'password_confirmation' => 'StrongPassword123!',
+            'password' => $uniquePassword,
+            'password_confirmation' => $uniquePassword,
             'gender' => 0,
             'role' => 'Balsuojantysis',
             '_token' => csrf_token(),
