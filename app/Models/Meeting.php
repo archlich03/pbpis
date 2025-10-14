@@ -177,19 +177,10 @@ class Meeting extends Model
         $votesAgainst = $voteCounts['Prieš'];
         
         // Determine threshold based on voting type
-        if ($question->type === '2/3 dauguma') {
-            // 2/3 majority: need >= 2/3 of all body members
-            $totalMembers = $this->body->members->count();
-            $majorityThreshold = ($totalMembers * 2 / 3) - 0.01; // Use -0.01 to make >= work with >
-        } elseif ($question->type === 'Dalyvių dauguma') {
-            // Attendee majority: need > 50% of attendees
-            $attendees = $this->getAttendeesCount();
-            $majorityThreshold = $attendees / 2;
-        } else {
-            // Simple majority (Balsuoti dauguma): need > 50% of all body members
-            $totalMembers = $this->body->members->count();
-            $majorityThreshold = $totalMembers / 2;
-        }
+        $totalMembers = $this->body->members->count();
+        
+        // Simple majority (Balsuoti dauguma): need > 50% of all body members
+        $majorityThreshold = $totalMembers / 2;
 
         // Decision is adopted only if votes_for > majority_threshold
         if ($votesFor > $majorityThreshold) {

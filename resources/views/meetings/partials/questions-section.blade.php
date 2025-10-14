@@ -15,7 +15,7 @@
                 </div>
                 @if($meeting->questions->count() > 1)
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-4" x-show="reorderMode">
-                        {{ __('Use the up and down buttons to reorder questions. Changes will be saved automatically.') }}
+                        {{ __('Drag and drop questions to reorder them. Changes will be saved automatically.') }}
                     </p>
                 @endif
             </div>
@@ -108,8 +108,18 @@
 
                     @if (!Auth::User()->isPrivileged())
                         <p><strong>{{ __('Presenter') }}:</strong> {{ optional($question->presenter)->pedagogical_name ?? '' }} {{ optional($question->presenter)->name ?? '' }}</p>
-                        @if (!empty($question->decision))
-                            <p><strong>{{ __('Decision') }}:</strong> {{ $question->decision }}</p>
+                        @if ($question->type != 'Nebalsuoti' && $meeting->status == 'Baigtas')
+                            @php
+                                $questionPassed = $meeting->calculateQuestionResult($question);
+                            @endphp
+                            <p>
+                                <strong>{{ __('Decision') }}:</strong>
+                                @if ($questionPassed)
+                                    <span class="text-green-600 dark:text-green-400 font-semibold">{{ __('Passed') }}</span>
+                                @else
+                                    <span class="text-red-600 dark:text-red-400 font-semibold">{{ __('Not Passed') }}</span>
+                                @endif
+                            </p>
                         @endif
                         @if (!empty($question->summary))
                             <div class="mt-2">
