@@ -14,7 +14,16 @@
 
                     @foreach ($meeting->questions as $question)
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <td class="px-6 py-4">{{ $loop->iteration }}. {{ $question->title }}</td>
+                            <td class="px-6 py-4">
+                                <div>
+                                    <div class="font-medium">{{ $loop->iteration }}. {{ $question->title }}</div>
+                                    @if ($question->type != "Nebalsuoti" && !empty($question->decision))
+                                        <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                            <span class="font-semibold">{{ __('Proposal') }}:</span> {{ $question->decision }}
+                                        </div>
+                                    @endif
+                                </div>
+                            </td>
                             @if ($question->type == "Nebalsuoti")
                                 <td class="px-6 py-4" colspan="{{ count(\App\Models\Vote::STATUSES) }}">
                                     <i>{{ __('Casting vote is not needed.') }}</i>
@@ -86,6 +95,11 @@
                         <h3 class="font-semibold text-gray-900 dark:text-gray-100">
                             {{ $loop->iteration }}. {{ $question->title }}
                         </h3>
+                        @if ($question->type != "Nebalsuoti" && !empty($question->decision))
+                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                <span class="font-semibold">{{ __('Proposal') }}:</span> {{ $question->decision }}
+                            </p>
+                        @endif
                     </div>
                     
                     @if ($question->type == "Nebalsuoti")

@@ -127,6 +127,11 @@
             color: #B8860B;
             font-weight: bold;
         }
+
+        .no-vote {
+            color: #000000;
+            font-weight: bold;
+        }
         
         .timestamp {
             font-size: 10pt;
@@ -260,12 +265,10 @@
                             $questionVotes = [];
                             foreach ($presentMembers as $member) {
                                 $vote = $question->votes()->where('user_id', $member->user_id)->first();
-                                if ($vote) {
-                                    $questionVotes[] = [
-                                        'member' => $member,
-                                        'vote' => $vote
-                                    ];
-                                }
+                                $questionVotes[] = [
+                                    'member' => $member,
+                                    'vote' => $vote
+                                ];
                             }
                         @endphp
                         
@@ -274,23 +277,31 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $voteData['member']->pedagogical_name }} {{ $voteData['member']->name }}</td>
                                 <td>
-                                    @php
-                                        $voteClass = match($voteData['vote']->choice) {
-                                            'Už' => 'vote-for',
-                                            'Prieš' => 'vote-against',
-                                            'Susilaiko' => 'vote-abstain',
-                                            default => ''
-                                        };
-                                    @endphp
-                                    <span class="{{ $voteClass }}">{{ $voteData['vote']->choice }}</span>
+                                    @if ($voteData['vote'])
+                                        @php
+                                            $voteClass = match($voteData['vote']->choice) {
+                                                'Už' => 'vote-for',
+                                                'Prieš' => 'vote-against',
+                                                'Susilaiko' => 'vote-abstain',
+                                                default => ''
+                                            };
+                                        @endphp
+                                        <span class="{{ $voteClass }}">{{ $voteData['vote']->choice }}</span>
+                                    @else
+                                        <span class="text-gray-500 no-vote">Nebalsavo</span>
+                                    @endif
                                 </td>
                                 <td class="timestamp">
-                                    {{ $voteData['vote']->created_at->format('Y-m-d H:i:s') }}
+                                    @if ($voteData['vote'])
+                                        {{ $voteData['vote']->created_at->format('Y-m-d H:i:s') }}
+                                    @else
+                                        <span class="text-gray-500">—</span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="no-votes">Nė vienas dalyvis nebalsavo už šį klausimą.</td>
+                                <td colspan="4" class="no-votes">Nė vienas dalyvis nedalyvavo posėdyje.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -308,7 +319,7 @@
             @endif
         </div>
     @endforeach
-    
+
     <div class="signature-block">
         <div class="signature-line">
             <p>Sekretorius:</p>

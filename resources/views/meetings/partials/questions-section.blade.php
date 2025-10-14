@@ -43,7 +43,7 @@
                                     $voteCounts = $meeting->getVoteCounts($question);
                                     $questionPassed = $meeting->calculateQuestionResult($question);
                                 @endphp
-                                @if ($voteCounts['Už'] > 0 || $voteCounts['Prieš'] > 0 || $voteCounts['Susilaikė'] > 0)
+                                @if (($voteCounts['Už'] ?? 0) > 0 || ($voteCounts['Prieš'] ?? 0) > 0 || ($voteCounts['Susilaiko'] ?? 0) > 0)
                                     @if ($questionPassed)
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
                                             {{ __('Passed') }}
@@ -89,9 +89,9 @@
                             {{-- After voting ends, show detailed results --}}
                             <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">
                                 <strong>{{ __('Vote counts') }}:</strong> 
-                                {{ __('Už') }}: {{ $voteCounts['Už'] }}, 
-                                {{ __('Prieš') }}: {{ $voteCounts['Prieš'] }}, 
-                                {{ __('Susilaikė') }}: {{ $voteCounts['Susilaikė'] }}
+                                {{ __('Už') }}: {{ $voteCounts['Už'] ?? 0 }}, 
+                                {{ __('Prieš') }}: {{ $voteCounts['Prieš'] ?? 0 }}, 
+                                {{ __('Susilaikė') }}: {{ $voteCounts['Susilaiko'] ?? 0 }}
                             </div>
                             
                             <div class="text-sm mb-2">
