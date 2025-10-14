@@ -508,8 +508,7 @@ class UserController extends Controller
             abort(403);
         }
         
-        $query = AuditLog::with('user')
-            ->orderBy('created_at', 'desc');
+        $query = AuditLog::with('user');
         
         // Search functionality
         if ($request->filled('search')) {

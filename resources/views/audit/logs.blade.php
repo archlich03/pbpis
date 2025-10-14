@@ -127,34 +127,34 @@
                             <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc']) }}" class="hover:text-gray-700 dark:hover:text-gray-100">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'direction' => (request('sort') == 'created_at' && request('direction') == 'asc') ? 'desc' : 'asc']) }}" class="hover:text-gray-700 dark:hover:text-gray-100">
                                             {{ __('Date') }}
-                                            @if(request('sort') == 'created_at')
-                                                @if(request('direction') == 'asc') ↑ @else ↓ @endif
+                                            @if(request('sort', 'created_at') == 'created_at')
+                                                @if(request('direction', 'desc') == 'asc') ↑ @else ↓ @endif
                                             @endif
                                         </a>
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'user_id', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc']) }}" class="hover:text-gray-700 dark:hover:text-gray-100">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'user_id', 'direction' => (request('sort') == 'user_id' && request('direction') == 'asc') ? 'desc' : 'asc']) }}" class="hover:text-gray-700 dark:hover:text-gray-100">
                                             {{ __('User') }}
                                             @if(request('sort') == 'user_id')
-                                                @if(request('direction') == 'asc') ↑ @else ↓ @endif
+                                                @if(request('direction', 'desc') == 'asc') ↑ @else ↓ @endif
                                             @endif
                                         </a>
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'action', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc']) }}" class="hover:text-gray-700 dark:hover:text-gray-100">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'action', 'direction' => (request('sort') == 'action' && request('direction') == 'asc') ? 'desc' : 'asc']) }}" class="hover:text-gray-700 dark:hover:text-gray-100">
                                             {{ __('Action') }}
                                             @if(request('sort') == 'action')
-                                                @if(request('direction') == 'asc') ↑ @else ↓ @endif
+                                                @if(request('direction', 'desc') == 'asc') ↑ @else ↓ @endif
                                             @endif
                                         </a>
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'ip_address', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc']) }}" class="hover:text-gray-700 dark:hover:text-gray-100">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'ip_address', 'direction' => (request('sort') == 'ip_address' && request('direction') == 'asc') ? 'desc' : 'asc']) }}" class="hover:text-gray-700 dark:hover:text-gray-100">
                                             {{ __('IP Address') }}
                                             @if(request('sort') == 'ip_address')
-                                                @if(request('direction') == 'asc') ↑ @else ↓ @endif
+                                                @if(request('direction', 'desc') == 'asc') ↑ @else ↓ @endif
                                             @endif
                                         </a>
                                     </th>

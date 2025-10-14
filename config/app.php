@@ -30,6 +30,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Audit Log Retention Period
+    |--------------------------------------------------------------------------
+    |
+    | Number of days to retain audit logs before deletion.
+    | Audit logs older than this period will be permanently deleted.
+    |
+    */
+
+    'audit_log_retention_days' => env('AUDIT_LOG_RETENTION_DAYS', 90),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |
