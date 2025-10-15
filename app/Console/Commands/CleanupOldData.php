@@ -41,6 +41,7 @@ class CleanupOldData extends Command
         $this->info("Permanently deleted {$deletedUsersCount} soft-deleted user(s).");
 
         // Delete meetings that finished voting more than retention period ago
+        // This will cascade delete: questions, votes, attendance records, and discussions
         $oldMeetingsCount = Meeting::where('vote_end', '<=', $cutoffDate)
             ->where('status', 'Baigtas')
             ->count();
@@ -50,7 +51,7 @@ class CleanupOldData extends Command
                 ->where('status', 'Baigtas')
                 ->delete();
 
-            $this->info("Deleted {$oldMeetingsCount} old meeting(s) and all related data.");
+            $this->info("Deleted {$oldMeetingsCount} old meeting(s) and all related data (questions, votes, attendance, discussions).");
         } else {
             $this->info("No old meetings to delete.");
         }

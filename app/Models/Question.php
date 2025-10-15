@@ -88,5 +88,15 @@ class Question extends Model
     {
         return $this->votes()->where('user_id', $user->user_id)->first();
     }
+
+    /**
+     * Get the discussions for the question.
+     */
+    public function discussions(): HasMany
+    {
+        return $this->hasMany(Discussion::class, 'question_id', 'question_id')
+                    ->whereNull('parent_id')
+                    ->orderBy('created_at', 'asc');
+    }
 }
 

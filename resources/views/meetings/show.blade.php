@@ -76,6 +76,18 @@
                                     {{ __('Proxy Voting') }}
                                 </button>
                             @endif
+                            
+                            {{-- Discussions Tab - Only for e-vote meetings --}}
+                            @if ($meeting->is_evote && ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged()))
+                                <button @click="activeTab = 'discussions'" 
+                                        :class="activeTab === 'discussions' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                                        class="whitespace-nowrap py-4 px-4 sm:px-6 border-b-2 font-medium text-sm transition-colors"
+                                        role="tab"
+                                        :aria-selected="activeTab === 'discussions'"
+                                        :tabindex="activeTab === 'discussions' ? 0 : -1">
+                                    {{ __('Discussions') }}
+                                </button>
+                            @endif
                         </nav>
                     </div>
                     
@@ -138,6 +150,18 @@
                                  role="tabpanel"
                                  :aria-hidden="activeTab !== 'proxy'">
                                 @include('meetings.partials.proxy-voting')
+                            </div>
+                        @endif
+                        
+                        {{-- Discussions Panel - Only for e-vote meetings --}}
+                        @if ($meeting->is_evote && ($meeting->body->members->contains(Auth::user()) || Auth::User()->isPrivileged()))
+                            <div x-show="activeTab === 'discussions'" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 role="tabpanel"
+                                 :aria-hidden="activeTab !== 'discussions'">
+                                @include('meetings.partials.discussions-tab')
                             </div>
                         @endif
                     </div>
