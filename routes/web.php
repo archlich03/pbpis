@@ -8,6 +8,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TwoFactorController;
+use App\Http\Controllers\DiscussionController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -84,6 +85,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Proxy voting routes (for secretaries and IT admins)
     Route::put('/meetings/{meeting}/questions/{question}/proxy-votes', [VoteController::class, 'storeProxy'])->name('votes.proxy');
     Route::delete('/meetings/{meeting}/questions/{question}/proxy-votes', [VoteController::class, 'destroyProxy'])->name('votes.proxy-destroy');
+});
+
+// Discussion routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/meetings/{meeting}/questions/{question}/discussions', [DiscussionController::class, 'store'])->name('discussions.store');
+    Route::patch('/meetings/{meeting}/questions/{question}/discussions/{discussion}', [DiscussionController::class, 'update'])->name('discussions.update');
+    Route::delete('/meetings/{meeting}/questions/{question}/discussions/{discussion}', [DiscussionController::class, 'destroy'])->name('discussions.destroy');
 });
 
 Route::middleware('auth')->group(function () {

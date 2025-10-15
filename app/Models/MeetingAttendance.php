@@ -25,6 +25,7 @@ class MeetingAttendance extends Model
     protected $fillable = [
         'meeting_id',
         'user_id',
+        'status',
     ];
 
     /**
