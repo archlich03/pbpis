@@ -28,6 +28,23 @@ class Discussion extends Model
     ];
 
     /**
+     * Boot the model and add event listeners.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // When a discussion is soft deleted, also soft delete all its replies
+        static::deleting(function ($discussion) {
+            if ($discussion->isForceDeleting()) {
+                $discussion->replies()->forceDelete();
+            } else {
+                $discussion->replies()->delete();
+            }
+        });
+    }
+
+    /**
      * Get the question this discussion belongs to.
      */
     public function question(): BelongsTo
