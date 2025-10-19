@@ -66,7 +66,8 @@
                     }
                     @endphp
 
-                    <table class="table-auto w-full">
+                    <div class="overflow-x-auto">
+                        <table class="table-auto w-full">
                         <thead>
                             <tr class="bg-gray-100 dark:bg-gray-700">
                                 <th class="px-4 py-2">{!! sortLink('title', __('Name')) !!}</th>
@@ -101,6 +102,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                     <div class="mt-4">
                         <form method="GET" class="mb-4 flex items-center space-x-2">
                             @foreach(request()->except('perPage', 'page') as $key => $value)

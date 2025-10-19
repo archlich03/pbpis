@@ -1,7 +1,7 @@
 @if ($meeting->body->members->contains(Auth::user()))
     @if ($meeting->status == "Vyksta")
-        <div class="w-full">
-            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <div class="w-full overflow-x-auto">
+            <table class="w-full min-w-[600px] text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         <th scope="col" class="px-6 py-3">{{ __('Question') }}</th>

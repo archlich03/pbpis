@@ -86,7 +86,8 @@
                     <hr class="border-t-2 border-gray-300 dark:border-gray-600 mt-4 mb-4">
 
                     <h3 class="text-xl font-semibold mt-8 mb-4">{{ __('Meetings') }}</h3>
-                    <table class="w-full mt-4">
+                    <div class="overflow-x-auto">
+                        <table class="w-full mt-4">
                         <thead class="text-gray-800 dark:text-gray-200">
                             <tr>
                                 <th class="px-4 py-2">{{ __('Meeting date') }}</th>
@@ -114,6 +115,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
             </div>
         </div>
     </div>
