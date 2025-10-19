@@ -231,6 +231,11 @@ class UserController extends Controller
             'role' => RoleAuthorizationService::getRoleValidationRules($authenticatedUser),
         ]);
 
+        // Check if user is demoting themselves (losing privileges)
+        $isDemotingSelf = ($authenticatedUser->user_id === $user->user_id) 
+            && in_array($authenticatedUser->role, ['IT administratorius', 'Sekretorius'])
+            && !in_array($request->input('role'), ['IT administratorius', 'Sekretorius']);
+
         $user->update([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
@@ -252,8 +257,17 @@ class UserController extends Controller
                 'updated_by' => $authenticatedUser->user_id,
                 'updated_by_name' => $authenticatedUser->name,
                 'updated_by_role' => $authenticatedUser->role,
+                'role_changed_from' => $authenticatedUser->role,
+                'role_changed_to' => $request->input('role'),
             ]
         );
+
+        // If user demoted themselves, redirect to dashboard instead of users page
+        if ($isDemotingSelf) {
+            return redirect()->route('dashboard')
+                ->with('status', 'profile-updated')
+                ->with('info', __('Your role has been changed. You have been redirected to the dashboard.'));
+        }
 
         return redirect()->route('users.index');
     }

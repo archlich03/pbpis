@@ -444,5 +444,6 @@
   "Applied Filters": "Pritaikyti filtrai",
   "Sorted by": "Rūšiuoti pagal",
   "Total records": "Iš viso įrašų",
-  "No audit logs found matching the selected filters.": "Nerasta audito įrašų pagal pasirinktus filtrus."
+  "No audit logs found matching the selected filters.": "Nerasta audito įrašų pagal pasirinktus filtrus.",
+  "Your role has been changed. You have been redirected to the dashboard.": "Jūsų rolė buvo pakeista. Buvote nukreipti į pagrindinį puslapį."
 }
