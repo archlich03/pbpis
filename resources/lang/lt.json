@@ -364,7 +364,6 @@
   "Reached": "Pasiektas",
   "Not reached": "Nepasiektas",
   "Quorum not reached": "Kvorumas nepasiektas",
-  "Voting is allowed": "Balsavimas leidžiamas",
 
   "Required": "Reikalingi",
   "attendees": "dalyviai",
@@ -445,5 +444,7 @@
   "Sorted by": "Rūšiuoti pagal",
   "Total records": "Iš viso įrašų",
   "No audit logs found matching the selected filters.": "Nerasta audito įrašų pagal pasirinktus filtrus.",
-  "Your role has been changed. You have been redirected to the dashboard.": "Jūsų rolė buvo pakeista. Buvote nukreipti į pagrindinį puslapį."
+  "Your role has been changed. You have been redirected to the dashboard.": "Jūsų rolė buvo pakeista. Buvote nukreipti į pagrindinį puslapį.",
+  "Meeting is valid": "Posėdis gali vykti",
+  "Meeting is not valid": "Posėdis negali vykti"
 }
