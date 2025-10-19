@@ -1,4 +1,4 @@
-@section('title', __('Login') . ' - ' . config('app.name', 'PBPIS'))
+@section('title', __('Login') . ' - ' . config('app.name', 'POBIS'))
 
 <x-guest-layout>
     <!-- Session Status -->

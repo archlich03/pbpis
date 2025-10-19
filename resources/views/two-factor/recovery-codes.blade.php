@@ -1,4 +1,4 @@
-@section('title', __('Two-Factor Recovery Codes') . ' - ' . config('app.name', 'PBPIS'))
+@section('title', __('Two-Factor Recovery Codes') . ' - ' . config('app.name', 'POBIS'))
 
 <x-app-layout>
     <x-slot name="header">

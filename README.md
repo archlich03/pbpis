@@ -1,4 +1,4 @@
-# PBPIS
+# POBIS
 
 Posėdžių balsavimo ir protokolavimo informacinė sistema - IS, kuri skirta Vilniaus universiteto Kauno fakulteto studijų programų komitetų elektroninių posėdžių administravimui bei jų protokolų generavimui. Ši IS kuriama, siekiant įgyvendinti Informacijos sistemų ir kibernetinės saugos „Kursinio darbo" modulio keliamus reikalavimus.
 
@@ -21,8 +21,8 @@ Posėdžių balsavimo ir protokolavimo informacinė sistema - IS, kuri skirta Vi
 ```bash
 # Klonuoti repozitoriją
 cd ~/Documents
-git clone https://github.com/archlich03/pbpis.git
-cd pbpis
+git clone https://github.com/archlich03/pobis.git
+cd pobis
 
 # Nukopijuoti aplinkos konfigūraciją
 cp .env.example .env
@@ -61,14 +61,14 @@ sleep 10
 ### 4. Aplikacijos inicializacija
 ```bash
 # Sugeneruoti aplikacijos raktą
-sudo docker exec pbpis php artisan key:generate
+sudo docker exec pobis php artisan key:generate
 
 # Įvykdyti duomenų bazės migracijas ir seed duomenis
-sudo docker exec pbpis php artisan migrate:fresh --seed
+sudo docker exec pobis php artisan migrate:fresh --seed
 
 # Sukompiliuoti frontend assets
-sudo docker exec pbpis npm install
-sudo docker exec pbpis npm run build
+sudo docker exec pobis npm install
+sudo docker exec pobis npm run build
 
 # Perkrauti konteinerius
 sudo docker compose restart
@@ -85,7 +85,7 @@ sudo docker compose restart
 ### Frontend plėtojimas su hot reload
 ```bash
 # Paleisti Vite dev serverį
-sudo docker exec -it pbpis npm run dev
+sudo docker exec -it pobis npm run dev
 
 # Arba lokaliai (jei turite Node.js)
 npm install
@@ -95,21 +95,21 @@ npm run dev
 ### Naudingos komandos
 ```bash
 # Peržiūrėti logus
-sudo docker logs pbpis -f
+sudo docker logs pobis -f
 
 # Prisijungti prie konteinerio
-sudo docker exec -it pbpis bash
+sudo docker exec -it pobis bash
 
 # Sustabdyti visus servisus
 sudo docker compose down
 
 # Perkrauti duomenų bazę
-sudo docker exec pbpis php artisan migrate:fresh --seed
+sudo docker exec pobis php artisan migrate:fresh --seed
 
 # Išvalyti cache
-sudo docker exec pbpis php artisan cache:clear
-sudo docker exec pbpis php artisan config:clear
-sudo docker exec pbpis php artisan view:clear
+sudo docker exec pobis php artisan cache:clear
+sudo docker exec pobis php artisan config:clear
+sudo docker exec pobis php artisan view:clear
 ```
 
 ## Funkcijos
@@ -150,14 +150,14 @@ sudo chmod -R 755 storage bootstrap/cache
 
 **3. Frontend assets neužsikrauna:**
 ```bash
-sudo docker exec pbpis npm install
-sudo docker exec pbpis npm run build
+sudo docker exec pobis npm install
+sudo docker exec pobis npm run build
 sudo docker compose restart nginx
 ```
 
 **4. Duomenų bazės problemos:**
 ```bash
-sudo docker exec pbpis php artisan migrate:fresh --seed
+sudo docker exec pobis php artisan migrate:fresh --seed
 ```
 
 **5. Tema neperjungia:**
@@ -171,7 +171,7 @@ sudo docker exec pbpis php artisan migrate:fresh --seed
 sudo docker ps -a
 
 # Peržiūrėti klaidas
-sudo docker logs pbpis
+sudo docker logs pobis
 sudo docker logs nginx
 sudo docker logs mysql
 
@@ -210,7 +210,7 @@ Pirmą kartą paleidus IS, sukuriamas IT administratoriaus rolę turintis naudot
 - Microsoft OAuth 2.0 integracija
 
 ## Licencija
-PBPIS veikia su GNU GPLv3 licencija.
+POBIS veikia su GNU GPLv3 licencija.
 
 ---
 
@@ -223,7 +223,7 @@ PBPIS veikia su GNU GPLv3 licencija.
 
 ### Failų struktūra
 ```
-pbpis/
+pobis/
 ├── app/                 # Laravel aplikacijos logika
 ├── resources/           # Views, CSS, JS failai
 ├── docker/             # Docker konfigūracijos

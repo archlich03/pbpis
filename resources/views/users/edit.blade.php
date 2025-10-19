@@ -1,4 +1,4 @@
-@section('title', __('Edit User') . ' - ' . config('app.name', 'PBPIS'))
+@section('title', __('Edit User') . ' - ' . config('app.name', 'POBIS'))
 
 <x-app-layout>
     @if (Auth::user()->isPrivileged())

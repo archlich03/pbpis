@@ -1,13 +1,13 @@
 # Microsoft Authentication Setup Guide
 
-This guide will help you set up Microsoft Authentication for your PBPIS application.
+This guide will help you set up Microsoft Authentication for your POBIS application.
 
 ## Step 1: Register an Application in the Microsoft Azure Portal
 
 1. Go to the [Azure Portal](https://portal.azure.com/)
 2. Navigate to "Azure Active Directory" > "App registrations" > "New registration"
 3. Enter the following information:
-   - **Name**: PBPIS Application (or your preferred name)
+   - **Name**: POBIS Application (or your preferred name)
    - **Supported account types**: Accounts in any organizational directory (Any Azure AD directory - Multitenant) and personal Microsoft accounts
    - **Redirect URI**: Set the platform to "Web" and enter your callback URL (e.g., `https://your-domain.com/login/microsoft/callback` or for local development `http://localhost:8000/login/microsoft/callback`)
 4. Click "Register"
@@ -50,7 +50,7 @@ Replace `your-client-id`, `your-client-secret`, and `your-tenant-id` with the va
 Run the following command to clear the configuration cache:
 
 ```
-sudo docker exec pbpis php artisan config:clear
+sudo docker exec pobis php artisan config:clear
 ```
 
 ## Step 7: Test the Authentication

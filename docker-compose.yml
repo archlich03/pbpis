@@ -1,9 +1,9 @@
 services:
-  pbpis:
+  pobis:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-    container_name: pbpis
+    container_name: pobis
     restart: unless-stopped
     working_dir: /var/www
     volumes:
@@ -28,7 +28,7 @@ services:
       - ./:/var/www
       - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - pbpis
+      - pobis
     networks:
       - laravel
 

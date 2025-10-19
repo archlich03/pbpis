@@ -1,6 +1,6 @@
 ---
 name: ✨ Feature Request
-about: Suggest an idea for PBPIS
+about: Suggest an idea for POBIS
 title: '[FEATURE] '
 labels: ['enhancement', 'needs-discussion']
 assignees: ''

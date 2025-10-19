@@ -1,6 +1,6 @@
 ---
 name: 🐛 Bug Report
-about: Create a report to help us improve PBPIS
+about: Create a report to help us improve POBIS
 title: '[BUG] '
 labels: ['bug', 'needs-triage']
 assignees: ''
@@ -34,7 +34,7 @@ assignees: ''
 - Laravel Version: [e.g. 10.x]
 - Docker: [Yes/No]
 
-**PBPIS Specific:**
+**POBIS Specific:**
 - Authentication Method: [Regular/Microsoft OAuth]
 - User Role: [Balsuojantysis/Sekretorius/IT administratorius]
 - Microsoft Account Linked: [Yes/No]

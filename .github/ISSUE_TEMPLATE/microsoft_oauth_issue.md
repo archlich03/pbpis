@@ -93,7 +93,7 @@ Paste Laravel log error here
 - Assigned Role: 
 
 ## 🔗 Account Linking Status
-- [ ] User has existing PBPIS account
+- [ ] User has existing POBIS account
 - [ ] User is trying to link Microsoft account
 - [ ] User is trying to unlink Microsoft account
 - [ ] New user registration via Microsoft

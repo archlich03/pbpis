@@ -1,4 +1,4 @@
-@section('title', __('Users') . ' - ' . config('app.name', 'PBPIS'))
+@section('title', __('Users') . ' - ' . config('app.name', 'POBIS'))
 
 <x-app-layout>
     <x-slot name="header">

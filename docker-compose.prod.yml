@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile.prod
-    container_name: pbpis_prod
+    container_name: pobis_prod
     restart: always
     working_dir: /var/www
     volumes:
@@ -11,7 +11,7 @@ services:
       - ./storage:/var/www/storage
       - ./.env:/var/www/.env:ro
     networks:
-      - pbpis_network
+      - pobis_network
       - shared_network
     depends_on:
       mysql:
@@ -27,17 +27,17 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: pbpis_mysql
+    container_name: pobis_mysql
     restart: always
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-pbpis_prod}
+      MYSQL_DATABASE: ${DB_DATABASE:-pobis_prod}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_USER: ${DB_USERNAME:-pbpis_user}
+      MYSQL_USER: ${DB_USERNAME:-pobis_user}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - pbpis_network
+      - pobis_network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
       interval: 10s
@@ -48,13 +48,13 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: pbpis_redis
+    container_name: pobis_redis
     restart: always
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
     networks:
-      - pbpis_network
+      - pobis_network
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
@@ -62,7 +62,7 @@ services:
       retries: 5
 
 networks:
-  pbpis_network:
+  pobis_network:
     driver: bridge
   shared_network:
     name: naudotojas_shared_network
@@ -71,7 +71,7 @@ networks:
 volumes:
   mysql_data:
     driver: local
-    name: pbpis_prod_mysql_data
+    name: pobis_prod_mysql_data
   redis_data:
     driver: local
-    name: pbpis_prod_redis_data
+    name: pobis_prod_redis_data

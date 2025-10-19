@@ -1,4 +1,4 @@
-@section('title', __('Register') . ' - ' . config('app.name', 'PBPIS'))
+@section('title', __('Register') . ' - ' . config('app.name', 'POBIS'))
 
 <x-guest-layout>
     <div class="mb-4 flex justify-between">
