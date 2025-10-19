@@ -90,10 +90,6 @@
             </a>
         </div>
 
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center mb-4">
-            POBIS
-        </h1>
-
         <p class="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
             {!! __('The Meeting Voting Information System (POBIS) is designed for the administration of electronic meetings of Study Program Committees at Vilnius University Kaunas Faculty. It assists members in participating in meetings, casting their votes and generating minutes in a convenient, unified platform.') !!}
         </p>
