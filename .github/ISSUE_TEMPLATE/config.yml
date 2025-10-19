@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: 📚 Documentation
-    url: https://github.com/archlich03/pbpis/wiki
+    url: https://github.com/archlich03/pobis/wiki
     about: Check the project documentation and setup guides
   - name: 💬 Discussions
-    url: https://github.com/archlich03/pbpis/discussions
+    url: https://github.com/archlich03/pobis/discussions
     about: Ask questions and discuss ideas with the community

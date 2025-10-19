@@ -1,6 +1,6 @@
-# Contributing to PBPIS
+# Contributing to POBIS
 
-Thank you for your interest in contributing to PBPIS! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to POBIS! This document provides guidelines and information for contributors.
 
 ## 🚀 Getting Started
 
@@ -13,13 +13,13 @@ Thank you for your interest in contributing to PBPIS! This document provides gui
 
 ### Development Setup
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/your-username/pbpis.git`
+2. Clone your fork: `git clone https://github.com/your-username/pobis.git`
 3. Copy environment file: `cp .env.example .env`
 4. Configure your `.env` file (especially Microsoft OAuth settings)
 5. Start with Docker: `docker compose up -d`
-6. Install dependencies: `docker exec pbpis composer install`
-7. Run migrations: `docker exec pbpis php artisan migrate`
-8. Seed database: `docker exec pbpis php artisan db:seed`
+6. Install dependencies: `docker exec pobis composer install`
+7. Run migrations: `docker exec pobis php artisan migrate`
+8. Seed database: `docker exec pobis php artisan db:seed`
 
 ## 🔄 Development Workflow
 
@@ -61,13 +61,13 @@ type(scope): description
 ### Running Tests
 ```bash
 # Run all tests
-docker exec pbpis php artisan test
+docker exec pobis php artisan test
 
 # Run specific test suite
-docker exec pbpis php artisan test --testsuite=Feature
+docker exec pobis php artisan test --testsuite=Feature
 
 # Run with coverage
-docker exec pbpis php artisan test --coverage
+docker exec pobis php artisan test --coverage
 ```
 
 ### Test Requirements
@@ -215,8 +215,8 @@ docker exec pbpis php artisan test --coverage
 ## 📞 Getting Help
 
 - 📚 Check the [documentation](./README.md)
-- 💬 Join [discussions](https://github.com/your-username/pbpis/discussions)
-- 🐛 Search [existing issues](https://github.com/your-username/pbpis/issues)
+- 💬 Join [discussions](https://github.com/your-username/pobis/discussions)
+- 🐛 Search [existing issues](https://github.com/your-username/pobis/issues)
 - 📧 Contact maintainers for security issues
 
 ## 📜 Code of Conduct
@@ -236,4 +236,4 @@ Contributors will be recognized in:
 
 ---
 
-Thank you for contributing to PBPIS! Your efforts help make this project better for everyone. 🎉
+Thank you for contributing to POBIS! Your efforts help make this project better for everyone. 🎉

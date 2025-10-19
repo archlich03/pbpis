@@ -1,4 +1,4 @@
-@section('title', __('Meeting Details') . ' - ' . config('app.name', 'PBPIS'))
+@section('title', __('Meeting Details') . ' - ' . config('app.name', 'POBIS'))
 
 <x-app-layout>
     <x-slot name="header">

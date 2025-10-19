@@ -50,8 +50,8 @@
                             <div x-show="selectedQuestion === {{ $question->question_id }}" class="space-y-4">
                                 <h4 class="font-semibold mb-3">{{ __('Cast Votes for') }}: {{ $question->title }}</h4>
                                 
-                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                                    <table class="w-full">
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-x-auto">
+                                    <table class="w-full min-w-[600px]">
                                         <thead class="bg-gray-50 dark:bg-gray-700">
                                             <tr>
                                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">

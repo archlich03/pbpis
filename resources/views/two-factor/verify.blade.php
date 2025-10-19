@@ -1,4 +1,4 @@
-@section('title', __('Two-Factor Authentication') . ' - ' . config('app.name', 'PBPIS'))
+@section('title', __('Two-Factor Authentication') . ' - ' . config('app.name', 'POBIS'))
 
 <x-guest-layout>
     <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">

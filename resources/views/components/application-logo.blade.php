@@ -1,1 +1,1 @@
-<img src="{{ asset('logo.png') }}" alt="Application Logo" width="50" height="50">
+<img src="{{ asset('logo2.png') }}" alt="Application Logo" width="120" height="30">

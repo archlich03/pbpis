@@ -1,6 +1,6 @@
-# Contributing to PBPIS
+# Contributing to POBIS
 
-First and foremost, thank you! We appreciate that you want to contribute to PBPIS, your time is valuable, and your contributions mean a lot to us.
+First and foremost, thank you! We appreciate that you want to contribute to POBIS, your time is valuable, and your contributions mean a lot to us.
 
 
 ## Important!
@@ -25,14 +25,14 @@ Creating an issue is the simplest form of contributing to a project. But there a
 - Bug reports
 
 
-## Showing support for PBPIS
+## Showing support for POBIS
 
 Please keep in mind that open source software is built by people like you, who spend their free time creating things the rest the community can use.
 
-Don't have time to contribute? No worries, here are some other ways to show your support for PBPIS:
+Don't have time to contribute? No worries, here are some other ways to show your support for POBIS:
 
-- star the [project](https://github.com/PBPIS/PBPIS)
-- tweet your support for PBPIS
+- star the [project](https://github.com/POBIS/POBIS)
+- tweet your support for POBIS
 
 
 ## Issues
@@ -67,14 +67,14 @@ Please be as descriptive as possible when creating an issue. Give us the informa
 
 - **description**: (required) What is the bug you're experiencing? How are you using this library/app?
 - **OS**: (required) what operating system are you on?
-- **version**: (required) please note the version of PBPIS are you using
+- **version**: (required) please note the version of POBIS are you using
 - **error messages**: (required) please paste any error messages into the issue, or a [gist](https://gist.github.com/)
 - **extensions, plugins, helpers, etc** (if applicable): please list any extensions you're using
 
 
 ### Closing issues
 
-The original poster or the maintainers of PBPIS may close an issue at any time. Typically, but not exclusively, issues are closed when:
+The original poster or the maintainers of POBIS may close an issue at any time. Typically, but not exclusively, issues are closed when:
 
 - The issue is resolved
 - The project's maintainers have determined the issue is out of scope

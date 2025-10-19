@@ -1,4 +1,4 @@
-name: PBPIS Deployment Test
+name: POBIS Deployment Test
 
 on:
   push:
@@ -97,7 +97,7 @@ jobs:
 
             location ~ \.php$ {
                 include fastcgi_params;
-                fastcgi_pass pbpis:9000;
+                fastcgi_pass pobis:9000;
                 fastcgi_index index.php;
                 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             }
@@ -113,7 +113,7 @@ jobs:
 
     - name: Step 1 - Follow your installation instructions
       run: |
-        echo "=== Following PBPIS Installation Instructions ==="
+        echo "=== Following POBIS Installation Instructions ==="
         
         # Step 1: cp .env.example .env (already have .env.example)
         cp .env.example .env
@@ -156,18 +156,18 @@ jobs:
         
         # Step 2: Run DB migration and seeding
         echo "Running database migration and seeding..."
-        docker exec pbpis php artisan migrate:fresh --seed
+        docker exec pobis php artisan migrate:fresh --seed
         echo "✅ Database migrated and seeded"
         
         # Step 2: Generate application key
         echo "Generating application key..."
-        docker exec pbpis php artisan key:generate
+        docker exec pobis php artisan key:generate
         echo "✅ Application key generated"
         
-        # Step 2: Restart pbpis container
-        echo "Restarting pbpis container..."
-        docker compose restart pbpis
-        echo "✅ PBPIS container restarted"
+        # Step 2: Restart pobis container
+        echo "Restarting pobis container..."
+        docker compose restart pobis
+        echo "✅ POBIS container restarted"
         
         # Wait for restart to complete
         echo "Waiting for restart to complete..."
@@ -187,7 +187,7 @@ jobs:
             
             # Get the actual response to verify it's working
             response=$(curl -s http://localhost/login)
-            if [[ $response == *"<html"* ]] || [[ $response == *"Laravel"* ]] || [[ $response == *"PBPIS"* ]]; then
+            if [[ $response == *"<html"* ]] || [[ $response == *"Laravel"* ]] || [[ $response == *"POBIS"* ]]; then
               echo "✅ Application is serving proper HTML content"
               echo "First 200 characters of response:"
               echo "$response" | head -c 200
@@ -210,11 +210,11 @@ jobs:
         echo "=== Container Status ==="
         docker compose ps
         echo ""
-        echo "=== PBPIS Container Logs ==="
-        docker logs pbpis --tail=50
+        echo "=== POBIS Container Logs ==="
+        docker logs pobis --tail=50
         echo ""
         echo "=== Laravel Error Logs ==="
-        docker exec pbpis tail -100 /var/www/storage/logs/laravel.log || echo "Could not read Laravel logs"
+        docker exec pobis tail -100 /var/www/storage/logs/laravel.log || echo "Could not read Laravel logs"
         echo ""
         echo "=== MySQL Container Logs ==="
         docker logs mysql --tail=20
@@ -233,7 +233,7 @@ jobs:
         
         # Test that Microsoft OAuth routes are registered
         echo "Testing Microsoft OAuth routes..."
-        docker exec pbpis php artisan route:list --name=microsoft
+        docker exec pobis php artisan route:list --name=microsoft
         
         # Test that login page includes Microsoft login option
         echo "Checking if login page includes Microsoft authentication..."
@@ -253,10 +253,10 @@ jobs:
           echo "⚠️  Microsoft OAuth redirect returned: $redirect_response"
         fi
 
-    - name: Step 5 - Run Tests inside pbpis container
+    - name: Step 5 - Run Tests inside pobis container
       run: |
         echo "=== Running PHP Tests ==="
-        docker exec pbpis ./vendor/bin/pest --colors=always
+        docker exec pobis ./vendor/bin/pest --colors=always
 
     - name: Verify installation completeness
       run: |
@@ -268,9 +268,9 @@ jobs:
         
         # Test database connection (verify migration worked)
         echo "Testing database connection..."
-        docker exec pbpis php -r "
+        docker exec pobis php -r "
         try {
-          \$pdo = new PDO('mysql:host=mysql;dbname=pbpis', 'user', 'secret');
+          \$pdo = new PDO('mysql:host=mysql;dbname=pobis', 'user', 'secret');
           echo '✅ Database connection successful\n';
         } catch (Exception \$e) {
           echo '❌ Database connection failed: ' . \$e->getMessage() . '\n';
@@ -280,11 +280,11 @@ jobs:
         
         # Test Laravel application status
         echo "Testing Laravel application..."
-        docker exec pbpis php artisan --version
+        docker exec pobis php artisan --version
         
         # Test if default admin user was created (from seeding)
         echo "Verifying database seeding..."
-        docker exec pbpis php artisan tinker --execute="
+        docker exec pobis php artisan tinker --execute="
         \$userCount = DB::table('users')->count();
         echo 'Users in database: ' . \$userCount . PHP_EOL;
         if (\$userCount > 0) {
@@ -303,23 +303,23 @@ jobs:
         
         # Test migration status
         echo "Checking migration status..."
-        docker exec pbpis php artisan migrate:status
+        docker exec pobis php artisan migrate:status
         
         # Test migration rollback (if possible)
         echo "Testing migration rollback..."
-        docker exec pbpis php artisan migrate:rollback --step=1 --force || echo "⚠️  Rollback failed (might be expected for initial migration)"
+        docker exec pobis php artisan migrate:rollback --step=1 --force || echo "⚠️  Rollback failed (might be expected for initial migration)"
         
         # Re-run migrations
         echo "Re-running migrations..."
-        docker exec pbpis php artisan migrate --force
+        docker exec pobis php artisan migrate --force
         
         # Test database seeding
         echo "Testing database seeding..."
-        docker exec pbpis php artisan db:seed --force
+        docker exec pobis php artisan db:seed --force
         
         # Verify database integrity
         echo "Verifying database integrity..."
-        docker exec pbpis php artisan tinker --execute="
+        docker exec pobis php artisan tinker --execute="
         try {
           \$tables = DB::select('SHOW TABLES');
           echo '✅ Database tables accessible: ' . count(\$tables) . PHP_EOL;
@@ -348,31 +348,31 @@ jobs:
         
         # Test Artisan commands
         echo "Testing Artisan commands..."
-        docker exec pbpis php artisan --version
-        docker exec pbpis php artisan list --format=json > /dev/null
+        docker exec pobis php artisan --version
+        docker exec pobis php artisan list --format=json > /dev/null
         
         # Test configuration caching
         echo "Testing configuration caching..."
-        docker exec pbpis php artisan config:cache
-        docker exec pbpis php artisan config:clear
+        docker exec pobis php artisan config:cache
+        docker exec pobis php artisan config:clear
         
         # Test route caching
         echo "Testing route caching..."
-        docker exec pbpis php artisan route:cache
-        docker exec pbpis php artisan route:clear
+        docker exec pobis php artisan route:cache
+        docker exec pobis php artisan route:clear
         
         # Test view caching
         echo "Testing view caching..."
-        docker exec pbpis php artisan view:cache
-        docker exec pbpis php artisan view:clear
+        docker exec pobis php artisan view:cache
+        docker exec pobis php artisan view:clear
         
         # Test queue functionality (if applicable)
         echo "Testing queue configuration..."
-        docker exec pbpis php artisan queue:work --once --stop-when-empty || echo "⚠️  Queue test completed (expected if no jobs)"
+        docker exec pobis php artisan queue:work --once --stop-when-empty || echo "⚠️  Queue test completed (expected if no jobs)"
         
         # Test session handling
         echo "Testing session configuration..."
-        docker exec pbpis php artisan tinker --execute="
+        docker exec pobis php artisan tinker --execute="
         try {
           // Test session store
           \$sessionId = Str::random(40);
@@ -390,7 +390,7 @@ jobs:
         
         # Test cache functionality
         echo "Testing cache functionality..."
-        docker exec pbpis php artisan tinker --execute="
+        docker exec pobis php artisan tinker --execute="
         try {
           Cache::put('test_cache_key', 'test_cache_value', 60);
           \$value = Cache::get('test_cache_key');
@@ -407,11 +407,11 @@ jobs:
         
         # Test Microsoft OAuth routes (specific to your app)
         echo "Testing Microsoft OAuth routes..."
-        docker exec pbpis php artisan route:list | grep microsoft || echo "⚠️  Microsoft OAuth routes not found"
+        docker exec pobis php artisan route:list | grep microsoft || echo "⚠️  Microsoft OAuth routes not found"
         
         # Test user model and authentication
         echo "Testing User model and authentication..."
-        docker exec pbpis php artisan tinker --execute="
+        docker exec pobis php artisan tinker --execute="
         try {
           \$user = User::first();
           if (\$user) {

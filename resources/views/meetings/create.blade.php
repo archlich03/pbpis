@@ -1,4 +1,4 @@
-@section('title', __('Create Meeting') . ' - ' . config('app.name', 'PBPIS'))
+@section('title', __('Create Meeting') . ' - ' . config('app.name', 'POBIS'))
 
 <x-app-layout>
     <div class="py-12">

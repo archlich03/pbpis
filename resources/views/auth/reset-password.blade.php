@@ -1,4 +1,4 @@
-@section('title', __('Reset Password') . ' - ' . config('app.name', 'PBPIS'))
+@section('title', __('Reset Password') . ' - ' . config('app.name', 'POBIS'))
 
 <x-guest-layout>
     <form method="POST" action="{{ route('password.store') }}">

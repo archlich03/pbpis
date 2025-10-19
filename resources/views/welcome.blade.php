@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>PBPIS</title>
+    <title>POBIS</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -90,16 +90,12 @@
             </a>
         </div>
 
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center mb-4">
-            PBPIS
-        </h1>
-
         <p class="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-            {!! __('The Voting and Protocol Management Information System (PBPIS) is designed for the administration of electronic meetings of Study Program Committees at Vilnius University Kaunas Faculty. It assists members in participating in meetings, casting their votes and generating minutes in a convenient, unified platform.') !!}
+            {!! __('The Meeting Voting Information System (POBIS) is designed for the administration of electronic meetings of Study Program Committees at Vilnius University Kaunas Faculty. It assists members in participating in meetings, casting their votes and generating minutes in a convenient, unified platform.') !!}
         </p>
 
         <p class="text-gray-700 dark:text-gray-300 mb-4 font-medium">
-            {{ __('Main functions of PBPIS') }}:
+            {{ __('Main functions of POBIS') }}:
         </p>
 
         <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mb-6 space-y-1">
@@ -120,7 +116,7 @@
                 <a 
                     href="{{ route('login') }}"
                     class="inline-flex items-center px-6 py-3 bg-blue-600 dark:bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 dark:hover:bg-blue-600 focus:bg-blue-700 dark:focus:bg-blue-600 active:bg-blue-900 dark:active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                    {{ __('Log in to PBPIS') }}
+                    {{ __('Log in to POBIS') }}
                 </a>
             @endauth
         </div>

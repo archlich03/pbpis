@@ -1,4 +1,4 @@
-# External Nginx Configuration for PBPIS
+# External Nginx Configuration for POBIS
 
 ## Quick Setup
 
@@ -7,7 +7,7 @@ This configuration goes on your **host machine's Nginx** (not inside Docker).
 ### 1. Create Nginx Site Configuration
 
 ```bash
-sudo nano /etc/nginx/sites-available/pbpis
+sudo nano /etc/nginx/sites-available/pobis
 ```
 
 ### 2. Paste This Configuration
@@ -17,7 +17,7 @@ sudo nano /etc/nginx/sites-available/pbpis
 server {
     listen 80;
     listen [::]:80;
-    server_name pbpis.teso.fyi;
+    server_name pobis.teso.fyi;
     
     # Let's Encrypt ACME challenge
     location /.well-known/acme-challenge/ {
@@ -34,11 +34,11 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name pbpis.teso.fyi;
+    server_name pobis.teso.fyi;
 
     # SSL Configuration
-    ssl_certificate /etc/letsencrypt/live/pbpis.teso.fyi/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/pbpis.teso.fyi/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/pobis.teso.fyi/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/pobis.teso.fyi/privkey.pem;
     
     # SSL Security Settings
     ssl_protocols TLSv1.2 TLSv1.3;
@@ -57,8 +57,8 @@ server {
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     
     # Logging
-    access_log /var/log/nginx/pbpis_access.log;
-    error_log /var/log/nginx/pbpis_error.log warn;
+    access_log /var/log/nginx/pobis_access.log;
+    error_log /var/log/nginx/pobis_error.log warn;
 
     # Max upload size
     client_max_body_size 100M;
@@ -71,11 +71,11 @@ server {
         
         # Preserve original request information
         # CRITICAL: Set Host to actual domain, not $host variable
-        proxy_set_header Host pbpis.teso.fyi;
+        proxy_set_header Host pobis.teso.fyi;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host pbpis.teso.fyi;
+        proxy_set_header X-Forwarded-Host pobis.teso.fyi;
         proxy_set_header X-Forwarded-Port $server_port;
         
         # WebSocket support (if needed in future)
@@ -102,7 +102,7 @@ server {
 
 ```bash
 # Create symbolic link
-sudo ln -s /etc/nginx/sites-available/pbpis /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/pobis /etc/nginx/sites-enabled/
 
 # Test configuration
 sudo nginx -t
@@ -121,7 +121,7 @@ sudo apt update
 sudo apt install certbot python3-certbot-nginx
 
 # Obtain certificate (will auto-configure Nginx)
-sudo certbot --nginx -d pbpis.teso.fyi
+sudo certbot --nginx -d pobis.teso.fyi
 
 # Test auto-renewal
 sudo certbot renew --dry-run
@@ -130,8 +130,8 @@ sudo certbot renew --dry-run
 ### Option B: Manual Certificate
 
 If you already have certificates, place them in:
-- Certificate: `/etc/letsencrypt/live/pbpis.teso.fyi/fullchain.pem`
-- Private Key: `/etc/letsencrypt/live/pbpis.teso.fyi/privkey.pem`
+- Certificate: `/etc/letsencrypt/live/pobis.teso.fyi/fullchain.pem`
+- Private Key: `/etc/letsencrypt/live/pobis.teso.fyi/privkey.pem`
 
 ## Firewall Configuration
 
@@ -154,41 +154,41 @@ sudo ufw status
 
 ### 1. Test HTTP to HTTPS Redirect
 ```bash
-curl -I http://pbpis.teso.fyi
+curl -I http://pobis.teso.fyi
 # Should return: 301 Moved Permanently
 ```
 
 ### 2. Test HTTPS Connection
 ```bash
-curl -I https://pbpis.teso.fyi
+curl -I https://pobis.teso.fyi
 # Should return: 200 OK
 ```
 
 ### 3. Test SSL Configuration
 ```bash
 # Using SSL Labs (online)
-# Visit: https://www.ssllabs.com/ssltest/analyze.html?d=pbpis.teso.fyi
+# Visit: https://www.ssllabs.com/ssltest/analyze.html?d=pobis.teso.fyi
 
 # Or using testssl.sh (local)
-docker run --rm -ti drwetter/testssl.sh pbpis.teso.fyi
+docker run --rm -ti drwetter/testssl.sh pobis.teso.fyi
 ```
 
 ### 4. Test Application
 ```bash
 # Visit in browser
-https://pbpis.teso.fyi
+https://pobis.teso.fyi
 ```
 
 ## Monitoring
 
 ### View Access Logs
 ```bash
-sudo tail -f /var/log/nginx/pbpis_access.log
+sudo tail -f /var/log/nginx/pobis_access.log
 ```
 
 ### View Error Logs
 ```bash
-sudo tail -f /var/log/nginx/pbpis_error.log
+sudo tail -f /var/log/nginx/pobis_error.log
 ```
 
 ### Check Nginx Status
@@ -335,8 +335,8 @@ sudo systemctl reload nginx
 sudo systemctl restart nginx
 
 # View logs
-sudo tail -f /var/log/nginx/pbpis_access.log
-sudo tail -f /var/log/nginx/pbpis_error.log
+sudo tail -f /var/log/nginx/pobis_access.log
+sudo tail -f /var/log/nginx/pobis_error.log
 
 # Renew SSL certificate
 sudo certbot renew

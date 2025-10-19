@@ -1,4 +1,4 @@
-@section('title', __('Password Change Required') . ' - ' . config('app.name', 'PBPIS'))
+@section('title', __('Password Change Required') . ' - ' . config('app.name', 'POBIS'))
 
 <x-app-layout>
     <x-slot name="header">

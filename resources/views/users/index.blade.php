@@ -1,4 +1,4 @@
-@section('title', __('Users') . ' - ' . config('app.name', 'PBPIS'))
+@section('title', __('Users') . ' - ' . config('app.name', 'POBIS'))
 
 <x-app-layout>
     <x-slot name="header">
@@ -87,7 +87,8 @@
                             }
                         }
                         @endphp
-                        <table class="table-auto w-full mt-4">
+                        <div class="overflow-x-auto">
+                            <table class="table-auto w-full mt-4">
                             <thead>
                                 <tr class="bg-gray-100 dark:bg-gray-700">
                                     <th class="px-4 py-2">{!! sortLink('name', __('Name')) !!}</th>
@@ -143,6 +144,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                         <div class="mt-4">
                             <form method="GET" class="mb-4 flex items-center space-x-2">
                                 <!-- Preserve other query params -->

@@ -24,8 +24,8 @@ Your external Nginx instance will `proxy_pass` requests to this container on por
 
 ```bash
 cd /var/www
-git clone <your-repo-url> pbpis-prod
-cd pbpis-prod
+git clone <your-repo-url> pobis-prod
+cd pobis-prod
 ```
 
 ### 2. Create Production Environment File
@@ -94,17 +94,17 @@ Configure your external Nginx to proxy requests to the container:
 ```nginx
 server {
     listen 80;
-    server_name pbpis.teso.fyi;
+    server_name pobis.teso.fyi;
     return 301 https://$server_name$request_uri;
 }
 
 server {
     listen 443 ssl http2;
-    server_name pbpis.teso.fyi;
+    server_name pobis.teso.fyi;
 
     # SSL Configuration
-    ssl_certificate /etc/letsencrypt/live/pbpis.teso.fyi/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/pbpis.teso.fyi/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/pobis.teso.fyi/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/pobis.teso.fyi/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
@@ -116,8 +116,8 @@ server {
     add_header X-XSS-Protection "1; mode=block" always;
 
     # Logging
-    access_log /var/log/nginx/pbpis_access.log;
-    error_log /var/log/nginx/pbpis_error.log;
+    access_log /var/log/nginx/pobis_access.log;
+    error_log /var/log/nginx/pobis_error.log;
 
     # Proxy to Docker container
     location / {
@@ -165,7 +165,7 @@ The default admin user is created automatically with credentials from `.env`:
 ### 3. Configure Microsoft OAuth (if using)
 
 1. Register application in Azure AD
-2. Add redirect URI: `https://pbpis.teso.fyi/login/microsoft/callback`
+2. Add redirect URI: `https://pobis.teso.fyi/login/microsoft/callback`
 3. Update `.env` with client ID and secret
 4. Restart container:
    ```bash
@@ -213,17 +213,17 @@ docker compose -f docker-compose.prod.yml exec app bash
 ### Database Backup
 ```bash
 # Create backup
-docker compose -f docker-compose.prod.yml exec mysql mysqldump -u root -p${DB_ROOT_PASSWORD} pbpis_prod > backup_$(date +%Y%m%d_%H%M%S).sql
+docker compose -f docker-compose.prod.yml exec mysql mysqldump -u root -p${DB_ROOT_PASSWORD} pobis_prod > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Restore backup
-docker compose -f docker-compose.prod.yml exec -T mysql mysql -u root -p${DB_ROOT_PASSWORD} pbpis_prod < backup.sql
+docker compose -f docker-compose.prod.yml exec -T mysql mysql -u root -p${DB_ROOT_PASSWORD} pobis_prod < backup.sql
 ```
 
 ## Updating Application
 
 ### 1. Pull Latest Code
 ```bash
-cd /var/www/pbpis-prod
+cd /var/www/pobis-prod
 git pull origin main
 ```
 
@@ -341,10 +341,10 @@ sudo crontab -e
 Add:
 ```cron
 # Daily database backup at 2 AM
-0 2 * * * cd /var/www/pbpis-prod && docker compose -f docker-compose.prod.yml exec -T mysql mysqldump -u root -p${DB_ROOT_PASSWORD} pbpis_prod | gzip > /backups/pbpis_$(date +\%Y\%m\%d).sql.gz
+0 2 * * * cd /var/www/pobis-prod && docker compose -f docker-compose.prod.yml exec -T mysql mysqldump -u root -p${DB_ROOT_PASSWORD} pobis_prod | gzip > /backups/pobis_$(date +\%Y\%m\%d).sql.gz
 
 # Keep only last 30 days
-0 3 * * * find /backups -name "pbpis_*.sql.gz" -mtime +30 -delete
+0 3 * * * find /backups -name "pobis_*.sql.gz" -mtime +30 -delete
 ```
 
 ### Storage Volume Backup
@@ -369,7 +369,7 @@ tar -czf storage_backup_$(date +%Y%m%d).tar.gz ./storage/app
 ### Database Optimization
 ```bash
 # Optimize tables
-docker compose -f docker-compose.prod.yml exec mysql mysqlcheck -u root -p${DB_ROOT_PASSWORD} --optimize pbpis_prod
+docker compose -f docker-compose.prod.yml exec mysql mysqlcheck -u root -p${DB_ROOT_PASSWORD} --optimize pobis_prod
 ```
 
 ## Scaling Considerations
