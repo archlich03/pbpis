@@ -112,6 +112,13 @@ class AuditLogService
             'description' => 'Admin/Secretary removed a vote on behalf of another user',
             'color' => 'orange',
         ],
+        
+        // Email actions
+        'email_sent' => [
+            'name' => 'Email Sent',
+            'description' => 'Email sent to body members',
+            'color' => 'blue',
+        ],
     ];
 
     /**

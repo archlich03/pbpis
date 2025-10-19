@@ -9,6 +9,7 @@ use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\DiscussionController;
+use App\Http\Controllers\EmailController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -92,6 +93,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/meetings/{meeting}/questions/{question}/discussions', [DiscussionController::class, 'store'])->name('discussions.store');
     Route::patch('/meetings/{meeting}/questions/{question}/discussions/{discussion}', [DiscussionController::class, 'update'])->name('discussions.update');
     Route::delete('/meetings/{meeting}/questions/{question}/discussions/{discussion}', [DiscussionController::class, 'destroy'])->name('discussions.destroy');
+});
+
+// Email routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/meetings/{meeting}/emails/compose', [EmailController::class, 'compose'])->name('emails.compose');
+    Route::post('/meetings/{meeting}/emails/send', [EmailController::class, 'send'])->name('emails.send');
+    Route::get('/meetings/{meeting}/emails/preview', [EmailController::class, 'preview'])->name('emails.preview');
 });
 
 Route::middleware('auth')->group(function () {

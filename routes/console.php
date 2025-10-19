@@ -8,6 +8,11 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+// Schedule email queue processing to run every minute (5 emails per run)
+Schedule::command('email:process-queue --limit=5')
+    ->everyMinute()
+    ->withoutOverlapping();
+
 // Schedule audit log cleanup to run daily at 2 AM
 Schedule::command('audit:cleanup')->dailyAt('02:00');
 
