@@ -436,5 +436,13 @@
   "Email Sent": "El. laiškas išsiųstas",
   "Select All": "Pažymėti visus",
   "Deselect All": "Atžymėti visus",
-  "Please wait :minutes more minute(s) before sending another email for this meeting.": "Palaukite dar :minutes min. prieš išsiunčiant kitą el. laišką šiam posėdžiui."
+  "Please wait :minutes more minute(s) before sending another email for this meeting.": "Palaukite dar :minutes min. prieš išsiunčiant kitą el. laišką šiam posėdžiui.",
+  "Export JSON": "Eksportuoti JSON",
+  "Export PDF": "Eksportuoti PDF",
+  "Audit Logs Export": "Audito žurnalų eksportas",
+  "Generated on": "Sugeneruota",
+  "Applied Filters": "Pritaikyti filtrai",
+  "Sorted by": "Rūšiuoti pagal",
+  "Total records": "Iš viso įrašų",
+  "No audit logs found matching the selected filters.": "Nerasta audito įrašų pagal pasirinktus filtrus."
 }

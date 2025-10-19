@@ -112,6 +112,8 @@ Route::middleware('auth')->group(function () {
     
     // Admin audit logs route (only for IT administrators and secretaries)
     Route::get('/audit-logs', [UserController::class, 'auditLogs'])->name('audit.logs');
+    Route::get('/audit-logs/export/json', [UserController::class, 'exportAuditLogsJson'])->name('audit.logs.export.json');
+    Route::get('/audit-logs/export/pdf', [UserController::class, 'exportAuditLogsPdf'])->name('audit.logs.export.pdf');
 });
 
 
