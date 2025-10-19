@@ -170,7 +170,7 @@
                                                              Auth::user()->role === 'Sekretorius' || 
                                                              Auth::user()->role === 'IT administratorius')
                                                             <form method="POST" action="{{ route('discussions.destroy', [$meeting, $question, $discussion]) }}" 
-                                                                  class="inline"
+                                                                  class="inline-flex items-center"
                                                                   onsubmit="return confirm('{{ __('Are you sure you want to delete this comment?') }}');">
                                                                 @csrf
                                                                 @method('DELETE')

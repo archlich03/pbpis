@@ -9,6 +9,7 @@ use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\DiscussionController;
+use App\Http\Controllers\EmailController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -94,6 +95,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/meetings/{meeting}/questions/{question}/discussions/{discussion}', [DiscussionController::class, 'destroy'])->name('discussions.destroy');
 });
 
+// Email routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/meetings/{meeting}/emails/compose', [EmailController::class, 'compose'])->name('emails.compose');
+    Route::post('/meetings/{meeting}/emails/send', [EmailController::class, 'send'])->name('emails.send');
+    Route::get('/meetings/{meeting}/emails/preview', [EmailController::class, 'preview'])->name('emails.preview');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -104,6 +112,8 @@ Route::middleware('auth')->group(function () {
     
     // Admin audit logs route (only for IT administrators and secretaries)
     Route::get('/audit-logs', [UserController::class, 'auditLogs'])->name('audit.logs');
+    Route::get('/audit-logs/export/json', [UserController::class, 'exportAuditLogsJson'])->name('audit.logs.export.json');
+    Route::get('/audit-logs/export/pdf', [UserController::class, 'exportAuditLogsPdf'])->name('audit.logs.export.pdf');
 });
 
 

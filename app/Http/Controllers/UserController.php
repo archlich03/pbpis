@@ -10,8 +10,12 @@ use App\Services\AuditLogService;
 use App\Services\RoleAuthorizationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
@@ -227,6 +231,11 @@ class UserController extends Controller
             'role' => RoleAuthorizationService::getRoleValidationRules($authenticatedUser),
         ]);
 
+        // Check if user is demoting themselves (losing privileges)
+        $isDemotingSelf = ($authenticatedUser->user_id === $user->user_id) 
+            && in_array($authenticatedUser->role, ['IT administratorius', 'Sekretorius'])
+            && !in_array($request->input('role'), ['IT administratorius', 'Sekretorius']);
+
         $user->update([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
@@ -248,8 +257,17 @@ class UserController extends Controller
                 'updated_by' => $authenticatedUser->user_id,
                 'updated_by_name' => $authenticatedUser->name,
                 'updated_by_role' => $authenticatedUser->role,
+                'role_changed_from' => $authenticatedUser->role,
+                'role_changed_to' => $request->input('role'),
             ]
         );
+
+        // If user demoted themselves, redirect to dashboard instead of users page
+        if ($isDemotingSelf) {
+            return redirect()->route('dashboard')
+                ->with('status', 'profile-updated')
+                ->with('info', __('Your role has been changed. You have been redirected to the dashboard.'));
+        }
 
         return redirect()->route('users.index');
     }
@@ -508,6 +526,110 @@ class UserController extends Controller
             abort(403);
         }
         
+        // Build query using helper method
+        $query = $this->buildAuditLogsQuery($request);
+        
+        // Paginate results
+        $perPage = $request->input('per_page', 20);
+        $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 20;
+        $auditLogs = $query->paginate($perPage)->withQueryString();
+        
+        // Get available actions for filter dropdown
+        $availableActions = array_keys(AuditLogService::getAllActions());
+        
+        // Get all users for filter dropdown
+        $availableUsers = User::select('user_id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
+        
+        return view('audit.logs', compact('auditLogs', 'availableActions', 'availableUsers'));
+    }
+
+    /**
+     * Export audit logs as JSON with applied filters and sorting.
+     */
+    public function exportAuditLogsJson(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+        
+        // Check if user has permission
+        if (!in_array($user->role, ['IT administratorius', 'Sekretorius'])) {
+            abort(403);
+        }
+        
+        // Build the same query as auditLogs() method
+        $query = $this->buildAuditLogsQuery($request);
+        
+        // Get all results (no pagination for export)
+        $auditLogs = $query->get();
+        
+        // Transform data for export
+        $exportData = $auditLogs->map(function ($log) {
+            return [
+                'id' => $log->id,
+                'user' => [
+                    'id' => $log->user_id,
+                    'name' => $log->user?->name ?? __('Deleted User'),
+                    'email' => $log->user?->email ?? __('N/A'),
+                ],
+                'action' => $log->action,
+                'action_label' => AuditLogService::getActionName($log->action),
+                'ip_address' => $log->ip_address,
+                'user_agent' => $log->user_agent,
+                'details' => $log->details,
+                'created_at' => $log->created_at->toIso8601String(),
+            ];
+        });
+        
+        $filename = 'audit_logs_' . now()->format('Y-m-d_His') . '.json';
+        
+        return response()->json($exportData, 200, [
+            'Content-Type' => 'application/json',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ], JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * Export audit logs as PDF with applied filters and sorting.
+     */
+    public function exportAuditLogsPdf(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Check if user has permission
+        if (!in_array($user->role, ['IT administratorius', 'Sekretorius'])) {
+            abort(403);
+        }
+        
+        // Build the same query as auditLogs() method
+        $query = $this->buildAuditLogsQuery($request);
+        
+        // Get all results (no pagination for export)
+        $auditLogs = $query->get();
+        
+        // Get filter information for PDF header
+        $filters = [
+            'search' => $request->get('search'),
+            'user_id' => $request->get('user_id'),
+            'action' => $request->get('action'),
+            'date_from' => $request->get('date_from'),
+            'date_to' => $request->get('date_to'),
+            'sort' => $request->get('sort', 'created_at'),
+            'direction' => $request->get('direction', 'desc'),
+        ];
+        
+        $pdf = Pdf::loadView('audit.export-pdf', compact('auditLogs', 'filters'));
+        
+        $filename = 'audit_logs_' . now()->format('Y-m-d_His') . '.pdf';
+        
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Build audit logs query with filters and sorting (DRY helper method).
+     */
+    private function buildAuditLogsQuery(Request $request)
+    {
         $query = AuditLog::with('user');
         
         // Search functionality
@@ -551,19 +673,6 @@ class UserController extends Controller
             $query->orderBy($sortBy, $sortDirection);
         }
         
-        // Paginate results
-        $perPage = $request->input('per_page', 20);
-        $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 20;
-        $auditLogs = $query->paginate($perPage)->withQueryString();
-        
-        // Get available actions for filter dropdown
-        $availableActions = array_keys(AuditLogService::getAllActions());
-        
-        // Get all users for filter dropdown
-        $availableUsers = User::select('user_id', 'name', 'email')
-            ->orderBy('name')
-            ->get();
-        
-        return view('audit.logs', compact('auditLogs', 'availableActions', 'availableUsers'));
+        return $query;
     }
 }

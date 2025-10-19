@@ -97,9 +97,9 @@
                             <div class="text-sm {{ $meeting->hasQuorum() ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300' }}">
                                 <strong>{{ __('Quorum') }}:</strong> 
                                 @if ($meeting->hasQuorum())
-                                    {{ __('Reached') }} - {{ __('Voting is allowed') }}
+                                    {{ __('Reached') }} - {{ __('Meeting is valid') }}
                                 @else
-                                    {{ __('Not reached') }} - {{ __('Voting is disabled') }}
+                                    {{ __('Not reached') }} - {{ __('Meeting is not valid') }}
                                 @endif
                                 <br>
                                 <small>{{ __('Required') }}: {{ ceil($meeting->body->members->count() / 2) }} {{ __('attendees') }}</small>

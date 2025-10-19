@@ -110,8 +110,8 @@
                         </form>
                     </div>
 
-                    <!-- Results Count -->
-                    <div class="mb-4">
+                    <!-- Results Count and Export Buttons -->
+                    <div class="mb-4 flex items-center justify-between">
                         <p class="text-sm text-gray-600 dark:text-gray-400">
                             {{ __('Showing :from to :to of :total results', [
                                 'from' => $auditLogs->firstItem() ?? 0,
@@ -119,6 +119,25 @@
                                 'total' => $auditLogs->total()
                             ]) }}
                         </p>
+                        
+                        <!-- Export Buttons -->
+                        <div class="flex items-center space-x-2">
+                            <a href="{{ route('audit.logs.export.json', request()->query()) }}" 
+                               class="inline-flex items-center px-3 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                {{ __('Export JSON') }}
+                            </a>
+                            
+                            <a href="{{ route('audit.logs.export.pdf', request()->query()) }}" 
+                               class="inline-flex items-center px-3 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                                {{ __('Export PDF') }}
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Audit Logs Table -->
