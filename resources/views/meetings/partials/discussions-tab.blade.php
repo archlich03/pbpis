@@ -146,8 +146,8 @@
 
                                                 {{-- Actions --}}
                                                 <div class="flex items-center space-x-2">
-                                                    {{-- AI Consent Checkbox (Secretary/IT Admin only, visible throughout meeting lifecycle) --}}
-                                                    @if (in_array(Auth::user()->role, ['Sekretorius', 'IT administratorius']))
+                                                    {{-- AI Consent Checkbox (Secretary/IT Admin only, visible throughout meeting lifecycle, only if AI enabled) --}}
+                                                    @if ($aiEnabled && in_array(Auth::user()->role, ['Sekretorius', 'IT administratorius']))
                                                         <div class="flex items-center space-x-1" 
                                                              x-data="{ 
                                                                  aiConsent: {{ $discussion->ai_consent ? 'true' : 'false' }},
@@ -291,8 +291,8 @@
                             @endforeach
                         </div>
                         
-                        {{-- Generate AI Summary Button (Secretary/IT Admin only, finished meetings only) --}}
-                        @if ($meeting->status === 'Baigtas' && in_array(Auth::user()->role, ['Sekretorius', 'IT administratorius']))
+                        {{-- Generate AI Summary Button (Secretary/IT Admin only, finished meetings only, AI enabled) --}}
+                        @if ($aiEnabled && $meeting->status === 'Baigtas' && in_array(Auth::user()->role, ['Sekretorius', 'IT administratorius']))
                             <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                                 <form method="POST" action="{{ route('discussions.generateAISummary', [$meeting, $question]) }}" 
                                       @submit.prevent="if ((consentCounts[{{ $question->question_id }}] || 0) > 0 && confirm('{{ __('Generate AI summary from comments with AI consent? This will replace the current question summary.') }}')) { $el.submit(); } else if ((consentCounts[{{ $question->question_id }}] || 0) === 0) { alert('{{ __('No comments with AI consent found for this question.') }}'); }">
@@ -309,11 +309,15 @@
                                                 <span x-bind:class="(consentCounts[{{ $question->question_id }}] || 0) > 0 ? 'text-purple-600 dark:text-purple-400' : 'text-red-600 dark:text-red-400'" 
                                                       x-text="(consentCounts[{{ $question->question_id }}] || 0) + ' {{ __('comments with AI consent') }}'">
                                                 </span>
+                                                <br>
+                                                <span class="{{ $aiUsedToday >= $aiDailyLimit ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-500 dark:text-gray-500' }}">
+                                                    {{ __('Daily limit') }}: {{ $aiUsedToday }}/{{ $aiDailyLimit }}
+                                                </span>
                                             </p>
                                         </div>
                                         <button type="submit" 
-                                                :disabled="(consentCounts[{{ $question->question_id }}] || 0) === 0"
-                                                :class="(consentCounts[{{ $question->question_id }}] || 0) > 0 ? 'bg-purple-600 hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900' : 'bg-gray-400 cursor-not-allowed'"
+                                                :disabled="(consentCounts[{{ $question->question_id }}] || 0) === 0 || {{ $aiUsedToday >= $aiDailyLimit ? 'true' : 'false' }}"
+                                                :class="(consentCounts[{{ $question->question_id }}] || 0) > 0 && {{ $aiUsedToday < $aiDailyLimit ? 'true' : 'false' }} ? 'bg-purple-600 hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900' : 'bg-gray-400 cursor-not-allowed'"
                                                 class="inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 disabled:opacity-50">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>

@@ -230,11 +230,28 @@ class DiscussionController extends Controller
                 ->with('error', __('AI summaries can only be generated for finished meetings.'));
         }
 
-        // Check for 5-minute cooldown using audit logs
+        // Check daily rate limit
+        $maxRequestsPerDay = config('services.gemini.max_requests_per_day', 10);
+        $startOfDay = now()->startOfDay();
+        $todayGenerations = AuditLog::where('action', 'ai_summary_generated')
+            ->where('created_at', '>=', $startOfDay)
+            ->count();
+
+        if ($todayGenerations >= $maxRequestsPerDay) {
+            return redirect()
+                ->route('meetings.show', $meeting)
+                ->with('error', __('Daily AI summary generation limit reached (:count/:max). Please try again tomorrow.', [
+                    'count' => $todayGenerations,
+                    'max' => $maxRequestsPerDay
+                ]));
+        }
+
+        // Check 5-minute cooldown per question
+        $fiveMinutesAgo = now()->subMinutes(5);
         $recentGeneration = AuditLog::where('action', 'ai_summary_generated')
-            ->where('created_at', '>=', now()->subMinutes(5))
-            ->whereJsonContains('details->question_id', $question->question_id)
-            ->orderBy('created_at', 'desc')
+            ->where('user_id', $user->user_id)
+            ->where('created_at', '>=', $fiveMinutesAgo)
+            ->whereRaw("JSON_EXTRACT(details, '$.question_id') = ?", [$question->question_id])
             ->first();
 
         if ($recentGeneration) {

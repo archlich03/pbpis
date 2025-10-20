@@ -459,5 +459,7 @@
   "Failed to generate AI summary. Please try again later.": "Nepavyko sugeneruoti DI santraukos. Bandykite vėliau.",
   "AI summary generated successfully and saved to question summary.": "DI santrauka sėkmingai sugeneruota ir išsaugota klausimo santraukoje.",
   "AI Summary Generated": "DI santrauka sugeneruota",
-  "AI Summary Failed": "DI santraukos generavimas nepavyko"
+  "AI Summary Failed": "DI santraukos generavimas nepavyko",
+  "Daily AI summary generation limit reached (:count/:max). Please try again tomorrow.": "Pasiektas dienos DI santraukų generavimo limitas (:count/:max). Bandykite rytoj.",
+  "Daily limit": "Dienos limitas"
 }

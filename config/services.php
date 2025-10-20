@@ -37,6 +37,7 @@ return [
 
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
+        'max_requests_per_day' => env('GEMINI_MAX_REQUESTS_PER_DAY', 10),
     ],
 
 ];
