@@ -6,11 +6,9 @@
             @foreach ($meeting->questions as $q)
                 {{ $q->question_id }}: {{ $allDiscussions->where('question_id', $q->question_id)->where('ai_consent', true)->count() }},
             @endforeach
-        },
-        updateConsentCount(questionId, increment) {
-            this.consentCounts[questionId] = (this.consentCounts[questionId] || 0) + (increment ? 1 : -1);
         }
-    }">
+    }"
+    @consent-toggled.window="consentCounts[$event.detail.questionId] = ($event.detail.newValue ? (consentCounts[$event.detail.questionId] || 0) + 1 : (consentCounts[$event.detail.questionId] || 0) - 1)">
         {{-- Question Tabs --}}
         @if ($meeting->questions->count() > 1)
             <div class="border-b border-gray-200 dark:border-gray-700 mb-4 -mx-4 sm:mx-0">
@@ -154,9 +152,14 @@
                                                              x-data="{ 
                                                                  aiConsent: {{ $discussion->ai_consent ? 'true' : 'false' }},
                                                                  questionId: {{ $question->question_id }},
-                                                                 async toggleConsent() {
+                                                                 isToggling: false,
+                                                                 async toggleConsent(event) {
+                                                                     if (this.isToggling) return;
+                                                                     this.isToggling = true;
+                                                                     
                                                                      const oldValue = this.aiConsent;
                                                                      const newValue = !oldValue;
+                                                                     
                                                                      try {
                                                                          const response = await fetch('{{ route('discussions.toggleAIConsent', [$meeting, $question, $discussion]) }}', {
                                                                              method: 'POST',
@@ -165,25 +168,39 @@
                                                                                  'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                                                              }
                                                                          });
+                                                                         
+                                                                         if (!response.ok) {
+                                                                             throw new Error('Network response was not ok');
+                                                                         }
+                                                                         
                                                                          const data = await response.json();
                                                                          if (data.success) {
                                                                              this.aiConsent = data.ai_consent;
-                                                                             // Update parent count
-                                                                             this.$root.updateConsentCount(this.questionId, data.ai_consent);
+                                                                             // Dispatch event to update parent count
+                                                                             window.dispatchEvent(new CustomEvent('consent-toggled', {
+                                                                                 detail: {
+                                                                                     questionId: this.questionId,
+                                                                                     oldValue: oldValue,
+                                                                                     newValue: data.ai_consent
+                                                                                 }
+                                                                             }));
                                                                          } else {
                                                                              this.aiConsent = oldValue;
                                                                          }
                                                                      } catch (error) {
                                                                          console.error('Error toggling AI consent:', error);
                                                                          this.aiConsent = oldValue;
+                                                                     } finally {
+                                                                         this.isToggling = false;
                                                                      }
                                                                  }
                                                              }">
                                                             <label class="flex items-center space-x-1 cursor-pointer">
                                                                 <input type="checkbox" 
                                                                        :checked="aiConsent"
-                                                                       @click="toggleConsent()"
-                                                                       class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                                                                       :disabled="isToggling"
+                                                                       @click.prevent="toggleConsent($event)"
+                                                                       class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed">
                                                                 <span class="text-xs text-gray-600 dark:text-gray-400" title="{{ __('Include this comment in AI-generated summary') }}">
                                                                     {{ __('AI') }}
                                                                 </span>
@@ -278,7 +295,7 @@
                         @if ($meeting->status === 'Baigtas' && in_array(Auth::user()->role, ['Sekretorius', 'IT administratorius']))
                             <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                                 <form method="POST" action="{{ route('discussions.generateAISummary', [$meeting, $question]) }}" 
-                                      onsubmit="return confirm('{{ __('Generate AI summary from comments with AI consent? This will replace the current question summary.') }}');">
+                                      @submit.prevent="if ((consentCounts[{{ $question->question_id }}] || 0) > 0 && confirm('{{ __('Generate AI summary from comments with AI consent? This will replace the current question summary.') }}')) { $el.submit(); } else if ((consentCounts[{{ $question->question_id }}] || 0) === 0) { alert('{{ __('No comments with AI consent found for this question.') }}'); }">
                                     @csrf
                                     <div class="flex items-center justify-between">
                                         <div class="text-sm text-gray-600 dark:text-gray-400">
@@ -289,12 +306,15 @@
                                             <p class="mt-1 text-xs">
                                                 {{ __('Generate a formal meeting summary from comments marked with AI consent.') }}
                                                 <br>
-                                                <span class="text-purple-600 dark:text-purple-400" x-text="(consentCounts[{{ $question->question_id }}] || 0) + ' {{ __('comments with AI consent') }}'">
+                                                <span x-bind:class="(consentCounts[{{ $question->question_id }}] || 0) > 0 ? 'text-purple-600 dark:text-purple-400' : 'text-red-600 dark:text-red-400'" 
+                                                      x-text="(consentCounts[{{ $question->question_id }}] || 0) + ' {{ __('comments with AI consent') }}'">
                                                 </span>
                                             </p>
                                         </div>
                                         <button type="submit" 
-                                                class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                :disabled="(consentCounts[{{ $question->question_id }}] || 0) === 0"
+                                                :class="(consentCounts[{{ $question->question_id }}] || 0) > 0 ? 'bg-purple-600 hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900' : 'bg-gray-400 cursor-not-allowed'"
+                                                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 disabled:opacity-50">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                             </svg>

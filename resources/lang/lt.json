@@ -455,8 +455,9 @@
   "Generate AI Summary": "Generuoti DI santrauką",
   "Generate AI summary from comments with AI consent? This will replace the current question summary.": "Generuoti DI santrauką iš pažymėtų komentarų? Tai pakeis esamą klausimo santrauką.",
   "AI summaries can only be generated for finished meetings.": "DI santraukos gali būti generuojamos tik baigtiems posėdžiams.",
-  "No comments with AI consent found for this question.": "Nerasta pažymėtų komentarų šiam klausimui.",
+  "No comments with AI consent found for this question.": "Nerasta pažymėtų komentarų šiam klausimui. Pažymėkite bent vieną komentarą DI ženkleliu prieš generuojant santrauką.",
   "Failed to generate AI summary. Please try again later.": "Nepavyko sugeneruoti DI santraukos. Bandykite vėliau.",
   "AI summary generated successfully and saved to question summary.": "DI santrauka sėkmingai sugeneruota ir išsaugota klausimo santraukoje.",
-  "AI Summary Generated": "DI santrauka sugeneruota"
+  "AI Summary Generated": "DI santrauka sugeneruota",
+  "AI Summary Failed": "DI santraukos generavimas nepavyko"
 }

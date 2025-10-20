@@ -266,13 +266,30 @@ class DiscussionController extends Controller
         })->toArray();
 
         // Generate summary
-        $summary = $geminiService->generateMeetingSummary($comments, $question->title);
+        $result = $geminiService->generateMeetingSummary($comments, $question->title);
 
-        if (!$summary) {
+        if (!$result['success']) {
+            // Log the failure to audit log
+            AuditLog::log(
+                $user->user_id,
+                'ai_summary_failed',
+                $request->ip(),
+                $request->userAgent(),
+                [
+                    'meeting_id' => $meeting->meeting_id,
+                    'question_id' => $question->question_id,
+                    'question_title' => $question->title,
+                    'comments_count' => $discussions->count(),
+                    'error' => $result['error'],
+                ]
+            );
+
             return redirect()
                 ->route('meetings.show', $meeting)
-                ->with('error', __('Failed to generate AI summary. Please try again later.'));
+                ->with('error', __('Failed to generate AI summary. Please try again later.') . ' (' . $result['error'] . ')');
         }
+
+        $summary = $result['summary'];
 
         // Truncate if necessary (summary column limit)
         $summary = $geminiService->truncateSummary($summary, 5000);
@@ -280,7 +297,7 @@ class DiscussionController extends Controller
         // Update question's summary
         $question->update(['summary' => $summary]);
 
-        // Log the AI summary generation
+        // Log the successful AI summary generation
         AuditLog::log(
             $user->user_id,
             'ai_summary_generated',

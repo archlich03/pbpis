@@ -21,17 +21,19 @@ class GeminiAIService
      *
      * @param array $comments Array of comments with 'name' and 'content' keys
      * @param string $questionTitle The question title for context
-     * @return string|null Generated summary or null on failure
+     * @return array ['success' => bool, 'summary' => string|null, 'error' => string|null]
      */
-    public function generateMeetingSummary(array $comments, string $questionTitle): ?string
+    public function generateMeetingSummary(array $comments, string $questionTitle): array
     {
         if (empty($this->apiKey)) {
-            Log::error('Gemini API key not configured');
-            return null;
+            $error = 'Gemini API key not configured';
+            Log::error($error);
+            return ['success' => false, 'summary' => null, 'error' => $error];
         }
 
         if (empty($comments)) {
-            return null;
+            $error = 'No comments provided';
+            return ['success' => false, 'summary' => null, 'error' => $error];
         }
 
         // Build the prompt
@@ -59,22 +61,29 @@ class GeminiAIService
                 $data = $response->json();
                 
                 if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-                    return trim($data['candidates'][0]['content']['parts'][0]['text']);
+                    $summary = trim($data['candidates'][0]['content']['parts'][0]['text']);
+                    return ['success' => true, 'summary' => $summary, 'error' => null];
                 }
+                
+                $error = 'Invalid response structure from Gemini API';
+                Log::error($error, ['response' => $data]);
+                return ['success' => false, 'summary' => null, 'error' => $error];
             }
 
-            Log::error('Gemini API request failed', [
+            $error = 'Gemini API request failed: HTTP ' . $response->status();
+            Log::error($error, [
                 'status' => $response->status(),
                 'body' => $response->body()
             ]);
 
-            return null;
+            return ['success' => false, 'summary' => null, 'error' => $error . ' - ' . substr($response->body(), 0, 200)];
         } catch (\Exception $e) {
-            Log::error('Gemini API exception', [
+            $error = 'Gemini API exception: ' . $e->getMessage();
+            Log::error($error, [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return null;
+            return ['success' => false, 'summary' => null, 'error' => $error];
         }
     }
 

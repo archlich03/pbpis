@@ -126,6 +126,11 @@ class AuditLogService
             'description' => 'AI-generated summary created for question discussions',
             'color' => 'purple',
         ],
+        'ai_summary_failed' => [
+            'name' => 'AI Summary Failed',
+            'description' => 'AI summary generation failed with error',
+            'color' => 'red',
+        ],
     ];
 
     /**
