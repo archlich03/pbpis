@@ -93,6 +93,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/meetings/{meeting}/questions/{question}/discussions', [DiscussionController::class, 'store'])->name('discussions.store');
     Route::patch('/meetings/{meeting}/questions/{question}/discussions/{discussion}', [DiscussionController::class, 'update'])->name('discussions.update');
     Route::delete('/meetings/{meeting}/questions/{question}/discussions/{discussion}', [DiscussionController::class, 'destroy'])->name('discussions.destroy');
+    
+    // AI features for discussions
+    Route::post('/meetings/{meeting}/questions/{question}/discussions/{discussion}/toggle-ai-consent', [DiscussionController::class, 'toggleAIConsent'])->name('discussions.toggleAIConsent');
+    Route::post('/meetings/{meeting}/questions/{question}/generate-ai-summary', [DiscussionController::class, 'generateAISummary'])->name('discussions.generateAISummary');
 });
 
 // Email routes

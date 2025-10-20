@@ -116,7 +116,14 @@ class MeetingController extends Controller
             $meeting->save();
         }
 
-        return view('meetings.show', ['meeting' => $meeting, 'users' => $users]);//, 'members' => $members]);
+        // Load all discussions for this meeting (for AI consent count)
+        $allDiscussions = \App\Models\Discussion::whereIn('question_id', $meeting->questions->pluck('question_id'))->get();
+
+        return view('meetings.show', [
+            'meeting' => $meeting, 
+            'users' => $users,
+            'allDiscussions' => $allDiscussions
+        ]);
     }
 
     /**

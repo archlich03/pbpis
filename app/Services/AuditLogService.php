@@ -119,6 +119,13 @@ class AuditLogService
             'description' => 'Email sent to body members',
             'color' => 'blue',
         ],
+        
+        // AI actions
+        'ai_summary_generated' => [
+            'name' => 'AI Summary Generated',
+            'description' => 'AI-generated summary created for question discussions',
+            'color' => 'purple',
+        ],
     ];
 
     /**
