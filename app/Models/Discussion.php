@@ -19,9 +19,11 @@ class Discussion extends Model
         'user_id',
         'parent_id',
         'content',
+        'ai_consent',
     ];
 
     protected $casts = [
+        'ai_consent' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',

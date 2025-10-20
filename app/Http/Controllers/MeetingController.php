@@ -116,7 +116,29 @@ class MeetingController extends Controller
             $meeting->save();
         }
 
-        return view('meetings.show', ['meeting' => $meeting, 'users' => $users]);//, 'members' => $members]);
+        // Load all discussions for this meeting (for AI consent count)
+        $allDiscussions = \App\Models\Discussion::whereIn('question_id', $meeting->questions->pluck('question_id'))->get();
+
+        // Check AI feature availability and daily rate limit
+        $geminiApiKey = config('services.gemini.api_key');
+        $aiEnabled = !empty($geminiApiKey);
+        $aiDailyLimit = config('services.gemini.max_requests_per_day', 10);
+        $aiUsedToday = 0;
+        
+        if ($aiEnabled) {
+            $aiUsedToday = \App\Models\AuditLog::where('action', 'ai_summary_generated')
+                ->where('created_at', '>=', now()->startOfDay())
+                ->count();
+        }
+
+        return view('meetings.show', [
+            'meeting' => $meeting, 
+            'users' => $users,
+            'allDiscussions' => $allDiscussions,
+            'aiEnabled' => $aiEnabled,
+            'aiDailyLimit' => $aiDailyLimit,
+            'aiUsedToday' => $aiUsedToday,
+        ]);
     }
 
     /**

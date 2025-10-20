@@ -1,6 +1,14 @@
 {{-- Discussions Tab - Only for E-Vote Meetings --}}
 @if ($meeting->is_evote)
-    <div x-data="{ activeQuestion: {{ session('active_question_id', $meeting->questions->first()->question_id ?? 0) }} }">
+    <div x-data="{ 
+        activeQuestion: {{ session('active_question_id', $meeting->questions->first()->question_id ?? 0) }},
+        consentCounts: {
+            @foreach ($meeting->questions as $q)
+                {{ $q->question_id }}: {{ $allDiscussions->where('question_id', $q->question_id)->where('ai_consent', true)->count() }},
+            @endforeach
+        }
+    }"
+    @consent-toggled.window="consentCounts[$event.detail.questionId] = ($event.detail.newValue ? (consentCounts[$event.detail.questionId] || 0) + 1 : (consentCounts[$event.detail.questionId] || 0) - 1)">
         {{-- Question Tabs --}}
         @if ($meeting->questions->count() > 1)
             <div class="border-b border-gray-200 dark:border-gray-700 mb-4 -mx-4 sm:mx-0">
@@ -137,8 +145,70 @@
                                                 </div>
 
                                                 {{-- Actions --}}
-                                                @if ($meeting->status === 'Vyksta')
-                                                    <div class="flex items-center space-x-2">
+                                                <div class="flex items-center space-x-2">
+                                                    {{-- AI Consent Checkbox (Secretary/IT Admin only, visible throughout meeting lifecycle, only if AI enabled) --}}
+                                                    @if ($aiEnabled && in_array(Auth::user()->role, ['Sekretorius', 'IT administratorius']))
+                                                        <div class="flex items-center space-x-1" 
+                                                             x-data="{ 
+                                                                 aiConsent: {{ $discussion->ai_consent ? 'true' : 'false' }},
+                                                                 questionId: {{ $question->question_id }},
+                                                                 isToggling: false,
+                                                                 async toggleConsent(event) {
+                                                                     if (this.isToggling) return;
+                                                                     this.isToggling = true;
+                                                                     
+                                                                     const oldValue = this.aiConsent;
+                                                                     const newValue = !oldValue;
+                                                                     
+                                                                     try {
+                                                                         const response = await fetch('{{ route('discussions.toggleAIConsent', [$meeting, $question, $discussion]) }}', {
+                                                                             method: 'POST',
+                                                                             headers: {
+                                                                                 'Content-Type': 'application/json',
+                                                                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                                             }
+                                                                         });
+                                                                         
+                                                                         if (!response.ok) {
+                                                                             throw new Error('Network response was not ok');
+                                                                         }
+                                                                         
+                                                                         const data = await response.json();
+                                                                         if (data.success) {
+                                                                             this.aiConsent = data.ai_consent;
+                                                                             // Dispatch event to update parent count
+                                                                             window.dispatchEvent(new CustomEvent('consent-toggled', {
+                                                                                 detail: {
+                                                                                     questionId: this.questionId,
+                                                                                     oldValue: oldValue,
+                                                                                     newValue: data.ai_consent
+                                                                                 }
+                                                                             }));
+                                                                         } else {
+                                                                             this.aiConsent = oldValue;
+                                                                         }
+                                                                     } catch (error) {
+                                                                         console.error('Error toggling AI consent:', error);
+                                                                         this.aiConsent = oldValue;
+                                                                     } finally {
+                                                                         this.isToggling = false;
+                                                                     }
+                                                                 }
+                                                             }">
+                                                            <label class="flex items-center space-x-1 cursor-pointer">
+                                                                <input type="checkbox" 
+                                                                       :checked="aiConsent"
+                                                                       :disabled="isToggling"
+                                                                       @click.prevent="toggleConsent($event)"
+                                                                       class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                                <span class="text-xs text-gray-600 dark:text-gray-400" title="{{ __('Include this comment in AI-generated summary') }}">
+                                                                    {{ __('AI') }}
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                    @endif
+                                                    
+                                                    @if ($meeting->status === 'Vyksta')
                                                         {{-- Reply button --}}
                                                         @if ($meeting->body->members->contains(Auth::user()) || 
                                                              Auth::user()->role === 'Sekretorius' || 
@@ -179,8 +249,8 @@
                                                                 </button>
                                                             </form>
                                                         @endif
-                                                    </div>
-                                                @endif
+                                                    @endif
+                                                </div>
                                             </div>
 
                                             {{-- Quoted parent message (if this is a reply) --}}
@@ -220,6 +290,44 @@
                                 </div>
                             @endforeach
                         </div>
+                        
+                        {{-- Generate AI Summary Button (Secretary/IT Admin only, finished meetings only, AI enabled) --}}
+                        @if ($aiEnabled && $meeting->status === 'Baigtas' && in_array(Auth::user()->role, ['Sekretorius', 'IT administratorius']))
+                            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <form method="POST" action="{{ route('discussions.generateAISummary', [$meeting, $question]) }}" 
+                                      @submit.prevent="if ((consentCounts[{{ $question->question_id }}] || 0) > 0 && confirm('{{ __('Generate AI summary from comments with AI consent? This will replace the current question summary.') }}')) { $el.submit(); } else if ((consentCounts[{{ $question->question_id }}] || 0) === 0) { alert('{{ __('No comments with AI consent found for this question.') }}'); }">
+                                    @csrf
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                                            <svg class="w-5 h-5 inline-block mr-1 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                            </svg>
+                                            <strong>{{ __('AI Summary Generation') }}</strong>
+                                            <p class="mt-1 text-xs">
+                                                {{ __('Generate a formal meeting summary from comments marked with AI consent.') }}
+                                                <br>
+                                                <span x-bind:class="(consentCounts[{{ $question->question_id }}] || 0) > 0 ? 'text-purple-600 dark:text-purple-400' : 'text-red-600 dark:text-red-400'" 
+                                                      x-text="(consentCounts[{{ $question->question_id }}] || 0) + ' {{ __('comments with AI consent') }}'">
+                                                </span>
+                                                <br>
+                                                <span class="{{ $aiUsedToday >= $aiDailyLimit ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-500 dark:text-gray-500' }}">
+                                                    {{ __('Daily limit') }}: {{ $aiUsedToday }}/{{ $aiDailyLimit }}
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <button type="submit" 
+                                                :disabled="(consentCounts[{{ $question->question_id }}] || 0) === 0 || {{ $aiUsedToday >= $aiDailyLimit ? 'true' : 'false' }}"
+                                                :class="(consentCounts[{{ $question->question_id }}] || 0) > 0 && {{ $aiUsedToday < $aiDailyLimit ? 'true' : 'false' }} ? 'bg-purple-600 hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900' : 'bg-gray-400 cursor-not-allowed'"
+                                                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 disabled:opacity-50">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                            </svg>
+                                            {{ __('Generate AI Summary') }}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        @endif
                     @endif
             </div>
         @endforeach
