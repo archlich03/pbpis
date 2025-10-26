@@ -41,14 +41,14 @@ class DiscussionController extends Controller
             abort(403, 'You are not authorized to participate in this discussion.');
         }
 
-        // Rate limiting: 1 message per user per minute
+        // Rate limiting: 1 message per user per 10 seconds (prevent spam)
         $lastComment = Discussion::where('user_id', $user->user_id)
             ->where('question_id', $question->question_id)
-            ->where('created_at', '>', now()->subMinute())
+            ->where('created_at', '>', now()->subSeconds(10))
             ->first();
         
         if ($lastComment) {
-            $secondsRemaining = 60 - now()->diffInSeconds($lastComment->created_at);
+            $secondsRemaining = 10 - now()->diffInSeconds($lastComment->created_at);
             return redirect()
                 ->route('meetings.show', $meeting)
                 ->with('error', __('Please wait :seconds seconds before posting another comment.', ['seconds' => $secondsRemaining]));
@@ -275,7 +275,7 @@ class DiscussionController extends Controller
         }
 
         // Prepare comments for AI with parent context
-        $comments = $discussions->map(function ($discussion) {
+        $comments = $discussions->map(function ($discussion) use ($discussions) {
             $comment = [
                 'id' => $discussion->discussion_id,
                 'name' => $discussion->user->name,
