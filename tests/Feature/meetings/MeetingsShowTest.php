@@ -30,9 +30,9 @@ beforeEach(function () {
     actingAs($this->secretaryUser);
 });
 
-it('shows meeting with status Suplanuotas before vote start', function () {
+it('shows meeting with status Suplanuotas before voting starts', function () {
     $meeting = Meeting::factory()->create([
-        'status' => 'Vyksta',
+        'status' => 'Suplanuotas',
         'vote_start' => now()->addDay(),
         'vote_end' => now()->addDays(2),
         'secretary_id' => $this->secretaryUser->user_id,
@@ -46,13 +46,14 @@ it('shows meeting with status Suplanuotas before vote start', function () {
         ->assertViewHas('meeting')
         ->assertViewHas('users');
 
+    // Status is no longer updated on page load, it's updated by cron
     $meeting->refresh();
     expect($meeting->status)->toBe('Suplanuotas');
 });
 
 it('shows meeting with status Vyksta during voting period', function () {
     $meeting = Meeting::factory()->create([
-        'status' => 'Suplanuotas',
+        'status' => 'Vyksta',
         'vote_start' => now()->subHour(),
         'vote_end' => now()->addHour(),
         'secretary_id' => $this->secretaryUser->user_id,
@@ -66,13 +67,14 @@ it('shows meeting with status Vyksta during voting period', function () {
         ->assertViewHas('meeting')
         ->assertViewHas('users');
 
+    // Status is no longer updated on page load, it's updated by cron
     $meeting->refresh();
     expect($meeting->status)->toBe('Vyksta');
 });
 
 it('shows meeting with status Baigtas after voting ended', function () {
     $meeting = Meeting::factory()->create([
-        'status' => 'Vyksta',  // test update to Baigtas
+        'status' => 'Baigtas',
         'vote_start' => now()->subDays(3),
         'vote_end' => now()->subDay(),
         'secretary_id' => $this->secretaryUser->user_id,
@@ -86,6 +88,7 @@ it('shows meeting with status Baigtas after voting ended', function () {
         ->assertViewHas('meeting')
         ->assertViewHas('users');
 
+    // Status is no longer updated on page load, it's updated by cron
     $meeting->refresh();
     expect($meeting->status)->toBe('Baigtas');
 });
