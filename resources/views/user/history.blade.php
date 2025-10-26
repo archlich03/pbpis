@@ -136,7 +136,7 @@
                                                 <span class="font-medium">{{ $log->ip_address }}</span>
                                                 @if($log->user_agent)
                                                     <span class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate max-w-xs cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition-colors" 
-                                                          title="{{ $log->user_agent }} (Double-click to copy)"
+                                                          title="{{ $log->user_agent }} ({{ __('Double-click to copy') }})"
                                                           ondblclick="copyToClipboard(this, '{{ addslashes($log->user_agent) }}')">
                                                         {{ Str::limit($log->user_agent, 50) }}
                                                     </span>
@@ -188,8 +188,8 @@
                 // Show visual feedback
                 const originalText = element.textContent;
                 const originalTitle = element.title;
-                element.textContent = '✓ Copied!';
-                element.title = 'Copied to clipboard!';
+                element.textContent = '✓ {{ __('Copied!') }}';
+                element.title = '{{ __('Copied to clipboard!') }}';
                 element.classList.add('text-green-600', 'dark:text-green-400');
                 
                 // Reset after 1.5 seconds
