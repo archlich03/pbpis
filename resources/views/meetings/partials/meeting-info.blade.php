@@ -27,20 +27,14 @@
                     <option value="1" {{ $meeting->is_evote === 1 ? 'selected' : '' }}>{{ __('Electronic') }}</option>
                 </select>
             </div>
-            <div>
-                <x-input-label for="secretary_id" value="{{ __('Associated secretary') }}:" />
-                <select id="secretary_id" name="secretary_id" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block w-full">
-                    <option value="">{{ __('Select secretary') }}</option>
-                    @foreach ($users as $user)
-                        @if ($user->isSecretary())
-                            <option value="{{ $user->user_id }}"
-                                    @if ($user == $meeting->secretary) selected @endif>
-                                {{ $user->pedagogical_name }} {{ $user->name }}
-                            </option>
-                        @endif
-                    @endforeach
-                </select>
-            </div>
+            <x-user-search-select 
+                name="secretary_id"
+                :label="__('Associated secretary') . ':'"
+                :users="$users"
+                :selected="$meeting->secretary"
+                :filter="fn($user) => $user->isSecretary()"
+                required
+            />
             <div>
                 <x-input-label for="vote_start" value="{{ __('Vote start') }}:" />
                 <x-text-input id="vote_start" name="vote_start" type="datetime-local" class="block w-full" value="{{ $meeting->vote_start->format('Y-m-d\TH:i') }}" />

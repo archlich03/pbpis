@@ -117,7 +117,14 @@ class GeminiAIService
 
         $commentsText = '';
         foreach ($comments as $comment) {
-            $commentsText .= "\n[{$comment['name']}]\n{$comment['content']}\n";
+            $commentId = $comment['id'] ?? 'unknown';
+            
+            // If this is a reply to another comment, indicate that
+            if (!empty($comment['parent_id'])) {
+                $commentsText .= "\n[Komentaras #{$commentId}] [{$comment['name']}] (atsakymas į komentarą #{$comment['parent_id']})\n{$comment['content']}\n";
+            } else {
+                $commentsText .= "\n[Komentaras #{$commentId}] [{$comment['name']}]\n{$comment['content']}\n";
+            }
         }
 
         return $systemPrompt . $commentsText;

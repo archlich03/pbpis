@@ -274,12 +274,24 @@ class DiscussionController extends Controller
                 ->with('error', __('No comments with AI consent found for this question.'));
         }
 
-        // Prepare comments for AI
+        // Prepare comments for AI with parent context
         $comments = $discussions->map(function ($discussion) {
-            return [
+            $comment = [
+                'id' => $discussion->discussion_id,
                 'name' => $discussion->user->name,
                 'content' => $discussion->content,
+                'parent_id' => $discussion->parent_id,
             ];
+            
+            // If this is a reply, include parent comment info
+            if ($discussion->parent_id) {
+                $parent = $discussions->firstWhere('discussion_id', $discussion->parent_id);
+                if ($parent) {
+                    $comment['parent_author'] = $parent->user->name;
+                }
+            }
+            
+            return $comment;
         })->toArray();
 
         // Generate summary

@@ -43,15 +43,12 @@
                         </div>
                     </div>
 
-                    <div class="mt-6">
-                        <x-input-label for="chairman_id" value="{{ __('Chairperson') }}" />
-                        <select id="chairman_id" name="chairman_id" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full" required>
-                            <option value="">{{ __('Select chairperson') }}</option>
-                            @foreach ($users as $user)
-                                <option value="{{ $user->user_id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <x-user-search-select 
+                        name="chairman_id"
+                        :label="__('Chairperson')"
+                        :users="$users"
+                        required
+                    />
 
                     <div class="mt-6" x-data="memberSelector()">
                         <x-input-label for="members" value="{{ __('Members') }}" />
