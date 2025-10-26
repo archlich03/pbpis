@@ -136,7 +136,18 @@
                                                         </form>
                                                     @endif
                                                 @else
-                                                    <a href="{{ route('users.edit', $user) }}" class="hover:underline font-semibold">{{ __('Edit') }}</a>
+                                                    @php
+                                                        // IT admins can edit everyone
+                                                        // Secretaries can only edit voters (Balsuojantysis)
+                                                        $canEdit = Auth::user()->isAdmin() || 
+                                                                   (Auth::user()->isSecretary() && $user->role === 'Balsuojantysis');
+                                                    @endphp
+                                                    
+                                                    @if($canEdit)
+                                                        <a href="{{ route('users.edit', $user) }}" class="hover:underline font-semibold">{{ __('Edit') }}</a>
+                                                    @else
+                                                        <span class="text-gray-400 dark:text-gray-500">{{ __('Edit') }}</span>
+                                                    @endif
                                                 @endif
                                             </td>
                                         </tr>

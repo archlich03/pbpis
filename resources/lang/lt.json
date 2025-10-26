@@ -248,7 +248,8 @@
   "History": "Istorija",
   "My History": "Mano istorija",
   "Audit Logs": "Audito žurnalai",
-  "Search by action, IP address...": "Ieškoti pagal veiksmą, IP adresą...",
+  "Search by action, IP, user agent, user...": "Ieškoti pagal veiksmą, IP, vartotojo agentą, vartotoją...",
+  "Search by action, IP, user agent...": "Ieškoti pagal veiksmą, IP adresą...",
   "Search by action, IP, user...": "Ieškoti pagal veiksmą, IP, vartotoją...",
   "Action Type": "Veiksmo tipas",
   "All Actions": "Visi veiksmai",
@@ -464,5 +465,17 @@
   "Daily limit": "Dienos limitas",
   "Double-click to copy": "Dukart spustelėkite, kad nukopijuotumėte",
   "Copied!": "Nukopijuota!",
-  "Copied to clipboard!": "Nukopijuota į iškarpinę!"
+  "Copied to clipboard!": "Nukopijuota į iškarpinę!",
+  "The :attribute field is required.": "Laukas :attribute yra privalomas.",
+  "validation.required": "Šis laukas yra privalomas.",
+  "The :attribute field must be a string.": "Laukas :attribute turi būti tekstas.",
+  "The :attribute field must not be greater than :max characters.": "Laukas :attribute negali būti ilgesnis nei :max simbolių.",
+  "The :attribute field must be an array.": "Laukas :attribute turi būti masyvas.",
+  "The :attribute field must have at least :min items.": "Laukas :attribute turi turėti bent :min elementų.",
+  "The :attribute field must be a valid email address.": "Laukas :attribute turi būti teisingas el. pašto adresas.",
+  "The :attribute field must be a date.": "Laukas :attribute turi būti data.",
+  "The :attribute field must be an integer.": "Laukas :attribute turi būti sveikasis skaičius.",
+  "The selected :attribute is invalid.": "Pasirinktas :attribute yra neteisingas.",
+  "subject": "tema",
+  "body": "turinys"
 }
