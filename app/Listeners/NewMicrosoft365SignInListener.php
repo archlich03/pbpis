@@ -58,10 +58,7 @@ class NewMicrosoft365SignInListener
                 Log::info('New user created successfully', ['user_id' => $user->user_id]);
             }
             
-            // Update login status
-            $user->isLoggedIn = true;
-            $user->last_login = now();
-            $user->save();
+            // Note: Login status is tracked via sessions table, not user model
 
             // Store Microsoft Graph token
             (new MsGraph)->storeToken(

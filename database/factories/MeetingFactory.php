@@ -29,7 +29,7 @@ class MeetingFactory extends Factory
             'meeting_id' => Str::uuid(),
             'status' => 'Suplanuotas',
             'secretary_id' => fake()->numberBetween(1, 3),
-            'body_id' => Str::uuid(),
+            'body_id' => \App\Models\Body::factory(),
             'is_evote' => fake()->boolean(),
             'meeting_date' => fake()->dateTimeBetween('-2 years', 'now'),
             'vote_start' => fake()->dateTimeBetween('-2 years', '-1 years'),
