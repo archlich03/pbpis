@@ -35,345 +35,377 @@ beforeEach(function () {
     ]);
 });
 
-describe('Member majority voting (Balsuoti dauguma)', function () {
-    beforeEach(function () {
-        $this->question = Question::factory()->create([
-            'meeting_id' => $this->meeting->meeting_id,
-            'title' => 'Member Majority Question',
-            'type' => 'Balsuoti dauguma',
-            'presenter_id' => $this->chairman->user_id,
-        ]);
-    });
+it('passes with simple majority of body members', function () {
+    $question = Question::factory()->create([
+        'meeting_id' => $this->meeting->meeting_id,
+        'title' => 'Member Majority Question',
+        'type' => 'Balsuoti dauguma',
+        'presenter_id' => $this->chairman->user_id,
+    ]);
 
-    it('passes with simple majority of body members - scenario 1', function () {
-        // Body has 10 members, 6 vote for, 2 vote against
-        $voters = $this->members->take(8);
-        
-        // 6 vote for
-        foreach ($voters->take(6) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Už',
-            ]);
-        }
-
-        // 2 vote against
-        foreach ($voters->skip(6)->take(2) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Prieš',
-            ]);
-        }
-
-        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        // For votes: 6 >= 6 (required) -> PASSES
-        expect($this->meeting->calculateQuestionResult($this->question))->toBeTrue();
-    });
-
-    it('fails without simple majority of body members - scenario 2', function () {
-        // Body has 10 members, 5 vote for, 2 vote against, 3 abstain
-        $voters = $this->members->take(10);
-        
-        // 5 vote for
-        foreach ($voters->take(5) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Už',
-            ]);
-        }
-
-        // 2 vote against
-        foreach ($voters->skip(5)->take(2) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Prieš',
-            ]);
-        }
-
-        // 3 abstain
-        foreach ($voters->skip(7)->take(3) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Susilaiko',
-            ]);
-        }
-
-        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        // For votes: 5 < 6 (required) -> FAILS
-        expect($this->meeting->calculateQuestionResult($this->question))->toBeFalse();
-    });
-
-    it('passes with exact minimum required votes - scenario 3', function () {
-        // Body has 10 members, 6 vote for, 1 vote against, 2 abstain
-        $voters = $this->members->take(9);
-        
-        // 6 vote for (exact minimum)
-        foreach ($voters->take(6) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Už',
-            ]);
-        }
-
-        // 1 vote against
+    // Body has 10 members, 6 vote for, 2 vote against
+    $voters = $this->members->take(8);
+    
+    // 6 vote for
+    foreach ($voters->take(6) as $member) {
         Vote::factory()->create([
-            'question_id' => $this->question->question_id,
-            'user_id' => $voters->skip(6)->first()->user_id,
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Už',
+        ]);
+    }
+
+    // 2 vote against
+    foreach ($voters->skip(6)->take(2) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
             'choice' => 'Prieš',
         ]);
+    }
 
-        // 2 abstain
-        foreach ($voters->skip(7)->take(2) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Susilaiko',
-            ]);
-        }
+    // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+    // For votes: 6 >= 6 (required) -> PASSES
+    expect($this->meeting->calculateQuestionResult($question))->toBeTrue();
+});
 
-        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        // For votes: 6 >= 6 (required) -> PASSES
-        expect($this->meeting->calculateQuestionResult($this->question))->toBeTrue();
-    });
+it('fails without simple majority of body members', function () {
+    $question = Question::factory()->create([
+        'meeting_id' => $this->meeting->meeting_id,
+        'title' => 'Member Majority Question',
+        'type' => 'Balsuoti dauguma',
+        'presenter_id' => $this->chairman->user_id,
+    ]);
 
-    it('fails with insufficient votes - scenario 4', function () {
-        // Body has 10 members, 5 vote for, 4 vote against, 1 abstain
-        $voters = $this->members->take(10);
-        
-        // 5 vote for
-        foreach ($voters->take(5) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Už',
-            ]);
-        }
-
-        // 4 vote against
-        foreach ($voters->skip(5)->take(4) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Prieš',
-            ]);
-        }
-
-        // 1 abstain
+    // Body has 10 members, 5 vote for, 2 vote against, 3 abstain
+    $voters = $this->members->take(10);
+    
+    // 5 vote for
+    foreach ($voters->take(5) as $member) {
         Vote::factory()->create([
-            'question_id' => $this->question->question_id,
-            'user_id' => $voters->skip(9)->first()->user_id,
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Už',
+        ]);
+    }
+
+    // 2 vote against
+    foreach ($voters->skip(5)->take(2) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Prieš',
+        ]);
+    }
+
+    // 3 abstain
+    foreach ($voters->skip(7)->take(3) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
             'choice' => 'Susilaiko',
         ]);
+    }
 
-        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        // For votes: 5 < 6 (required) -> FAILS
-        expect($this->meeting->calculateQuestionResult($this->question))->toBeFalse();
-    });
-
-    it('counts all body member votes regardless of attendance - scenario 5', function () {
-        // Body has 10 members, 7 vote for, 2 vote against
-        // Some voters are not marked as attending (but votes still count)
-        $voters = $this->members->take(9);
-        
-        // Only mark 4 as attending
-        foreach ($voters->take(4) as $member) {
-            $this->meeting->attendances()->create(['user_id' => $member->user_id]);
-        }
-
-        // 7 vote for (including non-attendees)
-        foreach ($voters->take(7) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Už',
-            ]);
-        }
-
-        // 2 vote against
-        foreach ($voters->skip(7)->take(2) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Prieš',
-            ]);
-        }
-
-        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        // For votes: 7 >= 6 (required) -> PASSES
-        expect($this->meeting->calculateQuestionResult($this->question))->toBeTrue();
-    });
+    // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+    // For votes: 5 < 6 (required) -> FAILS
+    expect($this->meeting->calculateQuestionResult($question))->toBeFalse();
 });
 
-describe('All members voting (Balsuoti dauguma)', function () {
-    beforeEach(function () {
-        $this->question = Question::factory()->create([
-            'meeting_id' => $this->meeting->meeting_id,
-            'title' => 'All Members Question',
-            'type' => 'Balsuoti dauguma',
-            'presenter_id' => $this->chairman->user_id,
-        ]);
-    });
+it('passes with exact minimum required votes', function () {
+    $question = Question::factory()->create([
+        'meeting_id' => $this->meeting->meeting_id,
+        'title' => 'Member Majority Question',
+        'type' => 'Balsuoti dauguma',
+        'presenter_id' => $this->chairman->user_id,
+    ]);
 
-    it('passes with simple majority of all body members - scenario 1', function () {
-        // Body has 10 members, 6 vote for, 2 vote against, 3 don't vote
-        $votingMembers = $this->members->take(8);
-        
-        // 6 vote for
-        foreach ($votingMembers->take(6) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Už',
-            ]);
-        }
-
-        // 2 vote against
-        foreach ($votingMembers->skip(6) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Prieš',
-            ]);
-        }
-
-        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        // For votes: 6 >= 6 (required) -> PASSES
-        expect($this->meeting->calculateQuestionResult($this->question))->toBeTrue();
-    });
-
-    it('fails without simple majority of all body members - scenario 2', function () {
-        // Body has 10 members, 5 vote for, 3 vote against, 3 don't vote
-        $votingMembers = $this->members->take(8);
-        
-        // 5 vote for
-        foreach ($votingMembers->take(5) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Už',
-            ]);
-        }
-
-        // 3 vote against
-        foreach ($votingMembers->skip(5) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Prieš',
-            ]);
-        }
-
-        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        // For votes: 5 < 6 (required) -> FAILS
-        expect($this->meeting->calculateQuestionResult($this->question))->toBeFalse();
-    });
-
-    it('counts all votes including non-attendees for all-members voting - scenario 3', function () {
-        // Body has 10 members, 7 total vote (4 attendees + 3 non-attendees), 1 against
-        $attendees = $this->members->take(5);
-        $nonAttendees = $this->members->skip(5)->take(3);
-
-        foreach ($attendees as $member) {
-            $this->meeting->attendances()->create(['user_id' => $member->user_id]);
-        }
-
-        // 4 attendees vote for
-        foreach ($attendees->take(4) as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Už',
-            ]);
-        }
-
-        // 1 attendee votes against
+    // Body has 10 members, 6 vote for, 1 vote against, 2 abstain
+    $voters = $this->members->take(9);
+    
+    // 6 vote for (exact minimum)
+    foreach ($voters->take(6) as $member) {
         Vote::factory()->create([
-            'question_id' => $this->question->question_id,
-            'user_id' => $attendees->skip(4)->first()->user_id,
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Už',
+        ]);
+    }
+
+    // 1 vote against
+    Vote::factory()->create([
+        'question_id' => $question->question_id,
+        'user_id' => $voters->skip(6)->first()->user_id,
+        'choice' => 'Prieš',
+    ]);
+
+    // 2 abstain
+    foreach ($voters->skip(7)->take(2) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Susilaiko',
+        ]);
+    }
+
+    // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+    // For votes: 6 >= 6 (required) -> PASSES
+    expect($this->meeting->calculateQuestionResult($question))->toBeTrue();
+});
+
+it('fails with insufficient votes', function () {
+    $question = Question::factory()->create([
+        'meeting_id' => $this->meeting->meeting_id,
+        'title' => 'Member Majority Question',
+        'type' => 'Balsuoti dauguma',
+        'presenter_id' => $this->chairman->user_id,
+    ]);
+
+    // Body has 10 members, 5 vote for, 4 vote against, 1 abstain
+    $voters = $this->members->take(10);
+    
+    // 5 vote for
+    foreach ($voters->take(5) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Už',
+        ]);
+    }
+
+    // 4 vote against
+    foreach ($voters->skip(5)->take(4) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
             'choice' => 'Prieš',
         ]);
+    }
 
-        // 3 non-attendees vote for (now counted)
-        foreach ($nonAttendees as $member) {
-            Vote::factory()->create([
-                'question_id' => $this->question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Už',
-            ]);
-        }
+    // 1 abstain
+    Vote::factory()->create([
+        'question_id' => $question->question_id,
+        'user_id' => $voters->skip(9)->first()->user_id,
+        'choice' => 'Susilaiko',
+    ]);
 
-        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        expect($this->meeting->calculateQuestionResult($this->question))->toBeTrue();
-    });
+    // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+    // For votes: 5 < 6 (required) -> FAILS
+    expect($this->meeting->calculateQuestionResult($question))->toBeFalse();
 });
 
-describe('Edge cases and quorum requirements', function () {
-    it('allows voting without quorum', function () {
-        // Body has 10 members, only 2 attending (no quorum)
-        $attendees = $this->members->take(2);
-        foreach ($attendees as $member) {
-            $this->meeting->attendances()->create(['user_id' => $member->user_id]);
-        }
+it('counts all body member votes regardless of attendance', function () {
+    $question = Question::factory()->create([
+        'meeting_id' => $this->meeting->meeting_id,
+        'title' => 'Member Majority Question',
+        'type' => 'Balsuoti dauguma',
+        'presenter_id' => $this->chairman->user_id,
+    ]);
 
-        $question = Question::factory()->create([
-            'meeting_id' => $this->meeting->meeting_id,
-            'type' => 'Balsuoti dauguma',
-            'presenter_id' => $this->chairman->user_id,
+    // Body has 10 members, 7 vote for, 2 vote against
+    // Some voters are not marked as attending (but votes still count)
+    $voters = $this->members->take(9);
+    
+    // Only mark 4 as attending
+    foreach ($voters->take(4) as $member) {
+        $this->meeting->attendances()->create(['user_id' => $member->user_id]);
+    }
+
+    // 7 vote for (including non-attendees)
+    foreach ($voters->take(7) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Už',
         ]);
+    }
 
-        // 6 members vote for (more than half of 10)
-        foreach ($this->members->take(6) as $member) {
-            Vote::factory()->create([
-                'question_id' => $question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Už',
-            ]);
-        }
-
-        // Voting is allowed without quorum
-        expect($this->meeting->hasQuorum())->toBeFalse();
-        
-        // Question passes because 6 > 5 (half of 10)
-        expect($this->meeting->calculateQuestionResult($question))->toBeTrue();
-    });
-
-    it('handles empty vote scenarios', function () {
-        $question = Question::factory()->create([
-            'meeting_id' => $this->meeting->meeting_id,
-            'type' => 'Balsuoti dauguma',
-            'presenter_id' => $this->chairman->user_id,
+    // 2 vote against
+    foreach ($voters->skip(7)->take(2) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Prieš',
         ]);
+    }
 
-        // Body has 10 members, no votes cast
-        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        // For votes: 0 < 6 (required) -> FAILS
-        expect($this->meeting->calculateQuestionResult($question))->toBeFalse();
-    });
+    // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+    // For votes: 7 >= 6 (required) -> PASSES
+    expect($this->meeting->calculateQuestionResult($question))->toBeTrue();
+});
 
-    it('handles all abstain votes scenario', function () {
-        $question = Question::factory()->create([
-            'meeting_id' => $this->meeting->meeting_id,
-            'type' => 'Balsuoti dauguma',
-            'presenter_id' => $this->chairman->user_id,
+it('passes with simple majority when all members vote', function () {
+    $question = Question::factory()->create([
+        'meeting_id' => $this->meeting->meeting_id,
+        'title' => 'All Members Question',
+        'type' => 'Balsuoti dauguma',
+        'presenter_id' => $this->chairman->user_id,
+    ]);
+
+    // Body has 10 members, 6 vote for, 2 vote against, 3 don't vote
+    $votingMembers = $this->members->take(8);
+    
+    // 6 vote for
+    foreach ($votingMembers->take(6) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Už',
         ]);
+    }
 
-        // All 10 members abstain
-        foreach ($this->members as $member) {
-            Vote::factory()->create([
-                'question_id' => $question->question_id,
-                'user_id' => $member->user_id,
-                'choice' => 'Susilaiko',
-            ]);
-        }
+    // 2 vote against
+    foreach ($votingMembers->skip(6) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Prieš',
+        ]);
+    }
 
-        // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
-        // For votes: 0 "Už" < 6 (required) -> FAILS
-        expect($this->meeting->calculateQuestionResult($question))->toBeFalse();
-    });
+    // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+    // For votes: 6 >= 6 (required) -> PASSES
+    expect($this->meeting->calculateQuestionResult($question))->toBeTrue();
+});
+
+it('fails without simple majority when all members vote', function () {
+    $question = Question::factory()->create([
+        'meeting_id' => $this->meeting->meeting_id,
+        'title' => 'All Members Question',
+        'type' => 'Balsuoti dauguma',
+        'presenter_id' => $this->chairman->user_id,
+    ]);
+
+    // Body has 10 members, 5 vote for, 3 vote against, 3 don't vote
+    $votingMembers = $this->members->take(8);
+    
+    // 5 vote for
+    foreach ($votingMembers->take(5) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Už',
+        ]);
+    }
+
+    // 3 vote against
+    foreach ($votingMembers->skip(5) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Prieš',
+        ]);
+    }
+
+    // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+    // For votes: 5 < 6 (required) -> FAILS
+    expect($this->meeting->calculateQuestionResult($question))->toBeFalse();
+});
+
+it('counts all votes including non-attendees for all-members voting', function () {
+    $question = Question::factory()->create([
+        'meeting_id' => $this->meeting->meeting_id,
+        'title' => 'All Members Question',
+        'type' => 'Balsuoti dauguma',
+        'presenter_id' => $this->chairman->user_id,
+    ]);
+
+    // Body has 10 members, 7 total vote (4 attendees + 3 non-attendees), 1 against
+    $attendees = $this->members->take(5);
+    $nonAttendees = $this->members->skip(5)->take(3);
+
+    foreach ($attendees as $member) {
+        $this->meeting->attendances()->create(['user_id' => $member->user_id]);
+    }
+
+    // 4 attendees vote for
+    foreach ($attendees->take(4) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Už',
+        ]);
+    }
+
+    // 1 attendee votes against
+    Vote::factory()->create([
+        'question_id' => $question->question_id,
+        'user_id' => $attendees->skip(4)->first()->user_id,
+        'choice' => 'Prieš',
+    ]);
+
+    // 3 non-attendees vote for (now counted)
+    foreach ($nonAttendees as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Už',
+        ]);
+    }
+
+    // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+    expect($this->meeting->calculateQuestionResult($question))->toBeTrue();
+});
+
+it('allows voting without quorum', function () {
+    // Body has 10 members, only 2 attending (no quorum)
+    $attendees = $this->members->take(2);
+    foreach ($attendees as $member) {
+        $this->meeting->attendances()->create(['user_id' => $member->user_id]);
+    }
+
+    $question = Question::factory()->create([
+        'meeting_id' => $this->meeting->meeting_id,
+        'type' => 'Balsuoti dauguma',
+        'presenter_id' => $this->chairman->user_id,
+    ]);
+
+    // 6 members vote for (more than half of 10)
+    foreach ($this->members->take(6) as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Už',
+        ]);
+    }
+
+    // Voting is allowed without quorum
+    expect($this->meeting->hasQuorum())->toBeFalse();
+    
+    // Question passes because 6 > 5 (half of 10)
+    expect($this->meeting->calculateQuestionResult($question))->toBeTrue();
+});
+
+it('handles empty vote scenarios', function () {
+    $question = Question::factory()->create([
+        'meeting_id' => $this->meeting->meeting_id,
+        'type' => 'Balsuoti dauguma',
+        'presenter_id' => $this->chairman->user_id,
+    ]);
+
+    // Body has 10 members, no votes cast
+    // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+    // For votes: 0 < 6 (required) -> FAILS
+    expect($this->meeting->calculateQuestionResult($question))->toBeFalse();
+});
+
+it('handles all abstain votes scenario', function () {
+    $question = Question::factory()->create([
+        'meeting_id' => $this->meeting->meeting_id,
+        'type' => 'Balsuoti dauguma',
+        'presenter_id' => $this->chairman->user_id,
+    ]);
+
+    // All 10 members abstain
+    foreach ($this->members as $member) {
+        Vote::factory()->create([
+            'question_id' => $question->question_id,
+            'user_id' => $member->user_id,
+            'choice' => 'Susilaiko',
+        ]);
+    }
+
+    // Required: >5 votes (more than half of 10 body members) = 6 votes minimum
+    // For votes: 0 "Už" < 6 (required) -> FAILS
+    expect($this->meeting->calculateQuestionResult($question))->toBeFalse();
 });

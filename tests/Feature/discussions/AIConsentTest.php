@@ -54,7 +54,7 @@ beforeEach(function () {
     ]);
 });
 
-test('secretary can toggle AI consent on discussion', function () {
+it('secretary can toggle AI consent on discussion', function () {
     actingAs($this->secretaryUser);
 
     expect($this->discussion->ai_consent)->toBeFalse();
@@ -75,7 +75,7 @@ test('secretary can toggle AI consent on discussion', function () {
     expect($this->discussion->ai_consent)->toBeTrue();
 });
 
-test('IT admin can toggle AI consent on discussion', function () {
+it('IT admin can toggle AI consent on discussion', function () {
     actingAs($this->adminUser);
 
     expect($this->discussion->ai_consent)->toBeFalse();
@@ -96,7 +96,7 @@ test('IT admin can toggle AI consent on discussion', function () {
     expect($this->discussion->ai_consent)->toBeTrue();
 });
 
-test('voter cannot toggle AI consent on discussion', function () {
+it('voter cannot toggle AI consent on discussion', function () {
     actingAs($this->voterUser);
 
     $response = post(route('discussions.toggleAIConsent', [
@@ -111,7 +111,7 @@ test('voter cannot toggle AI consent on discussion', function () {
     expect($this->discussion->ai_consent)->toBeFalse();
 });
 
-test('AI consent can be toggled multiple times', function () {
+it('AI consent can be toggled multiple times', function () {
     actingAs($this->secretaryUser);
 
     // Toggle to true
@@ -140,7 +140,7 @@ test('AI consent can be toggled multiple times', function () {
     expect($this->discussion->ai_consent)->toBeFalse();
 });
 
-test('AI consent defaults to false for new discussions', function () {
+it('AI consent defaults to false for new discussions', function () {
     $newDiscussion = Discussion::factory()->create([
         'question_id' => $this->question->question_id,
         'user_id' => $this->voterUser->user_id,
@@ -150,7 +150,7 @@ test('AI consent defaults to false for new discussions', function () {
     expect($newDiscussion->ai_consent)->toBeFalse();
 });
 
-test('multiple discussions can have different AI consent states', function () {
+it('multiple discussions can have different AI consent states', function () {
     actingAs($this->secretaryUser);
 
     $discussion2 = Discussion::factory()->create([

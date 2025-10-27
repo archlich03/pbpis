@@ -66,7 +66,7 @@ it('allows user to delete their own comment', function () {
 
     $response->assertRedirect(route('meetings.show', $this->meeting));
 
-    $this->assertSoftDeleted('discussions', [
+    $this->assertDatabaseMissing('discussions', [
         'discussion_id' => $this->discussion->discussion_id,
     ]);
 });
@@ -84,7 +84,7 @@ it('allows secretary to delete any comment', function () {
 
     $response->assertRedirect(route('meetings.show', $this->meeting));
 
-    $this->assertSoftDeleted('discussions', [
+    $this->assertDatabaseMissing('discussions', [
         'discussion_id' => $this->discussion->discussion_id,
     ]);
 });
@@ -102,7 +102,7 @@ it('allows IT admin to delete any comment', function () {
 
     $response->assertRedirect(route('meetings.show', $this->meeting));
 
-    $this->assertSoftDeleted('discussions', [
+    $this->assertDatabaseMissing('discussions', [
         'discussion_id' => $this->discussion->discussion_id,
     ]);
 });
@@ -121,7 +121,7 @@ it('prevents regular user from deleting others comments', function () {
     $response->assertForbidden();
 });
 
-it('soft deletes replies when parent is deleted', function () {
+it('deletes replies when parent is deleted', function () {
     actingAs($this->members->first());
 
     // Create reply
@@ -141,12 +141,12 @@ it('soft deletes replies when parent is deleted', function () {
         '_token' => csrf_token(),
     ]);
 
-    // Both parent and reply should be soft deleted
-    $this->assertSoftDeleted('discussions', [
+    // Both parent and reply should be deleted
+    $this->assertDatabaseMissing('discussions', [
         'discussion_id' => $this->discussion->discussion_id,
     ]);
 
-    $this->assertSoftDeleted('discussions', [
+    $this->assertDatabaseMissing('discussions', [
         'discussion_id' => $reply->discussion_id,
     ]);
 });

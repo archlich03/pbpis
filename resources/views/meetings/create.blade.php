@@ -13,19 +13,14 @@
                         </h2>
                     </div>
 
-                    <div class="mt-6">
-                        <x-input-label for="secretary_id" value="{{ __('Associated secretary') }}:" />
-                        <select id="secretary_id" name="secretary_id" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block w-full mt-1">
-                            <option value="">{{ __('Select secretary') }}</option>
-                            @foreach ($users as $user)
-                                @if ($user->isSecretary())
-                                    <option value="{{ $user->user_id }}"
-                                        @if ($user == Auth::user() && Auth::user()->isSecretary()) selected @endif
-                                        required>{{ $user->name }}</option>
-                                @endif
-                            @endforeach
-                        </select>
-                    </div>
+                    <x-user-search-select 
+                        name="secretary_id"
+                        :label="__('Associated secretary') . ':'"
+                        :users="$users"
+                        :selected="Auth::user()->isSecretary() ? Auth::user() : null"
+                        :filter="fn($user) => $user->isSecretary()"
+                        required
+                    />
 
                     <div class="mt-6">
                         <x-input-label for="is_evote" value="{{ __('Meeting type') }}:" class="flex items-center" />

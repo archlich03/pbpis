@@ -105,16 +105,8 @@ class MeetingController extends Controller
             abort(403);
         }
 
-        if ($meeting->status != 'Suplanuotas' && now() < $meeting->vote_start && now()) {
-            $meeting->status = 'Suplanuotas';
-            $meeting->save();
-        } elseif ($meeting->status != 'Vyksta' && now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
-            $meeting->status = 'Vyksta';
-            $meeting->save();
-        } elseif ($meeting->status != 'Baigtas' && now() >= $meeting->vote_end) {
-            $meeting->status = 'Baigtas';
-            $meeting->save();
-        }
+        // Meeting status is updated by cron job (meetings:update-statuses)
+        // No need to check and update status on page load
 
         // Load all discussions for this meeting (for AI consent count)
         $allDiscussions = \App\Models\Discussion::whereIn('question_id', $meeting->questions->pluck('question_id'))->get();

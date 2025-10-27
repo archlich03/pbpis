@@ -6,11 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Discussion extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $primaryKey = 'discussion_id';
 
@@ -26,7 +25,6 @@ class Discussion extends Model
         'ai_consent' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -36,13 +34,9 @@ class Discussion extends Model
     {
         parent::boot();
 
-        // When a discussion is soft deleted, also soft delete all its replies
+        // When a discussion is deleted, also delete all its replies
         static::deleting(function ($discussion) {
-            if ($discussion->isForceDeleting()) {
-                $discussion->replies()->forceDelete();
-            } else {
-                $discussion->replies()->delete();
-            }
+            $discussion->replies()->delete();
         });
     }
 

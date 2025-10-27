@@ -98,19 +98,8 @@ class BodyController extends Controller
             abort(403);
         }
 
-        $meetings = $body->meetings()->orderBy('meeting_date', 'desc')->limit(5)->get();
-        foreach ($meetings as $meeting) {
-            if ($meeting->status != 'Suplanuotas' && now() < $meeting->vote_start && now()) {
-                $meeting->status = 'Suplanuotas';
-                $meeting->save();
-            } elseif ($meeting->status != 'Vyksta' && now() >= $meeting->vote_start && now() <= $meeting->vote_end) {
-                $meeting->status = 'Vyksta';
-                $meeting->save();
-            } elseif ($meeting->status != 'Baigtas' && now() >= $meeting->vote_end) {
-                $meeting->status = 'Baigtas';
-                $meeting->save();
-            }
-        }
+        // Meeting statuses are updated by cron job (meetings:update-statuses)
+        // No need to check and update status on page load
 
         return view('bodies.show', ['body' => $body]);
     }

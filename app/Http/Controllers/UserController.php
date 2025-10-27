@@ -476,7 +476,15 @@ class UserController extends Controller
     {
         $user = Auth::user();
         
-        $query = AuditLog::where('user_id', $user->user_id)
+        // Show logs where user performed the action OR where action was performed on their behalf
+        $query = AuditLog::where(function($q) use ($user) {
+                $q->where('user_id', $user->user_id)
+                  ->orWhere(function($subQ) use ($user) {
+                      // Include proxy votes cast for this user
+                      $subQ->whereIn('action', ['proxy_vote_cast', 'proxy_vote_removed'])
+                           ->whereRaw("JSON_EXTRACT(details, '$.target_user_id') = ?", [$user->user_id]);
+                  });
+            })
             ->orderBy('created_at', 'desc');
         
         // Search functionality

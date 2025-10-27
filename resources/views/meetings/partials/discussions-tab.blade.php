@@ -34,7 +34,8 @@
                  x-transition:enter-start="opacity-0"
                  x-transition:enter-end="opacity-100"
                  role="tabpanel"
-                 class="space-y-4">
+                 class="space-y-4"
+                 x-data="{ content: '', replyTo: null, replyToName: '', replyToContent: '' }">
                     {{-- Question Header --}}
                     @if ($meeting->questions->count() > 1)
                         <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
@@ -57,7 +58,7 @@
                           Auth::user()->role === 'IT administratorius'))
                         <form method="POST" action="{{ route('discussions.store', [$meeting, $question]) }}" 
                               class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4"
-                              x-data="{ content: '', replyTo: null, replyToName: '', replyToContent: '' }">
+                              id="discussion-form-{{ $question->question_id }}">
                             @csrf
                             
                             {{-- Reply indicator with quoted message --}}
@@ -215,13 +216,14 @@
                                                              Auth::user()->role === 'IT administratorius')
                                                             <button type="button" 
                                                                     @click="
-                                                                        let form = $el.closest('.p-4').querySelector('form');
-                                                                        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                                                        let alpineData = Alpine.$data(form);
-                                                                        alpineData.replyTo = {{ $discussion->discussion_id }};
-                                                                        alpineData.replyToName = '{{ $discussion->user->name }}';
-                                                                        alpineData.replyToContent = {{ Js::from(Str::limit($discussion->content, 100)) }};
-                                                                        form.querySelector('textarea').focus();"
+                                                                        replyTo = {{ $discussion->discussion_id }};
+                                                                        replyToName = '{{ $discussion->user->name }}';
+                                                                        replyToContent = {{ Js::from(Str::limit($discussion->content, 100)) }};
+                                                                        let form = document.getElementById('discussion-form-{{ $question->question_id }}');
+                                                                        if (form) {
+                                                                            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                                                            setTimeout(() => form.querySelector('textarea').focus(), 300);
+                                                                        }"
                                                                     class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 font-medium">
                                                                 {{ __('Reply') }}
                                                             </button>

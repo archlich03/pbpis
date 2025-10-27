@@ -8,6 +8,11 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+// Schedule meeting status updates to run every minute
+Schedule::command('meetings:update-statuses')
+    ->everyMinute()
+    ->withoutOverlapping();
+
 // Schedule email queue processing to run every minute (5 emails per run)
 Schedule::command('email:process-queue --limit=5')
     ->everyMinute()

@@ -28,15 +28,12 @@
                             </select>
                         </div>
 
-                        <div class="mt-4">
-                            <x-input-label for="presenter_id" value="{{ __('Presenter') }}:" />
-                            <select id="presenter_id" name="presenter_id" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full">
-                                @foreach ($users as $user)
-                                    @if (!$user->isSecretary()) continue; @endif
-                                    <option value="{{ $user->user_id }}" {{ old('presenter_id') == $user->user_id ? 'selected' : '' }}>{{ $user->pedagogical_name }} {{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <x-user-search-select 
+                            name="presenter_id"
+                            :label="__('Presenter') . ':'"
+                            :users="$users"
+                            :filter="fn($user) => $user->isSecretary()"
+                        />
 
                         <div class="mt-4">
                             <x-input-label for="decision" value="{{ __('Question decision') }}:" />

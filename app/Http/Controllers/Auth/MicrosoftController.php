@@ -334,10 +334,7 @@ class MicrosoftController extends Controller
         // Store Microsoft tokens in user record or session if needed
         // You can add code here to store the tokens if needed
         
-        // Update login status
-        $user->isLoggedIn = true;
-        $user->last_login = now();
-        $user->save();
+        // Note: Login status is tracked via sessions table, not user model
         
         return $user;
     }

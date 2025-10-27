@@ -55,7 +55,7 @@ beforeEach(function () {
     ]);
 });
 
-test('only discussions with AI consent are included in summary generation', function () {
+it('only discussions with AI consent are included in summary generation', function () {
     // Create discussions with mixed consent states
     $discussion1 = Discussion::factory()->create([
         'question_id' => $this->question->question_id,
@@ -117,7 +117,7 @@ test('only discussions with AI consent are included in summary generation', func
     expect($this->question->summary)->toBe('Generated summary from consented comments');
 });
 
-test('comments are passed to AI in chronological order (oldest first)', function () {
+it('comments are passed to AI in chronological order (oldest first)', function () {
     // Create discussions with specific timestamps
     $discussion1 = Discussion::factory()->create([
         'question_id' => $this->question->question_id,
@@ -172,7 +172,7 @@ test('comments are passed to AI in chronological order (oldest first)', function
     ]));
 });
 
-test('generation fails when no comments have AI consent', function () {
+it('generation fails when no comments have AI consent', function () {
     // Create discussions without consent
     Discussion::factory()->create([
         'question_id' => $this->question->question_id,
@@ -195,7 +195,7 @@ test('generation fails when no comments have AI consent', function () {
     expect($this->question->summary)->toBeNull();
 });
 
-test('generation fails when meeting is not finished', function () {
+it('generation fails when meeting is not finished', function () {
     // Update meeting to ongoing status
     $this->meeting->update(['status' => 'Vyksta']);
 
@@ -217,7 +217,7 @@ test('generation fails when meeting is not finished', function () {
     $response->assertSessionHas('error');
 });
 
-test('voter cannot generate AI summary', function () {
+it('voter cannot generate AI summary', function () {
     Discussion::factory()->create([
         'question_id' => $this->question->question_id,
         'user_id' => $this->members[0]->user_id,
@@ -235,7 +235,7 @@ test('voter cannot generate AI summary', function () {
     $response->assertStatus(403);
 });
 
-test('daily rate limit blocks generation when limit reached', function () {
+it('daily rate limit blocks generation when limit reached', function () {
     // Create 10 audit log entries for today
     $maxLimit = config('services.gemini.max_requests_per_day');
     for ($i = 0; $i < $maxLimit; $i++) {
@@ -267,7 +267,7 @@ test('daily rate limit blocks generation when limit reached', function () {
     $response->assertSessionHas('error');
 });
 
-test('daily rate limit allows generation when under limit', function () {
+it('daily rate limit allows generation when under limit', function () {
     // Create only 5 audit log entries (under limit of 10)
     for ($i = 0; $i < 5; $i++) {
         AuditLog::create([
@@ -312,7 +312,7 @@ test('daily rate limit allows generation when under limit', function () {
     $response->assertSessionHas('success');
 });
 
-test('AI generation failure is logged to audit log', function () {
+it('AI generation failure is logged to audit log', function () {
     Discussion::factory()->create([
         'question_id' => $this->question->question_id,
         'user_id' => $this->members[0]->user_id,
@@ -351,7 +351,7 @@ test('AI generation failure is logged to audit log', function () {
     expect($details['error'])->toBe('API rate limit exceeded');
 });
 
-test('AI generation success is logged to audit log', function () {
+it('AI generation success is logged to audit log', function () {
     Discussion::factory()->create([
         'question_id' => $this->question->question_id,
         'user_id' => $this->members[0]->user_id,

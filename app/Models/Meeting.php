@@ -214,6 +214,19 @@ class Meeting extends Model
             if (empty($model->meeting_id)) {
                 $model->meeting_id = (string) Str::uuid();
             }
+            
+            // Set initial status based on voting period
+            if (empty($model->status)) {
+                $now = now();
+                
+                if ($model->vote_end && $now->isAfter($model->vote_end)) {
+                    $model->status = 'Baigtas';
+                } elseif ($model->vote_start && $now->isBetween($model->vote_start, $model->vote_end)) {
+                    $model->status = 'Vyksta';
+                } else {
+                    $model->status = 'Suplanuotas';
+                }
+            }
         });
     }
 }
