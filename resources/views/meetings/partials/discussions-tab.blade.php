@@ -311,11 +311,14 @@
                                                 <span x-bind:class="(consentCounts[{{ $question->question_id }}] || 0) > 0 ? 'text-purple-600 dark:text-purple-400' : 'text-red-600 dark:text-red-400'" 
                                                       x-text="(consentCounts[{{ $question->question_id }}] || 0) + ' {{ __('comments with AI consent') }}'">
                                                 </span>
-                                                <br>
-                                                <span class="{{ $aiUsedToday >= $aiDailyLimit ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-500 dark:text-gray-500' }}">
-                                                    {{ __('Daily limit') }}: {{ $aiUsedToday }}/{{ $aiDailyLimit }}
-                                                </span>
                                             </p>
+                                            <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs">
+                                                <strong class="text-gray-700 dark:text-gray-300">{{ __('Rate Limits') }}:</strong>
+                                                <ul class="mt-1 space-y-1 text-gray-600 dark:text-gray-400">
+                                                    <li>• <span class="{{ $aiUsedToday >= $aiDailyLimit ? 'text-red-600 dark:text-red-400 font-semibold' : '' }}">{{ __('Daily limit') }}: {{ $aiUsedToday }}/{{ $aiDailyLimit }}</span></li>
+                                                    <li>• {{ __('5 minute cooldown per question') }}</li>
+                                                </ul>
+                                            </div>
                                         </div>
                                         <button type="submit" 
                                                 :disabled="(consentCounts[{{ $question->question_id }}] || 0) === 0 || {{ $aiUsedToday >= $aiDailyLimit ? 'true' : 'false' }}"

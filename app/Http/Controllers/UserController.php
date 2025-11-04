@@ -90,13 +90,6 @@ class UserController extends Controller
             abort(403);
         }
         
-        // Only require password confirmation for non-Microsoft-linked admin accounts
-        if (empty($authenticatedUser->ms_id)) {
-            $request->validateWithBag('userDeletion', [
-                'password' => ['required', 'current_password'],
-            ]);
-        }
-        
         // Check if user is a chairman of any body
         $chairmanBodies = Body::where('chairman_id', $user->user_id)->get();
         if ($chairmanBodies->count() > 0) {
@@ -571,8 +564,19 @@ class UserController extends Controller
         // Get all results (no pagination for export)
         $auditLogs = $query->get();
         
+        // Get filter information (same as PDF export)
+        $filters = [
+            'search' => $request->get('search'),
+            'user_id' => $request->get('user_id'),
+            'action' => $request->get('action'),
+            'date_from' => $request->get('date_from'),
+            'date_to' => $request->get('date_to'),
+            'sort' => $request->get('sort', 'created_at'),
+            'direction' => $request->get('direction', 'desc'),
+        ];
+        
         // Transform data for export
-        $exportData = $auditLogs->map(function ($log) {
+        $logsData = $auditLogs->map(function ($log) {
             return [
                 'id' => $log->id,
                 'user' => [
@@ -588,6 +592,17 @@ class UserController extends Controller
                 'created_at' => $log->created_at->toIso8601String(),
             ];
         });
+        
+        // Structure export data to match PDF format
+        $exportData = [
+            'export_info' => [
+                'generated_at' => now()->toIso8601String(),
+                'generated_by' => $user->name,
+                'total_records' => $logsData->count(),
+            ],
+            'filters' => array_filter($filters), // Remove null/empty filters
+            'audit_logs' => $logsData,
+        ];
         
         $filename = 'audit_logs_' . now()->format('Y-m-d_His') . '.json';
         

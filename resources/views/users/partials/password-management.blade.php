@@ -47,11 +47,11 @@
                     </p>
 
                     <div class="mt-6 flex justify-end">
-                        <x-secondary-button x-on:click="$dispatch('close')">
+                        <x-secondary-button type="button" x-on:click="$dispatch('close')">
                             {{ __('Cancel') }}
                         </x-secondary-button>
 
-                        <x-primary-button class="ms-3">
+                        <x-primary-button type="submit" class="ms-3">
                             {{ __('Cancel Password Change') }}
                         </x-primary-button>
                     </div>
@@ -93,11 +93,11 @@
                     </p>
 
                     <div class="mt-6 flex justify-end">
-                        <x-primary-button x-on:click="$dispatch('close')">
+                        <x-secondary-button type="button" x-on:click="$dispatch('close')">
                             {{ __('Cancel') }}
-                        </x-primary-button>
+                        </x-secondary-button>
 
-                        <x-danger-button class="ms-3">
+                        <x-danger-button type="submit" class="ms-3">
                             {{ __('Force Password Change') }}
                         </x-danger-button>
                     </div>

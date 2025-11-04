@@ -5,7 +5,7 @@
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __('Once this account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
+            {{ __('This account will be soft-deleted and can be restored within :days days. After this period, all account data will be permanently deleted.', ['days' => config('app.data_retention_days', 455)]) }}
         </p>
     </header>
 
@@ -21,39 +21,31 @@
             @method('delete')
 
             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                {{ __('Are you sure you want to delete your account?') }}
+                {{ __('Are you sure you want to delete this account?') }}
             </h2>
 
-            @if(empty(Auth::user()->ms_id))
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    {{ __('Once the account is deleted, all of its resources and data will be permanently deleted. Please enter YOUR password to confirm you would like to permanently delete this account.') }}
-                </p>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                {{ __('This account will be soft-deleted and can be restored within :days days. After this period, all account data will be permanently deleted.', ['days' => config('app.data_retention_days', 455)]) }}
+            </p>
 
-                <div class="mt-6">
-                    <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
-
-                    <x-text-input
-                        id="password"
-                        name="password"
-                        type="password"
-                        class="mt-1 block w-3/4"
-                        placeholder="{{ __('Password') }}"
-                    />
-
-                    <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
+            <p class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
+                {{ __('User: :name (:email)', ['name' => $user->name, 'email' => $user->email]) }}
+            </p>
+            
+            @if($errors->userDeletion->has('delete'))
+                <div class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md">
+                    <p class="text-sm text-red-800 dark:text-red-200">
+                        {{ $errors->userDeletion->first('delete') }}
+                    </p>
                 </div>
-            @else
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    {{ __('Once the account is deleted, all of its resources and data will be permanently deleted. Since your account is linked to Microsoft, no password confirmation is required.') }}
-                </p>
             @endif
 
             <div class="mt-6 flex justify-end">
-                <x-secondary-button x-on:click="$dispatch('close')">
+                <x-secondary-button type="button" x-on:click="$dispatch('close')">
                     {{ __('Cancel') }}
                 </x-secondary-button>
 
-                <x-danger-button class="ms-3">
+                <x-danger-button type="submit" class="ms-3" x-on:click.stop>
                     {{ __('Delete Account') }}
                 </x-danger-button>
             </div>

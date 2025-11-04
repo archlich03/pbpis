@@ -65,18 +65,24 @@ p, div, h1, h2, h3 {
                 Posėdis vyko {{ $meeting->meeting_date->format('Y-m-d') }}; {{ $meeting->vote_start->format('H:i') }} - {{ $meeting->vote_end->format('H:i') }}.
             </span><br>
         @endif
-        <span>
-            Posėdžio 
-            {{ $meeting->body->chairman->gender? 'pirmininkas' : 'pirmininkė' }}: {{ $meeting->body->chairman->pedagogical_name }} {{ $meeting->body->chairman->name }}.
-        </span><br>
-        <span>
-            Posėdžio 
-            {{ $meeting->secretary->gender? 'sekretorius' : 'sekretorė' }}: {{ $meeting->secretary->pedagogical_name }} {{ $meeting->secretary->name }}.
-        </span><br>
+        @if($meeting->body->chairman)
+            <span>
+                Posėdžio 
+                {{ $meeting->body->chairman->gender? 'pirmininkas' : 'pirmininkė' }}: {{ $meeting->body->chairman->pedagogical_name }} {{ $meeting->body->chairman->name }}.
+            </span><br>
+        @endif
+        @if($meeting->secretary)
+            <span>
+                Posėdžio 
+                {{ $meeting->secretary->gender? 'sekretorius' : 'sekretorė' }}: {{ $meeting->secretary->pedagogical_name }} {{ $meeting->secretary->name }}.
+            </span><br>
+        @endif
         <span>
             Posėdyje dalyvavo: 
             @foreach ($meeting->body->members as $member)
-                {{ $member->pedagogical_name }} {{ $member->name }}{{ $loop->last ? '.' : ';' }}
+                @if($member)
+                    {{ $member->pedagogical_name }} {{ $member->name }}{{ $loop->last ? '.' : ';' }}
+                @endif
             @endforeach
         </span><br>
         <span>DARBOTVARKĖ:</span><br>

@@ -23,7 +23,7 @@
                             <x-input-label for="type" value="{{ __('Type') }}:" />
                             <select id="type" name="type" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full">
                                 @foreach (\App\Models\Question::STATUSES as $status)
-                                    <option value="{{ $status }}" {{ old('type') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                                    <option value="{{ $status }}" {{ old('type', 'Balsuoti dauguma') == $status ? 'selected' : '' }}>{{ $status }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -32,7 +32,7 @@
                             name="presenter_id"
                             :label="__('Presenter') . ':'"
                             :users="$users"
-                            :filter="fn($user) => $user->isSecretary()"
+                            :selected="$defaultPresenter"
                         />
 
                         <div class="mt-4">

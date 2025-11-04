@@ -15,7 +15,7 @@
                     <!-- Search and Filter Form -->
                     <div class="mb-6 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                         <form method="GET" action="{{ route('audit.logs') }}" class="space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <!-- Search -->
                                 <div>
                                     <x-input-label for="search" :value="__('Search')" />
@@ -23,22 +23,6 @@
                                                   value="{{ request('search') }}" 
                                                   placeholder="{{ __('Search by action, IP, user agent, user...') }}" 
                                                   class="mt-1 block w-full" />
-                                </div>
-
-                                <!-- User Filter -->
-                                <div>
-                                    <x-input-label for="user_search" :value="__('User')" />
-                                    <div class="relative">
-                                        <x-text-input id="user_search" name="user_search" type="text"
-                                                      value="{{ request('user_search') }}"
-                                                      placeholder="{{ __('Search by name or email...') }}"
-                                                      class="mt-1 block w-full"
-                                                      autocomplete="off" />
-                                        <div id="user_suggestions" class="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg mt-1 hidden max-h-60 overflow-y-auto">
-                                            <!-- Suggestions will be populated by JavaScript -->
-                                        </div>
-                                        <input type="hidden" id="user_id" name="user_id" value="{{ request('user_id') }}" />
-                                    </div>
                                 </div>
 
                                 <!-- Action Filter -->
@@ -260,79 +244,6 @@
     </div>
     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const userSearch = document.getElementById('user_search');
-            const userSuggestions = document.getElementById('user_suggestions');
-            const userIdInput = document.getElementById('user_id');
-            let debounceTimer;
-            
-            // Set initial display value if user is selected
-            if (userIdInput.value) {
-                const selectedUser = @json($availableUsers->firstWhere('user_id', request('user_id')));
-                if (selectedUser) {
-                    userSearch.value = selectedUser.name + ' (' + selectedUser.email + ')';
-                }
-            }
-            
-            userSearch.addEventListener('input', function() {
-                clearTimeout(debounceTimer);
-                const query = this.value.toLowerCase();
-                
-                if (query.length < 2) {
-                    userSuggestions.classList.add('hidden');
-                    return;
-                }
-                
-                debounceTimer = setTimeout(() => {
-                    const users = @json($availableUsers);
-                    const filteredUsers = users.filter(user => 
-                        user.name.toLowerCase().includes(query) || 
-                        user.email.toLowerCase().includes(query)
-                    ).slice(0, 10); // Limit to 10 results
-                    
-                    if (filteredUsers.length > 0) {
-                        userSuggestions.innerHTML = filteredUsers.map(user => 
-                            `<div class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer user-suggestion" data-user-id="${user.user_id}" data-user-name="${user.name}" data-user-email="${user.email}">
-                                ${user.name} (${user.email})
-                            </div>`
-                        ).join('');
-                        
-                        // Add click handlers to suggestions
-                        userSuggestions.querySelectorAll('.user-suggestion').forEach(suggestion => {
-                            suggestion.addEventListener('click', function() {
-                                const userId = this.dataset.userId;
-                                const userName = this.dataset.userName;
-                                const userEmail = this.dataset.userEmail;
-                                
-                                userSearch.value = userName + ' (' + userEmail + ')';
-                                userIdInput.value = userId;
-                                userSuggestions.classList.add('hidden');
-                            });
-                        });
-                        
-                        userSuggestions.classList.remove('hidden');
-                    } else {
-                        userSuggestions.innerHTML = '<div class="px-4 py-2 text-gray-500 dark:text-gray-400">{{ __('No users found') }}</div>';
-                        userSuggestions.classList.remove('hidden');
-                    }
-                }, 300);
-            });
-            
-            // Clear selection when input is cleared
-            userSearch.addEventListener('input', function() {
-                if (this.value === '') {
-                    userIdInput.value = '';
-                }
-            });
-            
-            // Hide suggestions when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!userSearch.contains(e.target) && !userSuggestions.contains(e.target)) {
-                    userSuggestions.classList.add('hidden');
-                }
-            });
-        });
-        
         // Copy to clipboard function
         function copyToClipboard(element, text) {
             navigator.clipboard.writeText(text).then(function() {

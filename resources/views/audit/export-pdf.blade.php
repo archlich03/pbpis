@@ -26,13 +26,21 @@
             margin-bottom: 15px;
             border-radius: 4px;
         }
-        .filter-item {
-            margin-bottom: 5px;
+        .filters-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .filters-table td {
+            padding: 3px 5px;
+            border: none;
         }
         .filter-label {
             font-weight: bold;
-            display: inline-block;
-            width: 100px;
+            width: 120px;
+            vertical-align: top;
+        }
+        .filter-value {
+            vertical-align: top;
         }
         table {
             width: 100%;
@@ -79,7 +87,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>{{ __('Audit Logs Export') }}</h1>
+        <h1>POBIS {{ __('Audit Logs Export') }}</h1>
         <div style="font-size: 9px; color: #6b7280;">
             {{ __('Generated on') }}: {{ now()->format('Y-m-d H:i:s') }}
         </div>
@@ -88,46 +96,47 @@
     @if($filters['search'] || $filters['user_id'] || $filters['action'] || $filters['date_from'] || $filters['date_to'])
         <div class="filters">
             <strong>{{ __('Applied Filters') }}:</strong>
-            
-            @if($filters['search'])
-                <div class="filter-item">
-                    <span class="filter-label">{{ __('Search') }}:</span>
-                    <span>{{ $filters['search'] }}</span>
-                </div>
-            @endif
-            
-            @if($filters['user_id'])
-                <div class="filter-item">
-                    <span class="filter-label">{{ __('User ID') }}:</span>
-                    <span>{{ $filters['user_id'] }}</span>
-                </div>
-            @endif
-            
-            @if($filters['action'])
-                <div class="filter-item">
-                    <span class="filter-label">{{ __('Action') }}:</span>
-                    <span>{{ \App\Services\AuditLogService::getActionName($filters['action']) }}</span>
-                </div>
-            @endif
-            
-            @if($filters['date_from'])
-                <div class="filter-item">
-                    <span class="filter-label">{{ __('Date From') }}:</span>
-                    <span>{{ $filters['date_from'] }}</span>
-                </div>
-            @endif
-            
-            @if($filters['date_to'])
-                <div class="filter-item">
-                    <span class="filter-label">{{ __('Date To') }}:</span>
-                    <span>{{ $filters['date_to'] }}</span>
-                </div>
-            @endif
-            
-            <div class="filter-item">
-                <span class="filter-label">{{ __('Sorted by') }}:</span>
-                <span>{{ ucfirst($filters['sort']) }} ({{ strtoupper($filters['direction']) }})</span>
-            </div>
+            <table class="filters-table">
+                @if($filters['search'])
+                    <tr>
+                        <td class="filter-label">{{ __('Search') }}:</td>
+                        <td class="filter-value">{{ $filters['search'] }}</td>
+                    </tr>
+                @endif
+                
+                @if($filters['user_id'])
+                    <tr>
+                        <td class="filter-label">{{ __('User ID') }}:</td>
+                        <td class="filter-value">{{ $filters['user_id'] }}</td>
+                    </tr>
+                @endif
+                
+                @if($filters['action'])
+                    <tr>
+                        <td class="filter-label">{{ __('Action') }}:</td>
+                        <td class="filter-value">{{ \App\Services\AuditLogService::getActionName($filters['action']) }}</td>
+                    </tr>
+                @endif
+                
+                @if($filters['date_from'])
+                    <tr>
+                        <td class="filter-label">{{ __('Date From') }}:</td>
+                        <td class="filter-value">{{ $filters['date_from'] }}</td>
+                    </tr>
+                @endif
+                
+                @if($filters['date_to'])
+                    <tr>
+                        <td class="filter-label">{{ __('Date To') }}:</td>
+                        <td class="filter-value">{{ $filters['date_to'] }}</td>
+                    </tr>
+                @endif
+                
+                <tr>
+                    <td class="filter-label">{{ __('Sorted by') }}:</td>
+                    <td class="filter-value">{{ ucfirst($filters['sort']) }} ({{ strtoupper($filters['direction']) }})</td>
+                </tr>
+            </table>
         </div>
     @endif
 

@@ -47,11 +47,11 @@
                     </p>
 
                     <div class="mt-6 flex justify-end">
-                        <x-primary-button x-on:click="$dispatch('close')">
+                        <x-secondary-button type="button" x-on:click="$dispatch('close')">
                             {{ __('Cancel') }}
-                        </x-primary-button>
+                        </x-secondary-button>
 
-                        <x-danger-button class="ms-3">
+                        <x-danger-button type="submit" class="ms-3">
                             {{ __('Remove Two-Factor Authentication') }}
                         </x-danger-button>
                     </div>

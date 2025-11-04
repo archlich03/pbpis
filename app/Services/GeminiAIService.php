@@ -104,16 +104,18 @@ class GeminiAIService
         $lines[] = 'Santrauka turi:';
         $lines[] = '1. Apjungti visus komentarus į vieną logiką diskusijos eigą';
         $lines[] = '2. Rodyti diskusijos raidą: kas pradėjo, kas pritarė, kas abejojo, kas papildė';
-        $lines[] = '3. Jei yra atsakymai į komentarus (pažymėti "atsakymas į komentarą #X"), juos integruoti į bendrą naratyvą';
-        $lines[] = '4. Jei keli dalyviai išsako panašias nuomones, apjungti jas (pvz., "V. P. ir R. S. pritarė...")';
+        $lines[] = '3. Jei yra atsakymai į komentarus, juos integruoti į bendrą naratyvą';
+        $lines[] = '4. Jei keli dalyviai išsako panašias nuomones, apjungti jas (pvz., "prof. V. P. ir R. S. pritarė...")';
         $lines[] = '5. Būti formali ir neutrali, vengti interpretacijų';
         $lines[] = '6. Jei naudojami stiprūs žodžiai, pakeisti silpnesniais';
+        $lines[] = '7. LABAI SVARBU: Naudok TIKSLIAI tokius vardus, kokie pateikti komentaruose. NEKEISK pedagoginių titulų (pvz., "prof.", "doc.", "lekt."). Jei vardas yra "prof. V. P.", rašyk TIKSLIAI "prof. V. P.", ne "Profesorius" ar "V. P."';
+        $lines[] = '8. NIEKADA NENAUDOK komentarų numerių (#1, #2, #3) santraukoje';
         $lines[] = '';
-        $lines[] = 'BLOGAS pavyzdys (atskirų komentarų sąrašas):';
-        $lines[] = 'V. P. pažymi, kad... V. P. abejoja... R. S. komentuoja...';
+        $lines[] = 'BLOGAS pavyzdys (atskirų komentarų sąrašas su komentarų numeriais):';
+        $lines[] = 'prof. V. P. (#1) pažymi, kad... prof. V. P. (#2) abejoja... R. S. (#3) komentuoja...';
         $lines[] = '';
-        $lines[] = 'GERAS pavyzdys (vientisas naratyvas):';
-        $lines[] = 'V. P. pažymėjo, kad tikslinga patvirtinti studento prašymą. Diskusijos metu jis išsakė abejonių dėl tam tikrų aspektų, į kuriuos atsakydamas R. S. pabrėžė precedento sukūrimo svarbą. Dalyviai sutarė dėl...';
+        $lines[] = 'GERAS pavyzdys (vientisas naratyvas be numerių, tikslūs vardai):';
+        $lines[] = 'prof. V. P. pažymėjo, kad tikslinga patvirtinti studento prašymą. Diskusijos metu jis išsakė abejonių dėl tam tikrų aspektų, į kuriuos atsakydamas R. S. pabrėžė precedento sukūrimo svarbą. Dalyviai sutarė dėl...';
         $lines[] = '';
         $lines[] = 'Rašyk lietuvių kalba, naudok būtąjį laiką (pažymėjo, išsakė, pasiūlė).';
         $lines[] = '';
@@ -125,13 +127,11 @@ class GeminiAIService
 
         $commentsText = '';
         foreach ($comments as $comment) {
-            $commentId = $comment['id'] ?? 'unknown';
-            
             // If this is a reply to another comment, indicate that
             if (!empty($comment['parent_id'])) {
-                $commentsText .= "\n[Komentaras #{$commentId}] [{$comment['name']}] (atsakymas į komentarą #{$comment['parent_id']})\n{$comment['content']}\n";
+                $commentsText .= "\n[{$comment['name']}] (atsakymas į ankstesnį komentarą)\n{$comment['content']}\n";
             } else {
-                $commentsText .= "\n[Komentaras #{$commentId}] [{$comment['name']}]\n{$comment['content']}\n";
+                $commentsText .= "\n[{$comment['name']}]\n{$comment['content']}\n";
             }
         }
 

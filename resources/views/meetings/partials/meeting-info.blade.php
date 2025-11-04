@@ -173,11 +173,12 @@
                 </x-danger-button>
 
                 <div x-show="confirmingMeetingDeletion"
+                        x-cloak
                         @click.outside="confirmingMeetingDeletion = false"
-                        class="fixed z-50 inset-0 bg-gray-900 bg-opacity-50 dark:bg-gray-800 dark:bg-opacity-50 flex items-center justify-center"
+                        class="fixed z-50 inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75 flex items-center justify-center"
                         style="backdrop-filter: blur(2px);">
-                    <div class="bg-gray-800 dark:bg-gray-700 p-6 rounded shadow-md max-w-md mx-auto">
-                        <h2 class="text-lg font-medium text-gray-300 dark:text-gray-100">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md max-w-md mx-auto">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
                             {{ __('Are you sure you want to delete this meeting?') }}
                         </h2>
 
