@@ -26,6 +26,11 @@
                 -ms-overflow-style: none;  /* IE and Edge */
                 scrollbar-width: none;  /* Firefox */
             }
+            
+            /* Alpine.js x-cloak - hide elements until Alpine initializes */
+            [x-cloak] {
+                display: none !important;
+            }
         </style>
         
         <!-- Theme Management Script -->

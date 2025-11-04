@@ -276,9 +276,22 @@ class DiscussionController extends Controller
 
         // Prepare comments for AI with parent context
         $comments = $discussions->map(function ($discussion) use ($discussions) {
+            // Build full name with title and full name
+            // Format: "title FirstName LastName" (e.g., "prof. Vardenis Pavardenis")
+            $user = $discussion->user;
+            
+            // If pedagogical_name exists and contains full name (not just title), use it
+            // Otherwise, construct from name field
+            if (!empty($user->pedagogical_name) && strlen($user->pedagogical_name) > 10) {
+                $fullName = $user->pedagogical_name;
+            } else {
+                // Fallback: if pedagogical_name is just a title or empty, use name
+                $fullName = $user->name;
+            }
+            
             $comment = [
                 'id' => $discussion->discussion_id,
-                'name' => $discussion->user->name,
+                'name' => $fullName,
                 'content' => $discussion->content,
                 'parent_id' => $discussion->parent_id,
             ];
@@ -286,8 +299,13 @@ class DiscussionController extends Controller
             // If this is a reply, include parent comment info
             if ($discussion->parent_id) {
                 $parent = $discussions->firstWhere('discussion_id', $discussion->parent_id);
-                if ($parent) {
-                    $comment['parent_author'] = $parent->user->name;
+                if ($parent && $parent->user) {
+                    if (!empty($parent->user->pedagogical_name) && strlen($parent->user->pedagogical_name) > 10) {
+                        $parentFullName = $parent->user->pedagogical_name;
+                    } else {
+                        $parentFullName = $parent->user->name;
+                    }
+                    $comment['parent_author'] = $parentFullName;
                 }
             }
             

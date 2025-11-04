@@ -464,6 +464,8 @@
   "AI Summary Failed": "DI santraukos generavimas nepavyko",
   "Daily AI summary generation limit reached (:count/:max). Please try again tomorrow.": "Pasiektas dienos DI santraukų generavimo limitas (:count/:max). Bandykite rytoj.",
   "Daily limit": "Dienos limitas",
+  "Rate Limits": "Apribojimai",
+  "5 minute cooldown per question": "5 minučių laukimas tarp klausimų",
   "Double-click to copy": "Dukart spustelėkite, kad nukopijuotumėte",
   "Copied!": "Nukopijuota!",
   "Copied to clipboard!": "Nukopijuota į iškarpinę!",
