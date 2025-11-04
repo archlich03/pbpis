@@ -60,7 +60,7 @@ class Meeting extends Model
      */
     public function secretary(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'secretary_id');
+        return $this->belongsTo(User::class, 'secretary_id')->withTrashed();
     }
 
     /**
@@ -101,6 +101,7 @@ class Meeting extends Model
     public function attendees()
     {
         return $this->belongsToMany(User::class, 'meeting_attendances', 'meeting_id', 'user_id', 'meeting_id', 'user_id')
+                    ->withTrashed()
                     ->withTimestamps();
     }
 

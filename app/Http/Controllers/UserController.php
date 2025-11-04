@@ -90,13 +90,6 @@ class UserController extends Controller
             abort(403);
         }
         
-        // Only require password confirmation for non-Microsoft-linked admin accounts
-        if (empty($authenticatedUser->ms_id)) {
-            $request->validateWithBag('userDeletion', [
-                'password' => ['required', 'current_password'],
-            ]);
-        }
-        
         // Check if user is a chairman of any body
         $chairmanBodies = Body::where('chairman_id', $user->user_id)->get();
         if ($chairmanBodies->count() > 0) {

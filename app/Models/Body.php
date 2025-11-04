@@ -62,14 +62,14 @@ class Body extends Model
      */
     public function chairman(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'chairman_id');
+        return $this->belongsTo(User::class, 'chairman_id')->withTrashed();
     }
 
     public function getMembersAttribute()
     {
         $ids = $this->attributes['members'] ? json_decode($this->attributes['members'], true) : [];
 
-        return User::whereIn('user_id', $ids)->get();
+        return User::withTrashed()->whereIn('user_id', $ids)->get();
     }
 
     /**

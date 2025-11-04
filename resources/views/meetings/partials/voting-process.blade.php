@@ -157,8 +157,12 @@
                                         {{ __($status) }}: {{ $count }}
                                     </span>
                                 @endforeach
+                                @php
+                                    $votedUserIds = $question->votes()->pluck('user_id');
+                                    $didNotVoteCount = $meeting->body->members->whereNotIn('user_id', $votedUserIds)->count();
+                                @endphp
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300">
-                                    {{ __('Nebalsuota') }}: {{ $meeting->body->members->count() - $question->votes()->count() }}
+                                    {{ __('Nebalsuota') }}: {{ $didNotVoteCount }}
                                 </span>
                             </div>
                             
@@ -181,9 +185,11 @@
                                         </h5>
                                         <div class="space-y-1">
                                             @forelse ($votedFor->sortBy('name') as $member)
-                                                <div class="text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded px-2 py-1">
-                                                    {{ $member->pedagogical_name }} {{ $member->name }}
-                                                </div>
+                                                @if($member)
+                                                    <div class="text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded px-2 py-1">
+                                                        {{ $member->pedagogical_name }} {{ $member->name }}
+                                                    </div>
+                                                @endif
                                             @empty
                                                 <div class="text-xs text-gray-500 dark:text-gray-400 italic">{{ __('None') }}</div>
                                             @endforelse
@@ -197,9 +203,11 @@
                                         </h5>
                                         <div class="space-y-1">
                                             @forelse ($votedAgainst->sortBy('name') as $member)
-                                                <div class="text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded px-2 py-1">
-                                                    {{ $member->pedagogical_name }} {{ $member->name }}
-                                                </div>
+                                                @if($member)
+                                                    <div class="text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded px-2 py-1">
+                                                        {{ $member->pedagogical_name }} {{ $member->name }}
+                                                    </div>
+                                                @endif
                                             @empty
                                                 <div class="text-xs text-gray-500 dark:text-gray-400 italic">{{ __('None') }}</div>
                                             @endforelse
@@ -213,9 +221,11 @@
                                         </h5>
                                         <div class="space-y-1">
                                             @forelse ($votedAbstain->sortBy('name') as $member)
-                                                <div class="text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded px-2 py-1">
-                                                    {{ $member->pedagogical_name }} {{ $member->name }}
-                                                </div>
+                                                @if($member)
+                                                    <div class="text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded px-2 py-1">
+                                                        {{ $member->pedagogical_name }} {{ $member->name }}
+                                                    </div>
+                                                @endif
                                             @empty
                                                 <div class="text-xs text-gray-500 dark:text-gray-400 italic">{{ __('None') }}</div>
                                             @endforelse
@@ -229,9 +239,11 @@
                                         </h5>
                                         <div class="space-y-1">
                                             @forelse ($didNotVote->sortBy('name') as $member)
-                                                <div class="text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded px-2 py-1">
-                                                    {{ $member->pedagogical_name }} {{ $member->name }}
-                                                </div>
+                                                @if($member)
+                                                    <div class="text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded px-2 py-1">
+                                                        {{ $member->pedagogical_name }} {{ $member->name }}
+                                                    </div>
+                                                @endif
                                             @empty
                                                 <div class="text-xs text-gray-500 dark:text-gray-400 italic">{{ __('None') }}</div>
                                             @endforelse

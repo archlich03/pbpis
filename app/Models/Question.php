@@ -66,7 +66,7 @@ class Question extends Model
      */
     public function presenter(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'presenter_id');
+        return $this->belongsTo(User::class, 'presenter_id')->withTrashed();
     }
 
     /**

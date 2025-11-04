@@ -150,5 +150,9 @@
     "Contains numbers (0-9)": "Contains numbers (0-9)",
     "Contains symbols (!@#$%^&*)": "Contains symbols (!@#$%^&*)",
     "Password must be at least 12 characters with uppercase, lowercase, numbers, and symbols.": "Password must be at least 12 characters with uppercase, lowercase, numbers, and symbols.",
-    "Your password must meet the following requirements:": "Your password must meet the following requirements:"
+    "Your password must meet the following requirements:": "Your password must meet the following requirements:",
+    "Your account will be soft-deleted and can be restored by an IT administrator within :days days. After this period, all account data will be permanently deleted.": "Your account will be soft-deleted and can be restored by an IT administrator within :days days. After this period, all account data will be permanently deleted.",
+    "This account will be soft-deleted and can be restored within :days days. After this period, all account data will be permanently deleted.": "This account will be soft-deleted and can be restored within :days days. After this period, all account data will be permanently deleted.",
+    "Are you sure you want to delete this account?": "Are you sure you want to delete this account?",
+    "User: :name (:email)": "User: :name (:email)"
 }
