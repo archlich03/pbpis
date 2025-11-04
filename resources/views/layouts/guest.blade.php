@@ -94,6 +94,20 @@
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
                 {{ $slot }}
             </div>
+
+            <!-- Footer -->
+            <footer class="mt-8 mb-4">
+                <div class="text-center text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                    <div>
+                        {{ __('Copyright') }} © 2025 Rokas Stankūnas, {{ __('ISCS22') }}
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:space-x-4">
+                        <span>{{ __('Licensed under') }} <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">GPLv3</a></span>
+                        <span class="hidden sm:inline">•</span>
+                        <a href="https://github.com/archlich03/pbpis" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">{{ __('View source code') }}</a>
+                    </div>
+                </div>
+            </footer>
         </div>
     </body>
 </html>

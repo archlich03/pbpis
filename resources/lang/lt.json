@@ -477,5 +477,9 @@
   "The :attribute field must be an integer.": "Laukas :attribute turi būti sveikasis skaičius.",
   "The selected :attribute is invalid.": "Pasirinktas :attribute yra neteisingas.",
   "subject": "tema",
-  "body": "turinys"
+  "body": "turinys",
+  "Copyright": "Visos teisės saugomos",
+  "Licensed under": "Licencijuota pagal",
+  "View source code": "Peržiūrėti šaltinio kodą",
+  "ISCS22": "ISKS22"
 }
