@@ -80,6 +80,18 @@
                     >{{ __('Saved.') }}</p>
                 @endif
             </div>
+
+            <!-- Password Requirements -->
+            <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-md">
+                <p class="text-xs font-medium text-blue-900 dark:text-blue-100 mb-1">{{ __('Password Requirements') }}:</p>
+                <ul class="text-xs text-blue-800 dark:text-blue-200 space-y-0.5">
+                    <li>• {{ __('At least 12 characters long') }}</li>
+                    <li>• {{ __('Contains uppercase letters (A-Z)') }}</li>
+                    <li>• {{ __('Contains lowercase letters (a-z)') }}</li>
+                    <li>• {{ __('Contains numbers (0-9)') }}</li>
+                    <li>• {{ __('Contains symbols (!@#$%^&*)') }}</li>
+                </ul>
+            </div>
         </form>
     @endif
 </section>

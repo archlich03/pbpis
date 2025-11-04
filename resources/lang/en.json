@@ -142,5 +142,13 @@
     "Voting Report": "Voting Report",
     "Copyright": "Copyright",
     "Licensed under": "Licensed under",
-    "View source code": "View source code"
+    "View source code": "View source code",
+    "Password Requirements": "Password Requirements",
+    "At least 12 characters long": "At least 12 characters long",
+    "Contains uppercase letters (A-Z)": "Contains uppercase letters (A-Z)",
+    "Contains lowercase letters (a-z)": "Contains lowercase letters (a-z)",
+    "Contains numbers (0-9)": "Contains numbers (0-9)",
+    "Contains symbols (!@#$%^&*)": "Contains symbols (!@#$%^&*)",
+    "Password must be at least 12 characters with uppercase, lowercase, numbers, and symbols.": "Password must be at least 12 characters with uppercase, lowercase, numbers, and symbols.",
+    "Your password must meet the following requirements:": "Your password must meet the following requirements:"
 }

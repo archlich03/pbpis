@@ -481,5 +481,13 @@
   "Copyright": "Visos teisės saugomos",
   "Licensed under": "Licencijuota pagal",
   "View source code": "Peržiūrėti šaltinio kodą",
-  "ISCS22": "ISKS22"
+  "ISCS22": "ISKS22",
+  "Password Requirements": "Slaptažodžio reikalavimai",
+  "At least 12 characters long": "Bent 12 simbolių ilgio",
+  "Contains uppercase letters (A-Z)": "Turi didžiąsias raides (A-Ž)",
+  "Contains lowercase letters (a-z)": "Turi mažąsias raides (a-ž)",
+  "Contains numbers (0-9)": "Turi skaitmenis (0-9)",
+  "Contains symbols (!@#$%^&*)": "Turi specialiuosius simbolius (!@#$%^&*)",
+  "Password must be at least 12 characters with uppercase, lowercase, numbers, and symbols.": "Slaptažodis turi būti bent 12 simbolių su didžiosiomis, mažosiomis raidėmis, skaitmenimis ir specialiaisiais simboliais.",
+  "Your password must meet the following requirements:": "Jūsų slaptažodis turi atitikti šiuos reikalavimus:"
 }
