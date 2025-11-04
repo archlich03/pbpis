@@ -37,8 +37,13 @@ class QuestionController extends Controller
             abort(403);
         }
         $users = User::orderBy('name')->get();
+        $defaultPresenter = $meeting->body->chairman;
 
-        return view('questions.create', ['meeting' => $meeting, 'users' => $users]);
+        return view('questions.create', [
+            'meeting' => $meeting, 
+            'users' => $users,
+            'defaultPresenter' => $defaultPresenter
+        ]);
     }
 
 
