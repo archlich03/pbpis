@@ -79,7 +79,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>{{ __('Audit Logs Export') }}</h1>
+        <h1>POBIS {{ __('Audit Logs Export') }}</h1>
         <div style="font-size: 9px; color: #6b7280;">
             {{ __('Generated on') }}: {{ now()->format('Y-m-d H:i:s') }}
         </div>
