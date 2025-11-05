@@ -46,14 +46,16 @@
                     </div>
 
 
-                    <div class="mt-6">
-                        <x-input-label for="vote_start" value="{{ __('Vote start') }}:" />
-                        <x-text-input id="vote_start" name="vote_start" type="datetime-local" class="block w-full" />
-                    </div>
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <x-input-label for="vote_start" value="{{ __('Vote start') }}:" />
+                            <x-text-input id="vote_start" name="vote_start" type="datetime-local" class="block w-full" />
+                        </div>
 
-                    <div class="mt-6">
-                        <x-input-label for="vote_end" value="{{ __('Vote end') }}:" />
-                        <x-text-input id="vote_end" name="vote_end" type="datetime-local" class="block w-full" />
+                        <div>
+                            <x-input-label for="vote_end" value="{{ __('Vote end') }}:" />
+                            <x-text-input id="vote_end" name="vote_end" type="datetime-local" class="block w-full" />
+                        </div>
                     </div>
 
                     <div class="flex items-center gap-4 mt-6">

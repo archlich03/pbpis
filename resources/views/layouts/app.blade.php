@@ -31,6 +31,78 @@
             [x-cloak] {
                 display: none !important;
             }
+            
+            /* Flatpickr Dark Mode Styles */
+            .dark .flatpickr-calendar {
+                background: #1f2937;
+                border-color: #374151;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            }
+            
+            .dark .flatpickr-months {
+                background: #1f2937;
+            }
+            
+            .dark .flatpickr-current-month .flatpickr-monthDropdown-months,
+            .dark .flatpickr-current-month input.cur-year {
+                background: #374151;
+                color: #f3f4f6;
+            }
+            
+            .dark .flatpickr-months .flatpickr-month,
+            .dark .flatpickr-current-month .flatpickr-monthDropdown-months,
+            .dark .flatpickr-weekdays,
+            .dark span.flatpickr-weekday {
+                background: #1f2937;
+                color: #f3f4f6;
+            }
+            
+            .dark .flatpickr-day {
+                color: #d1d5db;
+            }
+            
+            .dark .flatpickr-day:hover,
+            .dark .flatpickr-day.prevMonthDay:hover,
+            .dark .flatpickr-day.nextMonthDay:hover {
+                background: #374151;
+                border-color: #374151;
+            }
+            
+            .dark .flatpickr-day.today {
+                border-color: #6366f1;
+            }
+            
+            .dark .flatpickr-day.selected,
+            .dark .flatpickr-day.selected:hover {
+                background: #6366f1;
+                border-color: #6366f1;
+                color: #fff;
+            }
+            
+            .dark .flatpickr-time {
+                border-top-color: #374151;
+            }
+            
+            .dark .flatpickr-time input,
+            .dark .flatpickr-time .flatpickr-time-separator,
+            .dark .flatpickr-time .flatpickr-am-pm {
+                color: #f3f4f6;
+            }
+            
+            .dark .flatpickr-time input:hover,
+            .dark .flatpickr-time input:focus {
+                background: #374151;
+            }
+            
+            .dark .flatpickr-day.prevMonthDay,
+            .dark .flatpickr-day.nextMonthDay {
+                color: #6b7280;
+            }
+            
+            .dark .flatpickr-months .flatpickr-prev-month:hover svg,
+            .dark .flatpickr-months .flatpickr-next-month:hover svg {
+                fill: #6366f1;
+            }
         </style>
         
         <!-- Theme Management Script -->
