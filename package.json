@@ -20,6 +20,7 @@
     "dependencies": {
         "@tiptap/core": "^3.6.5",
         "@tiptap/pm": "^3.6.5",
-        "@tiptap/starter-kit": "^3.6.5"
+        "@tiptap/starter-kit": "^3.6.5",
+        "flatpickr": "^4.6.13"
     }
 }
