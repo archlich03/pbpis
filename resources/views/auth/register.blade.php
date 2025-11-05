@@ -65,17 +65,19 @@
             <x-input-label for="role" :value="__('Role')" />
             <select id="role" name="role" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block mt-1 w-full">
                 @if (Auth::user()->role === 'Sekretorius')
-                    <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || Auth::user()->role == 'Balsuojantysis' ? 'selected' : '' }}>
+                    {{-- Secretary can only create Balsuojantysis --}}
+                    <option value="Balsuojantysis" selected>
                         {{ __('Balsuojantysis') }}
                     </option>
                 @else
-                    <option value="IT administratorius" {{ old('role') == 'IT administratorius' || Auth::user()->role == 'IT administratorius' ? 'selected' : '' }}>
+                    {{-- IT Admin can create all roles, default to Balsuojantysis --}}
+                    <option value="IT administratorius" {{ old('role') == 'IT administratorius' ? 'selected' : '' }}>
                         {{ __('IT administratorius') }}
                     </option>
-                    <option value="Sekretorius" {{ old('role') == 'Sekretorius' || Auth::user()->role == 'Sekretorius' ? 'selected' : '' }}>
+                    <option value="Sekretorius" {{ old('role') == 'Sekretorius' ? 'selected' : '' }}>
                         {{ __('Sekretorius') }}
                     </option>
-                    <option value="Balsuojantysis" {{ old('role') == 'Balsuojantysis' || Auth::user()->role == 'Balsuojantysis' ? 'selected' : '' }}>
+                    <option value="Balsuojantysis" {{ old('role', 'Balsuojantysis') == 'Balsuojantysis' ? 'selected' : '' }}>
                         {{ __('Balsuojantysis') }}
                     </option>
                 @endif
