@@ -325,7 +325,7 @@
   "Each code can only be used once": "Kiekvienas kodas gali būti panaudotas tik vieną kartą.",
   "Keep these codes in a safe place, separate from your device": "Laikykite šiuos kodus saugioje vietoje, atskirai nuo savo įrenginio.",
   "If you lose access to your authenticator app, contact an administrator": "Jei praradote prieigą prie savo autentiškumo patvirtinimo programėlės, susisiekite su administratoriumi.",
-  "Two-factor authentication is currently enabled for your account. You can view your recovery codes or disable it below.": "Dviejų veiksnių autentifikavimas šiuo metu yra įjungtas jūsų paskyroje. Toliau galite peržiūrėti savo atkūrimo kodus arba išjungti šią funkciją.",
+  "Two-factor authentication is currently enabled for your account. You can disable it below if needed.": "Dviejų veiksnių autentifikavimas šiuo metu yra įjungtas jūsų paskyroje. Paspaudę žemiau galite išjungti šią funkciją.",
   "Disable": "Išjungti",
   "Cancel Password Change": "Atšaukti slaptažodžio keitimą",
   "Are you sure you want to cancel the forced password change for this user? They will be able to access the system with their current password.": "Ar tikrai norite atšaukti priverstinį slaptažodžio keitimą šiam vartotojui? Jis galės prisijungti prie sistemos su dabartiniu slaptažodžiu.",
@@ -361,12 +361,12 @@
   "Search members by name or email...": "Ieškoti narių pagal vardą ar el. paštą...",
   "Selected Members": "Pasirinkti nariai",
   "No members found matching your search.": "Nerasta narių, atitinkančių jūsų paiešką.",
-
+  "This user has two-factor authentication enabled. You can remove it if needed (e.g., if they lost their device).": "Šiam vartotojui įjungtas dviejų veiksnių autentifikavimas. Prireikus galite jį pašalinti (pvz., jei vartotojas pametė savo įrenginį).",
   "Quorum": "Kvorumas",
   "Reached": "Pasiektas",
   "Not reached": "Nepasiektas",
   "Quorum not reached": "Kvorumas nepasiektas",
-
+  "Remove Two-Factor Authentication": "Pašalinti dviejų žingsnių autentifikaciją",
   "Required": "Reikalingi",
   "attendees": "dalyviai",
   "No Quorum": "Nėra kvorumo",

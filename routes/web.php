@@ -143,8 +143,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/two-factor/setup', [TwoFactorController::class, 'setup'])->name('two-factor.setup');
     Route::post('/two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('two-factor.confirm');
     Route::delete('/two-factor/disable', [TwoFactorController::class, 'disable'])->name('two-factor.disable');
-    Route::get('/two-factor/recovery-codes', [TwoFactorController::class, 'showRecoveryCodes'])->name('two-factor.recovery-codes');
-    Route::post('/two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('two-factor.recovery-codes.regenerate');
 });
 
 // 2FA verification routes (no auth middleware)

@@ -1,6 +1,6 @@
 @props(['name', 'label', 'users', 'selected' => null, 'filter' => null, 'required' => false])
 
-<div x-data="userSearchSelect{{ Str::camel($name) }}()" class="mt-4">
+<div x-data="userSearchSelect{{ Str::camel($name) }}()" class="mt-4 relative">
     <x-input-label :for="$name" :value="$label" />
     
     <!-- Search Input - Hidden when user is selected -->
@@ -31,8 +31,7 @@
     <div 
         x-show="showDropdown && filteredUsers.length > 0" 
         @click.away="showDropdown = false"
-        class="mt-2 max-h-60 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 shadow-lg z-10 absolute w-full"
-        style="max-width: calc(100% - 3rem);"
+        class="mt-2 max-h-60 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 shadow-lg z-10 absolute left-0 right-0"
     >
         <template x-for="user in filteredUsers" :key="user.id">
             <div 

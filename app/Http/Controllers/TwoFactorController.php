@@ -72,13 +72,10 @@ class TwoFactorController extends Controller
             return back()->withErrors(['code' => 'Invalid verification code']);
         }
         
-        // Generate recovery codes
-        $recoveryCodes = $user->generateRecoveryCodes();
-        
         // Save 2FA settings
         $user->update([
             'two_factor_secret' => $secret,
-            'two_factor_recovery_codes' => $recoveryCodes,
+            'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => now(),
         ]);
         
@@ -93,7 +90,7 @@ class TwoFactorController extends Controller
             $request->userAgent()
         );
         
-        return redirect()->route('two-factor.recovery-codes')->with('status', '2fa-enabled');
+        return redirect()->route('profile.edit')->with('status', '2fa-enabled');
     }
     
     /**
@@ -143,13 +140,9 @@ class TwoFactorController extends Controller
         
         $isValid = false;
         
-        // Check if it's a TOTP code
+        // Check if it's a TOTP code (6 digits only)
         if (strlen($request->code) === 6 && is_numeric($request->code)) {
             $isValid = $this->google2fa->verifyKey($user->two_factor_secret, $request->code);
-        }
-        // Check if it's a recovery code
-        else if (strlen($request->code) === 8) {
-            $isValid = $user->useRecoveryCode($request->code);
         }
         
         if (!$isValid) {
@@ -212,39 +205,5 @@ class TwoFactorController extends Controller
         );
         
         return redirect()->route('profile.edit')->with('status', '2fa-disabled');
-    }
-    
-    /**
-     * Show recovery codes.
-     */
-    public function showRecoveryCodes(): View|RedirectResponse
-    {
-        $user = Auth::user();
-        
-        if (!$user->hasTwoFactorEnabled()) {
-            return redirect()->route('profile.edit')->with('error', '2FA is not enabled');
-        }
-        
-        return view('two-factor.recovery-codes', [
-            'recoveryCodes' => $user->two_factor_recovery_codes,
-        ]);
-    }
-    
-    /**
-     * Regenerate recovery codes.
-     */
-    public function regenerateRecoveryCodes(Request $request): RedirectResponse
-    {
-        $user = Auth::user();
-        
-        if (!$user->hasTwoFactorEnabled()) {
-            return redirect()->route('profile.edit')->with('error', '2FA is not enabled');
-        }
-        
-        $recoveryCodes = $user->generateRecoveryCodes();
-        $user->update(['two_factor_recovery_codes' => $recoveryCodes]);
-        
-        return redirect()->route('two-factor.recovery-codes')
-            ->with('status', 'recovery-codes-regenerated');
     }
 }

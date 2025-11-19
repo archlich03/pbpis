@@ -67,9 +67,16 @@
                 </span>
             </div>
 
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 {{ __('This user has not enabled two-factor authentication. They can enable it themselves from their profile settings.') }}
             </p>
+
+            <button
+                type="button"
+                disabled
+                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-150 bg-gray-400 dark:bg-gray-600 cursor-not-allowed opacity-50"
+                title="{{ __('Two-factor authentication is not enabled for this user') }}"
+            >{{ __('Remove Two-Factor Authentication') }}</button>
         @endif
     </div>
 
