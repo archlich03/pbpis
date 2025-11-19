@@ -124,3 +124,23 @@ it('stores meeting with "Planned" status', function () {
     expect($meeting)->not->toBeNull()
         ->and($meeting->status)->toBe('Suplanuotas');
 });
+
+it('allows IT administrator to be assigned as meeting secretary', function () {
+    actingAs($this->secretaryUser);
+
+    $response = post(route('meetings.store', $this->body), [
+        '_token' => csrf_token(),
+        'secretary_id' => $this->adminUser->user_id, // IT admin as secretary
+        'is_evote' => 1,
+        'meeting_date' => now()->toDateString(),
+        'vote_start' => now()->toDateString(),
+        'vote_end' => now()->addDay()->toDateString(),
+    ]);
+
+    $response->assertRedirect(route('bodies.show', $this->body));
+
+    $meeting = Meeting::first();
+    expect($meeting)->not->toBeNull()
+        ->and($meeting->secretary_id)->toBe($this->adminUser->user_id)
+        ->and($meeting->secretary->role)->toBe('IT administratorius');
+});

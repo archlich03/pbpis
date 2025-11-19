@@ -85,6 +85,9 @@ p, div, h1, h2, h3 {
                 @endif
             @endforeach
         </span><br>
+        <span>
+            Kvorumas priimti sprendimus {{ $meeting->hasQuorum() ? 'buvo' : 'nebuvo' }}, nes posėdyje dalyvavo {{ $meeting->getAttendeesCount() }} narių (-iai) iš {{ $meeting->body->members->count() }}.
+        </span><br>
         <span>DARBOTVARKĖ:</span><br>
         <ol style='margin-top: 0px; margin-bottom: 0px;'>
             @foreach ($meeting->questions as $question)
@@ -133,5 +136,16 @@ p, div, h1, h2, h3 {
                 </li>
             @endforeach
         </ol>
+        <br>
+        <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+            <tr>
+                <td style="text-align: left; width: 50%;">Posėdžio {{ $meeting->body->chairman->gender ? 'pirmininkas' : 'pirmininkė' }}:</td>
+                <td style="text-align: right; width: 50%;">{{ $meeting->body->chairman->pedagogical_name }} {{ $meeting->body->chairman->name }}</td>
+            </tr>
+            <tr>
+                <td style="text-align: left; width: 50%;">Posėdžio {{ $meeting->secretary->gender ? 'sekretorius' : 'sekretorė' }}:</td>
+                <td style="text-align: right; width: 50%;">{{ $meeting->secretary->pedagogical_name }} {{ $meeting->secretary->name }}</td>
+            </tr>
+        </table>
     </div>
 </div>

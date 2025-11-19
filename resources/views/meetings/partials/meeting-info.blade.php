@@ -32,7 +32,7 @@
                 :label="__('Associated secretary') . ':'"
                 :users="$users"
                 :selected="$meeting->secretary"
-                :filter="fn($user) => $user->isSecretary()"
+                :filter="fn($user) => $user->isPrivileged()"
                 required
             />
             <div>

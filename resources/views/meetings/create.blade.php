@@ -17,8 +17,8 @@
                         name="secretary_id"
                         :label="__('Associated secretary') . ':'"
                         :users="$users"
-                        :selected="Auth::user()->isSecretary() ? Auth::user() : null"
-                        :filter="fn($user) => $user->isSecretary()"
+                        :selected="Auth::user()->isPrivileged() ? Auth::user() : null"
+                        :filter="fn($user) => $user->isPrivileged()"
                         required
                     />
 

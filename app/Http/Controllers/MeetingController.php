@@ -368,6 +368,12 @@ class MeetingController extends Controller
         }
         $section->addText($attendeesText, $normalStyle);
         
+        // Quorum information
+        $quorumText = 'Kvorumas priimti sprendimus ' . ($meeting->hasQuorum() ? 'buvo' : 'nebuvo') . 
+                      ', nes posėdyje dalyvavo ' . $meeting->getAttendeesCount() . 
+                      ' narių iš ' . $meeting->body->members->count() . '.';
+        $section->addText($quorumText, $normalStyle);
+        
         // Add line break before agenda
         $section->addTextBreak();
 
@@ -433,6 +439,35 @@ class MeetingController extends Controller
                 }
             }
         }
+
+        // Add signatures at the end
+        $section->addTextBreak();
+        
+        // Chairman signature with left-right alignment
+        $chairmanTable = $section->addTable();
+        $chairmanRow = $chairmanTable->addRow();
+        $chairmanRow->addCell(4500)->addText(
+            'Posėdžio ' . ($meeting->body->chairman->gender ? 'pirmininkas' : 'pirmininkė') . ':',
+            $normalStyle
+        );
+        $chairmanRow->addCell(4500)->addText(
+            $meeting->body->chairman->pedagogical_name . ' ' . $meeting->body->chairman->name,
+            $normalStyle,
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::END]
+        );
+        
+        // Secretary signature with left-right alignment
+        $secretaryTable = $section->addTable();
+        $secretaryRow = $secretaryTable->addRow();
+        $secretaryRow->addCell(4500)->addText(
+            'Posėdžio ' . ($meeting->secretary->gender ? 'sekretorius' : 'sekretorė') . ':',
+            $normalStyle
+        );
+        $secretaryRow->addCell(4500)->addText(
+            $meeting->secretary->pedagogical_name . ' ' . $meeting->secretary->name,
+            $normalStyle,
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::END]
+        );
 
         // Generate filename
         $filename = $meeting->body->title . ' ' . 

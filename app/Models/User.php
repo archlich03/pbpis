@@ -194,36 +194,6 @@ class User extends Authenticatable
     {
         return empty($this->ms_id);
     }
-    
-    /**
-     * Generate new recovery codes.
-     */
-    public function generateRecoveryCodes(): array
-    {
-        $codes = [];
-        for ($i = 0; $i < 8; $i++) {
-            $codes[] = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 8));
-        }
-        return $codes;
-    }
-    
-    /**
-     * Use a recovery code.
-     */
-    public function useRecoveryCode(string $code): bool
-    {
-        $codes = $this->two_factor_recovery_codes ?? [];
-        $upperCode = strtoupper($code);
-        
-        if (($key = array_search($upperCode, $codes)) !== false) {
-            unset($codes[$key]);
-            $this->two_factor_recovery_codes = array_values($codes);
-            $this->save();
-            return true;
-        }
-        
-        return false;
-    }
 }
 
 

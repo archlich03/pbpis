@@ -62,14 +62,13 @@ it('allows user to setup 2fa with valid code', function () {
             '_token' => 'test_token',
         ]);
 
-    $response->assertRedirect(route('two-factor.recovery-codes'));
+    $response->assertRedirect(route('profile.edit'));
     $response->assertSessionHas('status');
 
     // Verify user has 2FA enabled
     $this->user->refresh();
     expect($this->user->two_factor_secret)->not->toBeNull();
     expect($this->user->two_factor_confirmed_at)->not->toBeNull();
-    expect($this->user->two_factor_recovery_codes)->not->toBeNull();
 
     // Verify audit log was created
     $this->assertDatabaseHas('audit_logs', [
@@ -104,7 +103,7 @@ it('redirects user with 2fa to verification during login', function () {
     $this->user->update([
         'two_factor_secret' => $secret,
         'two_factor_confirmed_at' => now(),
-        'two_factor_recovery_codes' => ['code1', 'code2'],
+        'two_factor_recovery_codes' => null,
     ]);
 
     $response = $this->post('/login', [
@@ -125,7 +124,7 @@ it('allows user to login with valid 2fa code', function () {
     // Enable 2FA for user
     $this->user->update([
         'two_factor_secret' => $secret,
-        'two_factor_recovery_codes' => ['recovery123', 'recovery456'],
+        'two_factor_recovery_codes' => null,
         'two_factor_confirmed_at' => now(),
     ]);
 
@@ -166,7 +165,7 @@ it('prevents user from logging in with invalid 2fa code', function () {
     // Enable 2FA for user
     $this->user->update([
         'two_factor_secret' => $secret,
-        'two_factor_recovery_codes' => ['code1', 'code2'],
+        'two_factor_recovery_codes' => null,
         'two_factor_confirmed_at' => now(),
     ]);
 
@@ -193,43 +192,6 @@ it('prevents user from logging in with invalid 2fa code', function () {
     $this->assertGuest();
 });
 
-it('allows user to login with recovery code', function () {
-    // Generate a proper 2FA secret using Google2FA
-    $google2fa = app('pragmarx.google2fa');
-    $secret = $google2fa->generateSecretKey();
-    
-    // Enable 2FA for user
-    $this->user->update([
-        'two_factor_secret' => $secret,
-        'two_factor_recovery_codes' => ['ABCD1234', 'EFGH5678'],
-        'two_factor_confirmed_at' => now(),
-    ]);
-
-    // Login first
-    $response = $this->post('/login', [
-        'email' => $this->user->email,
-        'password' => 'password123',
-        '_token' => 'test_token',
-    ]);
-
-    $response->assertRedirect(route('two-factor.verify'));
-    $this->assertGuest();
-
-    $response = $this->post(route('two-factor.verify.post'), [
-        'code' => 'ABCD1234',
-        '_token' => 'test_token',
-    ]);
-
-    $response->assertRedirect(route('dashboard'));
-    $this->assertAuthenticatedAs($this->user);
-
-    // Verify recovery code was removed
-    $this->user->refresh();
-    $remainingCodes = $this->user->two_factor_recovery_codes;
-    expect($remainingCodes)->not->toContain('ABCD1234');
-    expect($remainingCodes)->toContain('EFGH5678');
-
-});
 
 it('allows user to disable 2fa', function () {
     // Setup 2FA for user
@@ -237,7 +199,7 @@ it('allows user to disable 2fa', function () {
     $this->user->update([
         'two_factor_secret' => $secret,
         'two_factor_confirmed_at' => now(),
-        'two_factor_recovery_codes' => ['code1', 'code2'],
+        'two_factor_recovery_codes' => null,
     ]);
 
     $response = $this->actingAs($this->user)
@@ -262,30 +224,6 @@ it('allows user to disable 2fa', function () {
     ]);
 });
 
-it('allows user to regenerate recovery codes', function () {
-    // Setup 2FA for user
-    $secret = $this->google2fa->generateSecretKey();
-    $originalCodes = ['old1', 'old2'];
-    $this->user->update([
-        'two_factor_secret' => $secret,
-        'two_factor_confirmed_at' => now(),
-        'two_factor_recovery_codes' => $originalCodes,
-    ]);
-
-    $response = $this->actingAs($this->user)
-        ->post(route('two-factor.recovery-codes.regenerate'), [
-            '_token' => 'test_token',
-        ]);
-
-    $response->assertRedirect(route('two-factor.recovery-codes'));
-    $response->assertSessionHas('status');
-
-    // Verify recovery codes were regenerated
-    $this->user->refresh();
-    $newCodes = $this->user->two_factor_recovery_codes;
-    expect($newCodes)->not->toEqual($originalCodes);
-    expect($newCodes)->toHaveCount(8); // Should have 8 new codes
-});
 
 it('allows it admin to remove user 2fa', function () {
     // Create IT admin
@@ -298,7 +236,7 @@ it('allows it admin to remove user 2fa', function () {
     $this->user->update([
         'two_factor_secret' => $secret,
         'two_factor_confirmed_at' => now(),
-        'two_factor_recovery_codes' => ['code1', 'code2'],
+        'two_factor_recovery_codes' => null,
     ]);
 
     $response = $this->actingAs($admin)
@@ -424,28 +362,3 @@ it('generates qr code for 2fa setup', function () {
     expect($qrCodeUrl)->toContain(urlencode($this->user->email));
 });
 
-it('shows recovery codes page for authenticated user with 2fa', function () {
-    // Setup 2FA for user
-    $secret = $this->google2fa->generateSecretKey();
-    $recoveryCodes = ['code1', 'code2', 'code3'];
-    $this->user->update([
-        'two_factor_secret' => $secret,
-        'two_factor_confirmed_at' => now(),
-        'two_factor_recovery_codes' => $recoveryCodes,
-    ]);
-
-    $response = $this->actingAs($this->user)
-        ->get(route('two-factor.recovery-codes'));
-
-    $response->assertStatus(200);
-    $response->assertViewIs('two-factor.recovery-codes');
-    expect($response->viewData('recoveryCodes'))->toEqual($recoveryCodes);
-});
-
-it('prevents user without 2fa from accessing recovery codes', function () {
-    $response = $this->actingAs($this->user)
-        ->get(route('two-factor.recovery-codes'));
-
-    $response->assertRedirect(route('profile.edit'));
-    $response->assertSessionHas('error');
-});
