@@ -326,9 +326,9 @@ class MicrosoftController extends Controller
         if ($user) {
             Log::info('Found existing user', ['user_id' => $user->user_id]);
             
-            // Update existing user with Microsoft ID if not already set
-            if (empty($user->ms_id) && isset($msGraphData['id'])) {
+            if (isset($msGraphData['id'])) {
                 $user->ms_id = $msGraphData['id'];
+                Log::info('Updated/re-linked Microsoft ID', ['ms_id' => $msGraphData['id']]);
             }
             
             // Auto-update user information from Active Directory
@@ -336,6 +336,9 @@ class MicrosoftController extends Controller
                 $user->name = $msGraphData['displayName'];
                 Log::info('Updated user name from AD', ['name' => $msGraphData['displayName']]);
             }
+            
+            // Save the updated user
+            $user->save();
         } else {
             Log::info('Creating new user from Microsoft account');
             
