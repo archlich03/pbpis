@@ -128,29 +128,29 @@ class MicrosoftController extends Controller
                     ->with('error', __('Failed to authenticate with Microsoft. Please try again.'));
             }
             
-            // Get user info from Microsoft Graph API
+            // Get user info from ID token claims instead of Graph API
             try {
-                $msGraphData = $this->getUserInfo($tokenResponse['access_token']);
+                $msGraphData = $this->getUserInfoFromIdToken($tokenResponse['id_token']);
                 
                 // Verify we have the Microsoft ID
-                if (!isset($msGraphData['id']) || empty($msGraphData['id'])) {
-                    Log::error('Microsoft ID missing in Graph API response', ['data' => $msGraphData]);
+                if (!isset($msGraphData['oid']) || empty($msGraphData['oid'])) {
+                    Log::error('Microsoft ID missing in ID token', ['data' => $msGraphData]);
                     return redirect()->route('login')
                         ->with('error', __('Could not retrieve Microsoft ID. Please try again.'));
                 }
                 
-                Log::info('Microsoft Graph data retrieved', [
-                    'display_name' => $msGraphData['displayName'] ?? 'Unknown',
-                    'ms_id' => $msGraphData['id']
+                Log::info('Microsoft user data retrieved from ID token', [
+                    'display_name' => $msGraphData['name'] ?? 'Unknown',
+                    'ms_id' => $msGraphData['oid']
                 ]);
-            } catch (GuzzleException $e) {
-                Log::error('Failed to get user info', ['error' => $e->getMessage()]);
+            } catch (\Exception $e) {
+                Log::error('Failed to decode ID token', ['error' => $e->getMessage()]);
                 return redirect()->route('login')
                     ->with('error', __('Failed to retrieve your Microsoft account information. Please try again.'));
             }
             
-            // Get email from Microsoft account
-            $email = $msGraphData['mail'] ?? $msGraphData['userPrincipalName'] ?? null;
+            // Get email from ID token claims
+            $email = $msGraphData['email'] ?? $msGraphData['preferred_username'] ?? $msGraphData['upn'] ?? null;
             
             if (!$email) {
                 Log::error('No email found in Microsoft data');
@@ -161,19 +161,19 @@ class MicrosoftController extends Controller
             // Validate and sanitize Microsoft data
             $email = filter_var($email, FILTER_VALIDATE_EMAIL);
             if (!$email) {
-                Log::error('Invalid email format from Microsoft', ['email' => $msGraphData['mail'] ?? $msGraphData['userPrincipalName'] ?? 'null']);
+                Log::error('Invalid email format from Microsoft', ['email' => $msGraphData['email'] ?? $msGraphData['preferred_username'] ?? 'null']);
                 return redirect()->route('login')
                     ->with('error', __('Invalid email format from Microsoft account.'));
             }
             
             // Sanitize display name
-            $displayName = isset($msGraphData['displayName']) ? strip_tags(trim($msGraphData['displayName'])) : null;
+            $displayName = isset($msGraphData['name']) ? strip_tags(trim($msGraphData['name'])) : null;
             if ($displayName && strlen($displayName) > 255) {
                 $displayName = substr($displayName, 0, 255);
             }
             
-            // Validate Microsoft ID
-            $msId = isset($msGraphData['id']) ? preg_replace('/[^a-zA-Z0-9\-]/', '', $msGraphData['id']) : null;
+            // Validate Microsoft ID (oid = object ID in Azure AD)
+            $msId = isset($msGraphData['oid']) ? preg_replace('/[^a-zA-Z0-9\-]/', '', $msGraphData['oid']) : null;
             if ($msId && strlen($msId) > 255) {
                 $msId = substr($msId, 0, 255);
             }
@@ -246,7 +246,7 @@ class MicrosoftController extends Controller
     }
     
     /**
-     * Get user info from Microsoft Graph API
+     * Get user info from Microsoft Graph API (DEPRECATED - kept for reference)
      *
      * @param string $accessToken
      * @return array
@@ -273,6 +273,41 @@ class MicrosoftController extends Controller
         ]);
         
         return $userData;
+    }
+    
+    /**
+     * Get user info from ID token claims (no Graph API call needed)
+     *
+     * @param string $idToken
+     * @return array
+     */
+    protected function getUserInfoFromIdToken(string $idToken): array
+    {
+        // ID tokens are JWT tokens with 3 parts: header.payload.signature
+        $parts = explode('.', $idToken);
+        
+        if (count($parts) !== 3) {
+            throw new \Exception('Invalid ID token format');
+        }
+        
+        // Decode the payload (second part)
+        $payload = base64_decode(strtr($parts[1], '-_', '+/'));
+        $claims = json_decode($payload, true);
+        
+        if (!$claims) {
+            throw new \Exception('Failed to decode ID token payload');
+        }
+        
+        // Log the ID token claims for debugging
+        Log::info('ID token claims', [
+            'oid' => $claims['oid'] ?? 'Not found',
+            'name' => $claims['name'] ?? 'Not found',
+            'email' => $claims['email'] ?? $claims['preferred_username'] ?? 'Not found',
+            'has_oid' => isset($claims['oid']),
+            'claim_keys' => array_keys($claims)
+        ]);
+        
+        return $claims;
     }
     
     /**

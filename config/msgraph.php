@@ -61,7 +61,7 @@ return [
     set the scopes to be used, Microsoft Graph API will accept up to 20 scopes
     */
 
-    'scopes' => 'offline_access openid profile email user.read',
+    'scopes' => 'openid profile email',
 
     /*
     The default timezone is set to Europe/London this option allows you to set your prefered timetime
