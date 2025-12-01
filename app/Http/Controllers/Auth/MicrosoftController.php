@@ -326,7 +326,6 @@ class MicrosoftController extends Controller
         if ($user) {
             Log::info('Found existing user', ['user_id' => $user->user_id]);
             
-            // Always update Microsoft ID (allows re-linking after unlinking)
             if (isset($msGraphData['id'])) {
                 $user->ms_id = $msGraphData['id'];
                 Log::info('Updated/re-linked Microsoft ID', ['ms_id' => $msGraphData['id']]);
