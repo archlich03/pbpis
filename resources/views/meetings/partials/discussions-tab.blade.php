@@ -62,7 +62,7 @@
                             @csrf
                             
                             {{-- Reply indicator with quoted message --}}
-                            <div x-show="replyTo" class="mb-2 bg-blue-50 dark:bg-blue-900/30 px-3 py-2 rounded">
+                            <div x-show="replyTo" class="mb-2 bg-blue-50 dark:bg-blue-900/30 px-3 py-2 rounded font-sans">
                                 <div class="flex items-center justify-between mb-1">
                                     <span class="text-sm font-semibold text-blue-700 dark:text-blue-300">
                                         {{ __('Replying to') }}: <span x-text="replyToName"></span>
@@ -257,14 +257,14 @@
 
                                             {{-- Quoted parent message (if this is a reply) --}}
                                             @if ($discussion->parent_id && $discussion->parent)
-                                                <div class="mb-2 text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 border-l-2 border-gray-300 dark:border-gray-600 pl-2 py-1 rounded">
+                                                <div class="mb-2 text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 border-l-2 border-gray-300 dark:border-gray-600 pl-2 py-1 rounded font-sans">
                                                     <div class="font-semibold">{{ $discussion->parent->user->name }}</div>
                                                     <div class="italic">{{ Str::limit($discussion->parent->content, 100) }}</div>
                                                 </div>
                                             @endif
 
                                             {{-- Comment text (view mode) --}}
-                                            <div x-show="!editing" class="text-sm text-gray-700 dark:text-gray-300 break-words">
+                                            <div x-show="!editing" class="text-sm text-gray-700 dark:text-gray-300 break-words font-sans">
                                                 {{ $discussion->content }}
                                             </div>
 
