@@ -297,9 +297,6 @@ class EmailService
 
 <p>Galite peržiūrėti posėdžio informaciją ir balsavimo rezultatus:</p>
 <p>Posėdžio nuoroda: {$meetingLink}</p>
-
-<p>Pagarbiai,<br>
-{$meeting->secretary->name}</p>",
         ];
     }
 
