@@ -255,16 +255,80 @@ class EmailService
 
 <p>Regards,<br>
 {$meeting->secretary->name}</p>",
-            ];
-        }
+        ];
+    }
 
         return [
-            'subject' => 'Informacija dėl „' . $meeting->body->title . '“ darinio posėdžio',
+            'subject' => 'Informacija dėl „' . $meeting->body->title . '" darinio posėdžio',
             'body' => "<p>Sveiki,</p>
 
 <p>[Jūsų žinutė čia]</p>
 
 <p>Posėdžio nuoroda: " . route('meetings.show', $meeting) . "</p>
+
+<p>Pagarbiai,<br>
+{$meeting->secretary->name}</p>",
+        ];
+    }
+
+    /**
+     * Get email template for proxy vote cast notification.
+     */
+    public static function getProxyVoteCastTemplate(
+        Meeting $meeting,
+        \App\Models\Question $question,
+        \App\Models\User $targetUser,
+        \App\Models\User $castByUser,
+        string $choice
+    ): array {
+        $choiceText = $choice;
+        $meetingLink = route('meetings.show', $meeting);
+        
+        return [
+            'subject' => 'Balsas užfiksuotas Jūsų vardu - „' . $meeting->body->title . '“ posėdis',
+            'body' => "<p>Sveiki, {$targetUser->name},</p>
+
+<p>Informuojame, kad Jūsų vardu buvo užfiksuotas balsas <strong>{$meeting->body->title}</strong> posėdyje.</p>
+
+<p><strong>Posėdžio data:</strong> {$meeting->meeting_date->format('Y-m-d')}</p>
+<p><strong>Klausimas:</strong> {$question->title}</p>
+<p><strong>Balsas:</strong> {$choiceText}</p>
+<p><strong>Balsą užfiksavo:</strong> {$castByUser->name}</p>
+
+<p>Galite peržiūrėti posėdžio informaciją ir balsavimo rezultatus:</p>
+<p>Posėdžio nuoroda: {$meetingLink}</p>
+
+<p>Pagarbiai,<br>
+{$meeting->secretary->name}</p>",
+        ];
+    }
+
+    /**
+     * Get email template for proxy vote removed notification.
+     */
+    public static function getProxyVoteRemovedTemplate(
+        Meeting $meeting,
+        \App\Models\Question $question,
+        \App\Models\User $targetUser,
+        \App\Models\User $removedByUser,
+        ?string $previousChoice
+    ): array {
+        $meetingLink = route('meetings.show', $meeting);
+        $choiceText = $previousChoice ? "Ankstesnis balsas buvo: {$previousChoice}" : '';
+        
+        return [
+            'subject' => 'Balsas pašalintas – „' . $meeting->body->title . '" posėdis',
+            'body' => "<p>Sveiki, {$targetUser->name},</p>
+
+<p>Informuojame, kad Jūsų balsas buvo pašalintas <strong>{$meeting->body->title}</strong> posėdyje.</p>
+
+<p><strong>Posėdžio data:</strong> {$meeting->meeting_date->format('Y-m-d')}</p>
+<p><strong>Klausimas:</strong> {$question->title}</p>
+" . ($choiceText ? "<p><strong>{$choiceText}</strong></p>" : "") . "
+<p><strong>Balsą pašalino:</strong> {$removedByUser->name}</p>
+
+<p>Galite peržiūrėti posėdžio informaciją:</p>
+<p>Posėdžio nuoroda: {$meetingLink}</p>
 
 <p>Pagarbiai,<br>
 {$meeting->secretary->name}</p>",

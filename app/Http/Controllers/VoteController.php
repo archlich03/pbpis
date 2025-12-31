@@ -7,6 +7,7 @@ use App\Models\Meeting;
 use App\Models\User;
 use App\Models\Question;
 use App\Models\Vote;
+use App\Services\EmailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -124,7 +125,7 @@ class VoteController extends Controller
     /**
      * Store a proxy vote on behalf of another user
      */
-    public function storeProxy(Meeting $meeting, Question $question, Request $request)
+    public function storeProxy(Meeting $meeting, Question $question, Request $request, EmailService $emailService)
     {
         // Only secretaries and IT admins can cast proxy votes
         if (!Auth::user()->isPrivileged() && !Auth::user()->isSecretary()) {
@@ -176,6 +177,28 @@ class VoteController extends Controller
             ]);
         }
 
+        // Send email notification to target user with CC to chairman
+        $emailTemplate = EmailService::getProxyVoteCastTemplate(
+            $meeting,
+            $question,
+            $targetUser,
+            Auth::user(),
+            $request->choice
+        );
+        
+        $recipients = [$targetUser->email];
+        if ($meeting->body->chairman && $meeting->body->chairman->email) {
+            $recipients[] = $meeting->body->chairman->email;
+        }
+        
+        $emailService->queueEmail(
+            subject: $emailTemplate['subject'],
+            body: $emailTemplate['body'],
+            recipients: $recipients,
+            meetingId: $meeting->meeting_id,
+            userId: Auth::id()
+        );
+
         return redirect()->route('meetings.show', ['meeting' => $meeting])
             ->with('success', 'Proxy vote cast successfully for ' . $targetUser->name);
     }
@@ -183,7 +206,7 @@ class VoteController extends Controller
     /**
      * Remove a proxy vote on behalf of another user
      */
-    public function destroyProxy(Meeting $meeting, Question $question, Request $request)
+    public function destroyProxy(Meeting $meeting, Question $question, Request $request, EmailService $emailService)
     {
         // Only secretaries and IT admins can remove proxy votes
         if (!Auth::user()->isPrivileged() && !Auth::user()->isSecretary()) {
@@ -234,6 +257,28 @@ class VoteController extends Controller
         if (!$userHasVotes && $meeting->isUserAttending($targetUser)) {
             $meeting->attendances()->where('user_id', $targetUser->user_id)->delete();
         }
+
+        // Send email notification to target user with CC to chairman
+        $emailTemplate = EmailService::getProxyVoteRemovedTemplate(
+            $meeting,
+            $question,
+            $targetUser,
+            Auth::user(),
+            $previousChoice
+        );
+        
+        $recipients = [$targetUser->email];
+        if ($meeting->body->chairman && $meeting->body->chairman->email) {
+            $recipients[] = $meeting->body->chairman->email;
+        }
+        
+        $emailService->queueEmail(
+            subject: $emailTemplate['subject'],
+            body: $emailTemplate['body'],
+            recipients: $recipients,
+            meetingId: $meeting->meeting_id,
+            userId: Auth::id()
+        );
 
         return redirect()->route('meetings.show', ['meeting' => $meeting])
             ->with('success', 'Proxy vote removed successfully for ' . $targetUser->name);
