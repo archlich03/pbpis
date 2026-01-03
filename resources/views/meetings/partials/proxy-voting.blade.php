@@ -3,6 +3,9 @@
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             {{ __('Cast votes on behalf of body members. Only secretaries and IT administrators can use this feature.') }}
         </p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+            {{ __('When you cast or remove a proxy vote, an email notification will be sent to the member and the chairman.') }}
+        </p>
         
         @if ($meeting->status == "Vyksta" && $meeting->questions->count() > 0)
             <div class="flex gap-6" x-data="{

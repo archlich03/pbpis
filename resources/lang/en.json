@@ -90,6 +90,7 @@
     "Download PDF Protocol": "Download PDF Protocol",
     "Proxy Voting": "Proxy Voting",
     "Cast votes on behalf of body members. Only secretaries and IT administrators can use this feature.": "Cast votes on behalf of body members. Only secretaries and IT administrators can use this feature.",
+    "When you cast or remove a proxy vote, an email notification will be sent to the member and the chairman.": "When you cast or remove a proxy vote, an email notification will be sent to the member and the chairman.",
     "Current votes": "Current votes",
     "Proxy voting is only available during active meetings.": "Proxy voting is only available during active meetings.",
     "No questions available for voting.": "No questions available for voting.",

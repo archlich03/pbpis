@@ -379,8 +379,7 @@
   "Passed": "Priimtas",
   "Not Passed": "Nepriimtas",
   "Remove vote": "Nebalsuoti",
-
-
+  "When you cast or remove a proxy vote, an email notification will be sent to the member and the chairman.": "Kai užfiksuojate arba pašalinate balsą už kitą narį, el. laiško pranešimas bus išsiųstas nariui ir darinio pirmininkui.",
   "Are you sure you want to delete this meeting?": "Ar tikrai norite ištrinti šį posėdį?",
   "This action is irreversible. Please confirm that you want to delete this meeting": "Šis veiksmas negrįžtamas. Patvirtinkite, kad norite ištrinti šį posėdį",
   "Proxy Voting": "Balsavimas už kitus",
