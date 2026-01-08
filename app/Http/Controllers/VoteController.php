@@ -115,7 +115,7 @@ class VoteController extends Controller
         })->exists();
         
         // If user has no votes left, mark them as absent
-        if (!$userHasVotes && $meeting->isUserAttending(Auth::user())) {
+        if (!$userHasVotes) {
             $meeting->attendances()->where('user_id', Auth::user()->user_id)->delete();
         }
 
@@ -254,7 +254,7 @@ class VoteController extends Controller
         })->exists();
         
         // If target user has no votes left, mark them as absent
-        if (!$userHasVotes && $meeting->isUserAttending($targetUser)) {
+        if (!$userHasVotes) {
             $meeting->attendances()->where('user_id', $targetUser->user_id)->delete();
         }
 
