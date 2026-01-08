@@ -157,5 +157,6 @@
     "Are you sure you want to delete this account?": "Are you sure you want to delete this account?",
     "User: :name (:email)": "User: :name (:email)",
     "Rate Limits": "Rate Limits",
-    "5 minute cooldown per question": "5 minute cooldown per question"
+    "5 minute cooldown per question": "5 minute cooldown per question",
+    "Commenting is currently not available.": "Commenting is currently not available."
 }

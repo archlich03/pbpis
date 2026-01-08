@@ -283,20 +283,20 @@ class EmailService
     ): array {
         $choiceText = $choice;
         $meetingLink = route('meetings.show', $meeting);
-        
+
+        $body = "<p>Sveiki, {$targetUser->name},</p>\n\n";
+        $body .= "<p>Informuojame, kad Jūsų vardu buvo užfiksuotas balsas <strong>{$meeting->body->title}</strong> posėdyje.</p>\n\n";
+        $body .= "<p><strong>Posėdžio data:</strong> {$meeting->meeting_date->format('Y-m-d')}</p>\n";
+        $body .= "<p><strong>Klausimas:</strong> {$question->title}</p>\n";
+        $body .= "<p><strong>Balsas:</strong> {$choiceText}</p>\n";
+        $body .= "<p><strong>Balsą užfiksavo:</strong> {$castByUser->name}</p>\n\n";
+        $body .= "<p>Galite peržiūrėti posėdžio informaciją ir balsavimo rezultatus:</p>\n";
+        $body .= "<p>Posėdžio nuoroda: {$meetingLink}</p>\n\n";
+        $body .= "<p>Pagarbiai,<br>{$meeting->secretary->name}</p>";
+
         return [
             'subject' => 'Balsas užfiksuotas Jūsų vardu - „' . $meeting->body->title . '“ posėdis',
-            'body' => "<p>Sveiki, {$targetUser->name},</p>
-
-<p>Informuojame, kad Jūsų vardu buvo užfiksuotas balsas <strong>{$meeting->body->title}</strong> posėdyje.</p>
-
-<p><strong>Posėdžio data:</strong> {$meeting->meeting_date->format('Y-m-d')}</p>
-<p><strong>Klausimas:</strong> {$question->title}</p>
-<p><strong>Balsas:</strong> {$choiceText}</p>
-<p><strong>Balsą užfiksavo:</strong> {$castByUser->name}</p>
-
-<p>Galite peržiūrėti posėdžio informaciją ir balsavimo rezultatus:</p>
-<p>Posėdžio nuoroda: {$meetingLink}</p>
+            'body' => $body,
         ];
     }
 
@@ -312,23 +312,22 @@ class EmailService
     ): array {
         $meetingLink = route('meetings.show', $meeting);
         $choiceText = $previousChoice ? "Ankstesnis balsas buvo: {$previousChoice}" : '';
-        
+
+        $body = "<p>Sveiki, {$targetUser->name},</p>\n\n";
+        $body .= "<p>Informuojame, kad Jūsų balsas buvo pašalintas <strong>{$meeting->body->title}</strong> posėdyje.</p>\n\n";
+        $body .= "<p><strong>Posėdžio data:</strong> {$meeting->meeting_date->format('Y-m-d')}</p>\n";
+        $body .= "<p><strong>Klausimas:</strong> {$question->title}</p>\n";
+        if ($choiceText) {
+            $body .= "<p><strong>{$choiceText}</strong></p>\n";
+        }
+        $body .= "<p><strong>Balsą pašalino:</strong> {$removedByUser->name}</p>\n\n";
+        $body .= "<p>Galite peržiūrėti posėdžio informaciją:</p>\n";
+        $body .= "<p>Posėdžio nuoroda: {$meetingLink}</p>\n\n";
+        $body .= "<p>Pagarbiai,<br>{$meeting->secretary->name}</p>";
+
         return [
             'subject' => 'Balsas pašalintas – „' . $meeting->body->title . '" posėdis',
-            'body' => "<p>Sveiki, {$targetUser->name},</p>
-
-<p>Informuojame, kad Jūsų balsas buvo pašalintas <strong>{$meeting->body->title}</strong> posėdyje.</p>
-
-<p><strong>Posėdžio data:</strong> {$meeting->meeting_date->format('Y-m-d')}</p>
-<p><strong>Klausimas:</strong> {$question->title}</p>
-" . ($choiceText ? "<p><strong>{$choiceText}</strong></p>" : "") . "
-<p><strong>Balsą pašalino:</strong> {$removedByUser->name}</p>
-
-<p>Galite peržiūrėti posėdžio informaciją:</p>
-<p>Posėdžio nuoroda: {$meetingLink}</p>
-
-<p>Pagarbiai,<br>
-{$meeting->secretary->name}</p>",
+            'body' => $body,
         ];
     }
 }

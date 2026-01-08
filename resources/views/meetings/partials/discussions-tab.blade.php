@@ -36,6 +36,13 @@
                  role="tabpanel"
                  class="space-y-4"
                  x-data="{ content: '', replyTo: null, replyToName: '', replyToContent: '' }">
+                    @php
+                        $canComment = $meeting->status === 'Vyksta' && (
+                            $meeting->body->members->contains(Auth::user()) ||
+                            Auth::user()->role === 'Sekretorius' ||
+                            Auth::user()->role === 'IT administratorius'
+                        );
+                    @endphp
                     {{-- Question Header --}}
                     @if ($meeting->questions->count() > 1)
                         <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
@@ -52,10 +59,7 @@
                     @endif
 
                     {{-- New Comment Form (only during voting) --}}
-                    @if ($meeting->status === 'Vyksta' && 
-                         ($meeting->body->members->contains(Auth::user()) || 
-                          Auth::user()->role === 'Sekretorius' || 
-                          Auth::user()->role === 'IT administratorius'))
+                    @if ($canComment)
                         <form method="POST" action="{{ route('discussions.store', [$meeting, $question]) }}" 
                               class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4"
                               id="discussion-form-{{ $question->question_id }}">
@@ -110,7 +114,11 @@
                             <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                             </svg>
-                            <p class="text-sm">{{ __('No comments yet. Be the first to start the discussion!') }}</p>
+                            @if ($canComment)
+                                <p class="text-sm">{{ __('No comments yet. Be the first to start the discussion!') }}</p>
+                            @else
+                                <p class="text-sm">{{ __('Commenting is currently not available.') }}</p>
+                            @endif
                         </div>
                     @else
                         <div class="space-y-3">
